@@ -1,0 +1,10 @@
+ 	Inicia MiCodigo
+ 	
+ 		Def Byte resultado_str=44h;
+ 		Def Word posicion_pila=00h; 
+ 		Def Word posicion_entrada=00h;
+ 		Def Cadena Mensaje="Hola mundo \n Esto es mucho mas facil";
+ 		
+ 		Consola.Imprimir(Mensaje);
+ 		
+ 	Termina MiCodigo
