@@ -23,14 +23,20 @@ namespace My8086.Clases.Advertencias
         {
             InitializeComponent();
         }
-        public EventHandler VerLinea;
-        public WarningError(ErrorCompilacion ce)
+        private EventHandler VerLinea;
+        public ErrorCompilacion Excepcion { get; private set; }
+        public WarningError(ErrorCompilacion ce, EventHandler VerLinea)
         {
             InitializeComponent();
-            this.Img.MySource = ce.EsAdvertencia ? @"\Imgs\warning (2).png" : @"\Imgs\bug.png";
-            this.Error.Text = ce.Texto;
-            this.Linea.Text = ce.Linea.ToString();
-            this.MouseDoubleClick += (o, i) => { this.VerLinea?.Invoke(ce.Linea, i); };
+            this.Excepcion = ce;
+            this.Img.MySource = this.Excepcion.EsAdvertencia ? @"\Imgs\warning (2).png" : @"\Imgs\bug.png";
+            this.Error.Text = this.Excepcion.Texto;
+            this.Linea.Text = this.Excepcion.Linea.ToString();
+            this.VerLinea = VerLinea;
+            this.MouseDoubleClick += (o, i) =>
+            {
+                this.VerLinea?.Invoke(this.Excepcion.Linea, i);
+            };
         }
     }
 }

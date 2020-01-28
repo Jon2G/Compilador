@@ -1,19 +1,34 @@
 ﻿using ICSharpCode.AvalonEdit.Document;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using My8086.Clases.Advertencias;
 
 namespace My8086.Clases.Compilador
 {
     public class Compilador
     {
+        private ResultadosCompilacion ResultadosCompilacion;
+        public List<Advertencias.WarningError> Resultados => ResultadosCompilacion.Resultados;
         private readonly TextDocument document;
-        public readonly List<Advertencias.WarningError> ResultadosCompilacion;
         private readonly PropiedadesPrograma PropiedadesPrograma;
         public EventHandler OnProgreso;
         private readonly ReconoceTokens ReconceTokens;
+        private EventHandler _VerLinea;
+        public bool Compilado;
+        private readonly BorlandC Borland;
+        public EventHandler VerLinea
+        {
+            get => _VerLinea;
+            set
+            {
+                _VerLinea = value;
+                this.ResultadosCompilacion = new ResultadosCompilacion(_VerLinea);
+            }
+        }
         private double _Progreso { get; set; }
 
         public double Progreso
@@ -29,31 +44,45 @@ namespace My8086.Clases.Compilador
         public Compilador(TextDocument document)
         {
             this.document = document;
-            this.ResultadosCompilacion = new List<WarningError>();
-
             this.PropiedadesPrograma = new PropiedadesPrograma();
+            this.ResultadosCompilacion = new ResultadosCompilacion(this.VerLinea);
             this.ReconceTokens = new ReconoceTokens(this.ResultadosCompilacion, this.PropiedadesPrograma);
+            this.Borland = new BorlandC();
         }
 
-        public bool Compilar()
+
+        public void Compilar()
         {
-            bool resultado = false;
             this.Progreso = 0;
             this.ResultadosCompilacion.Clear();
-
             try
             {
                 Convertir();
+                if (this.ResultadosCompilacion.SinErrores)
+                {
+                    this.Compilado = false;
+                    return;
+                }
                 TraductorAsm traductor = new TraductorAsm(this.PropiedadesPrograma);
                 string documento = traductor.ObtenerAsm();
+                Clipboard.SetText(documento);
+                if (this.Borland.GeneraEjecutable(documento))
+                {
+                    this.Compilado = true;
+                }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return false;
+                this.Compilado = false;
             }
+        }
 
-            resultado = true;
-            return resultado;
+        public void Ejecutar()
+        {
+            if (this.Compilado)
+            {
+                this.Borland.Ejecutar();
+            }
         }
         private void Convertir()
         {
@@ -66,6 +95,31 @@ namespace My8086.Clases.Compilador
                 {
                     continue;
                 }
+
+                if (texto.StartsWith("//"))
+                {
+                    continue;
+                }
+                if (!texto.EndsWith(";"))
+                {
+                    if (this.ReconceTokens.EsIncio(texto, linea.LineNumber))
+                    {
+                        continue;
+                    }
+                    if (this.ReconceTokens.EsFin(texto, linea.LineNumber))
+                    {
+                        continue;
+                    }
+
+                    this.ResultadosCompilacion.ResultadoCompilacion("Se esperaba ';' al final de la instrucción.", linea.LineNumber);
+                    continue;
+                }
+
+                if (this.PropiedadesPrograma.Titulo is null)
+                {
+                    this.ResultadosCompilacion.ResultadoCompilacion("FATAL No se definio un punto de entrada para la aplicación", linea.LineNumber);
+                    break;
+                }
                 if (this.ReconceTokens.EsDeclaracionDeVariable(texto, linea.LineNumber))
                 {
                     continue;
@@ -74,36 +128,13 @@ namespace My8086.Clases.Compilador
                 {
                     continue;
                 }
-                if (this.ReconceTokens.EsIncio(texto, linea.LineNumber))
-                {
-                    continue;
-                }
-                if (this.ReconceTokens.EsFin(texto, linea.LineNumber))
-                {
-                    continue;
-                }
-
-                ErrorCompilacion error = new ErrorCompilacion(false,
-                    "Sentencia no recononocida...", linea.LineNumber);
-                this.ResultadosCompilacion.Add(new WarningError(error));
-                throw error;
+                this.ResultadosCompilacion.ResultadoCompilacion("Sentencia no recononocida...", linea.LineNumber);
+                break;
+            }
+            if (!this.PropiedadesPrograma.Cerrado)
+            {
+                this.ResultadosCompilacion.ResultadoCompilacion($"Se esperaba el cierre de la función principal '{this.PropiedadesPrograma.Titulo}' y no se encontro", -1);
             }
         }
-
-        /*
-
-
-;
-;-----------------------------------------------------------------------------------------------------------
-
-resultado_str      db 44h dup(0),"$"                                        ;
-posicion_pila      dw 0000h                                                 ;
-;VARIABLES PARA LEER LA ENTRADA
-posicion_entrada   dw 0000h                                                 ;
-;-----------------------------------------------------------------------------------------------------------   
-renglones_pila     db 00h                                                   ;cuenta los renglones de la pila de operaciones
-aux                db 00h                                                   ;variable auxiliar
-registros_tbl      dw 0000h,0000h,0000h,0000h 
- */
     }
 }

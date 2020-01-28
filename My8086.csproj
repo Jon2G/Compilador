@@ -79,6 +79,7 @@
     </Compile>
     <Compile Include="BraceFoldingStrategy.cs" />
     <Compile Include="Clases\Advertencias\ErrorCompilacion.cs" />
+    <Compile Include="Clases\Advertencias\ResultadosCompilacion.cs" />
     <Compile Include="Clases\Advertencias\WarningError.xaml.cs">
       <DependentUpon>WarningError.xaml</DependentUpon>
     </Compile>
@@ -87,6 +88,7 @@
     <Compile Include="Clases\AutoCompletar\MyCompletionData.cs" />
     <Compile Include="Clases\AutoCompletar\Sugerencia.cs" />
     <Compile Include="Clases\Compilador\Accion.cs" />
+    <Compile Include="Clases\Compilador\BorlandC.cs" />
     <Compile Include="Clases\Compilador\Compilador.cs" />
     <Compile Include="Clases\Compilador\EscritorAsm.cs" />
     <Compile Include="Clases\Compilador\PropiedadesPrograma.cs" />

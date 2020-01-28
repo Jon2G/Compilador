@@ -21,7 +21,8 @@ namespace My8086.Clases.AutoCompletar
             this.Sugerencias = new List<Sugerencia>()
             {
                 new Sugerencia("Consola")
-                    .Agregar("Imprimir()", "Imprime un elemento en pantalla.", TipoSugerencia.Metodo)
+                    .Agregar("Imprimir();", "Imprime un elemento en pantalla.", TipoSugerencia.Metodo)
+                    .Agregar("LimpiarPantalla();","Limpia el contenido de la pantalla",TipoSugerencia.Metodo)
             };
         }
 

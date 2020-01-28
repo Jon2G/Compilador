@@ -7,14 +7,14 @@
              xmlns:images="clr-namespace:My8086.Images"
              mc:Ignorable="d" 
              MinHeight="25"
-             Height="25" MinWidth="75" Background="Green" HorizontalAlignment="Stretch" 
+             Height="25" MinWidth="75" Padding="0" Margin="0"  HorizontalAlignment="Stretch" 
              HorizontalContentAlignment="Stretch">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition MaxWidth="50"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Border Background="Red" BorderBrush="Black" BorderThickness="1">
+        <Border BorderBrush="Black" BorderThickness="1">
             <Image x:Name="Imagen" Source="../Images/Copy.png"/>
         </Border>
         <TextBlock Foreground="Black" x:Name="TxtName" Grid.Column="1" FontSize="16"/>

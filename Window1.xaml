@@ -84,7 +84,7 @@
                     FontFamily="Consolas"
                     Background="#FF2D2D30"
                     Foreground="White"
-                    FontSize="10pt"
+                    FontSize="14pt"
                     SyntaxHighlighting="C#"
                     ShowLineNumbers="True" WordWrap="True">
                     <avalonedit:TextEditor.VerticalScrollBarVisibility>Auto</avalonedit:TextEditor.VerticalScrollBarVisibility>

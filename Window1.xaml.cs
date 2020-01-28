@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -30,8 +31,10 @@ using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Folding;
 using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Rendering;
 using Microsoft.Win32;
 using My8086.Clases;
+using My8086.Clases.Advertencias;
 using My8086.Clases.AutoCompletar;
 using My8086.Clases.Compilador;
 
@@ -45,9 +48,9 @@ namespace My8086
         private readonly AutoCompletado AutoCompletado;
         readonly FoldingManager FoldingManager;
         readonly BraceFoldingStrategy FoldingStrategy;
+        private Compilador Compilador;
         public Window1()
         {
-
             this.FoldingStrategy = new BraceFoldingStrategy();
             // Load our custom highlighting definition
             IHighlightingDefinition customHighlighting;
@@ -81,6 +84,8 @@ namespace My8086
             foldingUpdateTimer.Interval = TimeSpan.FromSeconds(2);
             foldingUpdateTimer.Tick += foldingUpdateTimer_Tick;
             foldingUpdateTimer.Start();
+
+            this.Compilador = new Compilador(textEditor.TextArea.Document);
         }
 
         string currentFileName;
@@ -90,6 +95,7 @@ namespace My8086
             OpenFileDialog dlg = new OpenFileDialog { CheckFileExists = true };
             if (dlg.ShowDialog() ?? false)
             {
+                this.Compilador.Compilado = false;
                 currentFileName = dlg.FileName;
                 textEditor.Load(currentFileName);
                 textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(Path.GetExtension(currentFileName));
@@ -134,9 +140,15 @@ namespace My8086
 
         void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
         {
+            this.Compilador.Compilado = false;
             if (e.Text == ".")
             {
                 this.AutoCompletado.AutoCompletar();
+            }
+
+            if (e.Text == "(")
+            {
+                //this.AutoCompletado.SugerirVariable();
             }
         }
 
@@ -161,7 +173,18 @@ namespace My8086
 
         private void Ejecutar(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            if (!Compilador.Compilado)
+            {
+                if (MessageBox.Show("Debe compilar el código antes de poder ejecutarlo.\n¿Desea compilarlo ahora?",
+                        "Compilar código", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+                {
+                    Compilar(sender, e);
+                    if (Compilador.Compilado)
+                    {
+                        Ejecutar(sender, e);
+                    }
+                }
+            }
         }
 
         private void Compilar(object sender, RoutedEventArgs e)
@@ -174,14 +197,36 @@ namespace My8086
                 this.ProgresoCompilacion.IsIndeterminate = false;
                 this.ProgresoCompilacion.SetPercent(compilador.Progreso);
             };
-            if (compilador.Compilar())
+            compilador.VerLinea += (o, i) =>
             {
-
-            }
-
-            ErroresList.ItemsSource = compilador.ResultadosCompilacion;
+                int linea = Convert.ToInt32(o);
+                if (linea > 0)
+                {
+                    var l = this.textEditor.TextArea.Document.GetLineByNumber(linea);
+                    SelectText(l.Offset, l.Length);
+                    this.textEditor.ScrollToLine(linea);
+                }
+            };
+            compilador.Compilar();
+            ErroresList.ItemsSource = compilador.Resultados;
             ErroresList.Items.Refresh();
             this.ProgresoCompilacion.Visibility = Visibility.Collapsed;
+            this.Salida.Text = string.Join("\n", compilador.Resultados
+                .Select(x => $"->[{x.Excepcion.Linea}] " + x.Excepcion.Texto));
+        }
+        private void SelectText(int offset, int length)
+        {
+            //Get the line number based off the offset.
+            var line = textEditor.Document.GetLineByOffset(offset);
+            var lineNumber = line.LineNumber;
+
+            //Select the text.
+            textEditor.SelectionStart = offset;
+            textEditor.SelectionLength = length;
+
+            //Scroll the textEditor to the selected line.
+            var visualTop = textEditor.TextArea.TextView.GetVisualTopByDocumentLine(lineNumber);
+            textEditor.ScrollToVerticalOffset(visualTop);
         }
     }
 }

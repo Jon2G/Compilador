@@ -9,7 +9,9 @@ namespace My8086.Clases.Compilador
     {
         public enum Acciones
         {
-            ImprimirPorConsola
+            ImprimirPorConsola,
+            LimpiarConsola,
+            ImprimirPorConsolaXY
         }
 
         public Acciones EjecutarAccion { get; private set; }

@@ -11,7 +11,7 @@ namespace My8086.Clases.Compilador
 {
     public class ReconoceTokens
     {
-        private readonly List<Advertencias.WarningError> ResultadosCompilacion;
+        private readonly ResultadosCompilacion ResultadosCompilacion;
         private readonly PropiedadesPrograma Propiedades;
         private static string[] PalabrasReservadas =
             new string[]
@@ -19,7 +19,7 @@ namespace My8086.Clases.Compilador
                 "Si", "Sino", "Byte", "//",".", "Word", "Cadena", "Consola", "Inicia", "Termina",
                 "Def","No"
             };
-        public ReconoceTokens(List<Advertencias.WarningError> ResultadosCompilacion, PropiedadesPrograma Propiedades)
+        public ReconoceTokens(ResultadosCompilacion ResultadosCompilacion, PropiedadesPrograma Propiedades)
         {
             this.ResultadosCompilacion = ResultadosCompilacion;
             this.Propiedades = Propiedades;
@@ -44,7 +44,7 @@ namespace My8086.Clases.Compilador
         }
         private bool DeclaracionCadena(string texto, int Linea)
         {
-            Regex regex = new Regex(@"(Def\s*Cadena)+\s*(([a-zA-Z]+[0-9a-zA-Z]|_*)*)\s*=\s*(""(([0-9a-zA-Z]|\s|\\n)*)"");");
+            Regex regex = new Regex(@"(Def\s*Cadena)+\s*(([a-zA-Z]+[0-9a-zA-Z]|_*)*)\s*=\s*(""(([0-9a-zA-Z]|\s|\\n|.)*)"");");
             Match match = regex.Match(texto);
             if (!match.Success)
             {
@@ -58,9 +58,8 @@ namespace My8086.Clases.Compilador
             string identificador = match.Groups[2].Value;
             if (EsPalabraReservada(identificador))
             {
-                ErrorCompilacion error = new ErrorCompilacion(false, "El identificador de la cadena no puede ser una palabra reservada...", Linea);
-                this.ResultadosCompilacion.Add(new WarningError(error));
-                throw error;
+                this.ResultadosCompilacion.ResultadoCompilacion("El identificador de la cadena no puede ser una palabra reservada...", Linea);
+                return false;
             }
             string valor = match.Groups[5].Value;
             this.Propiedades.Variables.Add(new Variable(identificador, valor, Variable.TipoDato.Cadena));
@@ -93,9 +92,8 @@ namespace My8086.Clases.Compilador
             string identificador = match.Groups[2].Value;
             if (EsPalabraReservada(identificador))
             {
-                ErrorCompilacion error = new ErrorCompilacion(false, "El identificador de la palabra no puede ser una palabra reservada...", Linea);
-                this.ResultadosCompilacion.Add(new WarningError(error));
-                throw error;
+                this.ResultadosCompilacion.ResultadoCompilacion("El identificador de la palabra no puede ser una palabra reservada...", Linea);
+                return false;
             }
             this.Propiedades.Variables.Add(new Variable(identificador, val, Variable.TipoDato.Byte));
             return true;
@@ -127,9 +125,8 @@ namespace My8086.Clases.Compilador
             string identificador = match.Groups[2].Value;
             if (EsPalabraReservada(identificador))
             {
-                ErrorCompilacion error = new ErrorCompilacion(false, "El identificador de la palabra no puede ser una palabra reservada...", Linea);
-                this.ResultadosCompilacion.Add(new WarningError(error));
-                throw error;
+                this.ResultadosCompilacion.ResultadoCompilacion("El identificador de la palabra no puede ser una palabra reservada...", Linea);
+                return false;
             }
 
             this.Propiedades.Variables.Add(new Variable(identificador, val, Variable.TipoDato.Word));
@@ -163,10 +160,7 @@ namespace My8086.Clases.Compilador
 
             if (this.Propiedades.Titulo != null)
             {
-                ErrorCompilacion error = new ErrorCompilacion(false,
-                    "La función principal esta definida dos veces.", linea);
-                this.ResultadosCompilacion.Add(new WarningError(error));
-                throw error;
+                this.ResultadosCompilacion.ResultadoCompilacion("La función principal esta definida dos veces.", linea);
             }
             else
             {
@@ -202,17 +196,13 @@ namespace My8086.Clases.Compilador
 
             if (this.Propiedades.Titulo != Titulo)
             {
-                ErrorCompilacion error = new ErrorCompilacion(false,
-                    "La etiqueta de cierre para la función principal difiere de la etiqueta de apertura.", linea);
-                this.ResultadosCompilacion.Add(new WarningError(error));
-                throw error;
+                this.ResultadosCompilacion.ResultadoCompilacion("La etiqueta de cierre para la función principal difiere de la etiqueta de apertura.", linea);
+                return false;
             }
-            else if(this.Propiedades.Cerrado)
+            else if (this.Propiedades.Cerrado)
             {
-                ErrorCompilacion error = new ErrorCompilacion(false,
-                    "La etiqueta de cierre para la función principal ya ha sido cerrada antes.", linea);
-                this.ResultadosCompilacion.Add(new WarningError(error));
-                throw error;
+                this.ResultadosCompilacion.ResultadoCompilacion("La etiqueta de cierre para la función principal ya ha sido cerrada antes.", linea);
+                return false;
             }
             else
             {
@@ -227,29 +217,42 @@ namespace My8086.Clases.Compilador
             {
                 return true;
             }
+
+            if (EsLimpiarConsola(texto, Linea))
+            {
+                return true;
+            }
             return false;
         }
-
-        private bool EsImpresionDeConsola(string texto, int Linea)
+        private bool EsLimpiarConsola(string texto, int Linea)
         {
-            Regex regex = new Regex(@"Consola.(Imprimir\(((""([0-9a-zA-Z]|\s)*"")|(([a-zA-Z]+[0-9a-zA-Z]+)*))\));");
+            Regex regex = new Regex(@"Consola.LimpiarPantalla\(\);");
             Match match = regex.Match(texto);
             if (!match.Success)
             {
                 return false;
             }
+            this.Propiedades.Acciones.Add(new Accion(Accion.Acciones.LimpiarConsola));
+            return true;
+        }
+        private bool EsImpresionDeConsola(string texto, int Linea)
+        {
+            Regex regex = new Regex(
+                @"Consola.Imprimir\(((""([0-9a-zA-Z]|\s|\\n|\.)+"")|(([a-zA-Z]+[0-9a-zA-Z]*)))\);");
+            Match match = regex.Match(texto);
+            if (!match.Success)
+            {
+                return EsImpresionDeConsolaXY(texto, Linea);
+            }
 
-            if (match.Groups.Count != 7)
+            if (match.Groups.Count != 6)
             {
                 return false;
             }
-            string argumento = match.Groups[2].Value;
+            string argumento = match.Groups[1].Value;
             if (string.IsNullOrEmpty(argumento))
             {
-                ErrorCompilacion error = new ErrorCompilacion(false,
-                    "Hace falta un argumento para la función Imprimir de Consola.", Linea);
-                this.ResultadosCompilacion.Add(new WarningError(error));
-                throw error;
+                this.ResultadosCompilacion.ResultadoCompilacion("Hace falta un argumento para la función Imprimir de Consola.", Linea);
             }
 
             if (this.Propiedades.Variables.FirstOrDefault(x => x.Identificador == argumento) is Variable var)
@@ -260,14 +263,62 @@ namespace My8086.Clases.Compilador
             {
                 if (argumento.StartsWith("\""))
                 {
-                    this.Propiedades.Acciones.Add(new Accion(Accion.Acciones.ImprimirPorConsola, argumento));
+                    argumento = argumento.Replace("\"", "").Trim();
+                    Variable nuevaVariable = new Variable($"AutoVariable{this.Propiedades.Variables.Count}", argumento,
+                        Variable.TipoDato.Cadena);
+                    this.Propiedades.Variables.Add(nuevaVariable);
+                    this.Propiedades.Acciones.Add(new Accion(Accion.Acciones.ImprimirPorConsola, nuevaVariable));
                 }
                 else
                 {
-                    ErrorCompilacion error = new ErrorCompilacion(false,
-                        $"Uso de variable no declarada en Consola.Imprimir({argumento});", Linea);
-                    this.ResultadosCompilacion.Add(new WarningError(error));
-                    throw error;
+                    this.ResultadosCompilacion.ResultadoCompilacion($"Uso de variable no declarada en Consola.Imprimir({argumento});", Linea);
+                    return false;
+                }
+
+            }
+            return true;
+        }
+        private bool EsImpresionDeConsolaXY(string texto, int Linea)
+        {
+            Regex regex = new Regex(
+                @"Consola.Imprimir\(((""([0-9a-zA-Z]|\s|\\n|\.)+"")|(([a-zA-Z]+[0-9a-zA-Z]*)))((,([0-9]+),([0-9]+)))+\);");
+            Match match = regex.Match(texto);
+            if (!match.Success)
+            {
+                return false;
+            }
+
+            if (match.Groups.Count != 10)
+            {
+                return false;
+            }
+            string argumento = match.Groups[1].Value;
+            byte x = Convert.ToByte(match.Groups[8].Value);
+            byte y = Convert.ToByte(match.Groups[9].Value);
+            if (string.IsNullOrEmpty(argumento))
+            {
+                this.ResultadosCompilacion.ResultadoCompilacion("Hace falta un argumento para la función Imprimir de Consola.", Linea);
+                return false;
+            }
+
+            if (this.Propiedades.Variables.FirstOrDefault(variable => variable.Identificador == argumento) is Variable var)
+            {
+                this.Propiedades.Acciones.Add(new Accion(Accion.Acciones.ImprimirPorConsolaXY, var, x, y));
+            }
+            else
+            {
+                if (argumento.StartsWith("\""))
+                {
+                    argumento = argumento.Replace("\"", "").Trim();
+                    Variable nuevaVariable = new Variable($"AutoVariable{this.Propiedades.Variables.Count}", argumento,
+                        Variable.TipoDato.Cadena);
+                    this.Propiedades.Variables.Add(nuevaVariable);
+                    this.Propiedades.Acciones.Add(new Accion(Accion.Acciones.ImprimirPorConsolaXY, nuevaVariable, x, y));
+                }
+                else
+                {
+                    this.ResultadosCompilacion.ResultadoCompilacion($"Uso de variable no declarada en Consola.Imprimir({argumento});", Linea);
+                    return false;
                 }
 
             }
