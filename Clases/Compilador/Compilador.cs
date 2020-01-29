@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using My8086.Clases.Advertencias;
 
@@ -18,7 +20,9 @@ namespace My8086.Clases.Compilador
         public EventHandler OnProgreso;
         private readonly ReconoceTokens ReconceTokens;
         private EventHandler _VerLinea;
-        public bool Compilado;
+
+        public bool Compilado { get; set; }
+
         private readonly BorlandC Borland;
         public EventHandler VerLinea
         {
@@ -51,8 +55,10 @@ namespace My8086.Clases.Compilador
         }
 
 
-        public void Compilar()
+
+        public string Compilar()
         {
+
             this.Progreso = 0;
             this.ResultadosCompilacion.Clear();
             try
@@ -61,8 +67,9 @@ namespace My8086.Clases.Compilador
                 if (this.ResultadosCompilacion.SinErrores)
                 {
                     this.Compilado = false;
-                    return;
+                    return "Se encontrarón errores previos a la compilación\n";
                 }
+
                 TraductorAsm traductor = new TraductorAsm(this.PropiedadesPrograma);
                 string documento = traductor.ObtenerAsm();
                 Clipboard.SetText(documento);
@@ -70,19 +77,27 @@ namespace My8086.Clases.Compilador
                 {
                     this.Compilado = true;
                 }
+
+                return this.Borland.ResultadosCompilacion;
             }
             catch (Exception e)
             {
                 this.Compilado = false;
             }
+
+            return "Error desconocido,la compilación no se realizo\n";
+
         }
 
-        public void Ejecutar()
+        public string Ejecutar()
         {
             if (this.Compilado)
             {
                 this.Borland.Ejecutar();
+                return this.Borland.ResultadosCompilacion;
             }
+
+            return "No se ha compilado el archivo";
         }
         private void Convertir()
         {

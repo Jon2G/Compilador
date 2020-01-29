@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -173,7 +174,7 @@ namespace My8086
 
         private void Ejecutar(object sender, RoutedEventArgs e)
         {
-            if (!Compilador.Compilado)
+            if (!this.Compilador.Compilado)
             {
                 if (MessageBox.Show("Debe compilar el código antes de poder ejecutarlo.\n¿Desea compilarlo ahora?",
                         "Compilar código", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
@@ -185,19 +186,26 @@ namespace My8086
                     }
                 }
             }
+            else
+            {
+                Salida.Text = Compilador.Ejecutar();
+            }
         }
 
         private void Compilar(object sender, RoutedEventArgs e)
         {
-            this.ProgresoCompilacion.Visibility = Visibility.Visible;
-            this.ProgresoCompilacion.IsIndeterminate = true;
-            Compilador compilador = new Compilador(this.textEditor.TextArea.Document);
-            compilador.OnProgreso += (o, i) =>
+            Dispatcher.BeginInvoke(new Action(() =>
             {
-                this.ProgresoCompilacion.IsIndeterminate = false;
-                this.ProgresoCompilacion.SetPercent(compilador.Progreso);
+                this.ProgresoCompilacion.Visibility = Visibility.Visible;
+                this.ProgresoCompilacion.IsIndeterminate = true;
+            }));
+
+            this.Compilador = new Compilador(this.textEditor.TextArea.Document);
+            Compilador.OnProgreso += (o, i) =>
+            {
+                this.ProgresoCompilacion.SetPercent(Compilador.Progreso);
             };
-            compilador.VerLinea += (o, i) =>
+            Compilador.VerLinea += (o, i) =>
             {
                 int linea = Convert.ToInt32(o);
                 if (linea > 0)
@@ -207,12 +215,19 @@ namespace My8086
                     this.textEditor.ScrollToLine(linea);
                 }
             };
-            compilador.Compilar();
-            ErroresList.ItemsSource = compilador.Resultados;
+            this.Salida.Text = Compilador.Compilar();
+            ErroresList.ItemsSource = Compilador.Resultados;
             ErroresList.Items.Refresh();
-            this.ProgresoCompilacion.Visibility = Visibility.Collapsed;
-            this.Salida.Text = string.Join("\n", compilador.Resultados
+            Dispatcher.Invoke(() => { this.ProgresoCompilacion.Visibility = Visibility.Collapsed; },
+                DispatcherPriority.ApplicationIdle);
+            this.Salida.Text += string.Join("\n", Compilador.Resultados
                 .Select(x => $"->[{x.Excepcion.Linea}] " + x.Excepcion.Texto));
+
+            this.ProgresoCompilacion.Visibility = Visibility.Collapsed;
+            this.ProgresoCompilacion.IsIndeterminate = false;
+
+
+
         }
         private void SelectText(int offset, int length)
         {

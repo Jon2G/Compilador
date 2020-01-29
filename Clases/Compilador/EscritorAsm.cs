@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using My8086.Clases.Advertencias;
@@ -25,7 +26,7 @@ namespace My8086.Clases.Compilador
             this.Asm.AppendLine(";-----[INICIA SEGMENTO DE DATOS]-----");
             //VARIABLES DE APOYO USADAS POR LAS MACROS PRECARGADAS
             this.Asm.AppendLine("registros_tbl      dw 0000h,0000h,0000h,0000h ;guarda el estado previo de los registros");
-
+            this.Asm.AppendLine("CadenaInicio db ' ','$'");
             this.Propiedades.Variables.ForEach(EscribeVariable);
             this.Asm.AppendLine(";----[TERMINA SEGMENTO DE DATOS]-----");
             this.Asm.AppendLine(".code");
@@ -43,7 +44,9 @@ namespace My8086.Clases.Compilador
             this.Asm.AppendLine("MOV Ax, @data ;Asigna el contenido de @data a Ax");
             this.Asm.AppendLine("MOV ds, Ax ;Asigna el contenido de Ax a ds ");
             this.Asm.AppendLine("Call Cls ;Llamada al procedimiento 'Cls'");
+            this.Asm.AppendLine("ImprimeXY CadenaInicio,0,0");
             this.Propiedades.Acciones.ForEach(EscribeAccion);
+            this.Asm.AppendLine("PAUSA");
             this.Asm.AppendLine("MOV Ah,4ch ;Asigna 4ch a Ah");
             this.Asm.AppendLine("int 21h ;Interrupcion 21h (funciones de el DOS API)");
             this.Asm.Append("end ");
@@ -241,7 +244,7 @@ Impr_salir:                                                                 	;Et
     
 	MOV Ah, 06h                                                                 ;limpia la pantalla
 	MOV al, 00h                                                                 ;coordenas de inicio en x
-MOV Bh, 0F1h                                                                	;F:Color Blanco(Fondo),1:Azul(Texto)
+MOV Bh, 00Fh                                                                	;F:Color Blanco(Fondo),1:Azul(Texto)
 	MOV Cx, 0000h                                                               ;coordenas de inicio en y
 	MOV Dx, 184Fh                                                               ;tama�o de la pantalla ()
 	int 10h                                                                     ;Interrupcion 10h (Servicios de Pantalla)

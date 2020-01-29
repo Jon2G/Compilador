@@ -1,0 +1,4 @@
+ 	Inicia MiCodigo
+ 		Def Cadena Mensaje="Hola mundo\n";
+ 		Consola.Imprimir(Mensaje);	
+ 	Termina MiCodigo

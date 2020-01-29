@@ -89,10 +89,11 @@ namespace My8086.Clases
                 DispatcherPriority.Send,
                 new Action(() =>
                     {
+                        progressBar.IsIndeterminate = false;
                         DoubleAnimation animation = new DoubleAnimation(percentage, TimeSpan.FromSeconds(2)) { };
                         progressBar.BeginAnimation(RangeBase.ValueProperty, animation);
                     }
-                    ));
+                ));
         }
         public static string GetOsName(this OperatingSystem os_info)
         {

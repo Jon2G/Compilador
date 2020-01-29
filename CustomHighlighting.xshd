@@ -25,8 +25,14 @@
       <Word>Cadena</Word>
     </Keywords>
 
+    <!--Clases-->
     <Keywords fontWeight="bold" foreground="DeepPink">
       <Word>Consola</Word>
+    </Keywords>
+    <!--Metodos-->
+    <Keywords fontWeight="bold" foreground="Khaki">
+      <Word>.Imprimir</Word>
+      <Word>.LimpiarPantalla</Word>
     </Keywords>
 
     <Keywords fontWeight="bold" foreground="LightSkyBlue">
