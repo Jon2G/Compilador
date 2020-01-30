@@ -129,39 +129,10 @@ Imprime MACRO cadena                                                    		;Delca
 ;-----[INICIA SEGMENTO DE DATOS]-----
 registros_tbl      dw 0000h,0000h,0000h,0000h ;guarda el estado previo de los registros
 CadenaInicio db ' ','$'
-resultado_str	db	68d
-posicion_pila	dw	0d
-posicion_entrada	dw	0d
-Mensaje	db	"Hola mundo yo soy una"
-	db " variable.",13,"","$"
-AutoVariable4	db	"Hola mundo yo fui aut"
-	db "o declarada.",13,"","$"
-AutoVariable5	db	"7u7","$"
-AutoVariable6	db	"Hola mundo yo fui aut"
-	db "o declarada.",13,"","$"
-AutoVariable7	db	"Hola mundo yo fui aut"
-	db "o declarada",13,"","$"
-AutoVariable8	db	"7u7","$"
-AutoVariable9	db	"7u7","$"
-AutoVariable10	db	"7u7","$"
-AutoVariable11	db	"7u7","$"
-AutoVariable12	db	"7u7","$"
-AutoVariable13	db	"7u7","$"
-AutoVariable14	db	"7u7","$"
-AutoVariable15	db	"7u7","$"
-AutoVariable16	db	"7u7","$"
-AutoVariable17	db	"7u7","$"
-AutoVariable18	db	"7u7","$"
-AutoVariable19	db	"7u7","$"
-AutoVariable20	db	"7u7","$"
-AutoVariable21	db	"7u7","$"
-AutoVariable22	db	"7u7","$"
-AutoVariable23	db	"7u7","$"
-AutoVariable24	db	"7u7","$"
-AutoVariable25	db	"7u7","$"
-AutoVariable26	db	"7u7","$"
-AutoVariable27	db	"7u7","$"
-AutoVariable28	db	"7u7","$"
+AutoVariable0	db	"aaaaaaaaaaaaaaaaaaaaa"
+	db "aaaa",13,"","$"
+AutoVariable1	db	"aaaaaaaaaaaaaaaaaaaaa"
+	db "aaaa","$"
 ;----[TERMINA SEGMENTO DE DATOS]-----
 .code
 ;______________________PROC_ImprimirXY (solo debe ser llamado por macro imprimirXY)________________ 
@@ -235,35 +206,8 @@ MOV Ax, @data ;Asigna el contenido de @data a Ax
 MOV ds, Ax ;Asigna el contenido de Ax a ds 
 Call Cls ;Llamada al procedimiento 'Cls'
 ImprimeXY CadenaInicio,0,0
-	ImprimeXY	Mensaje 0,5
-	ImprimeXY	AutoVariable4 0,6
-	 Call Cls
-	ImprimeXY	AutoVariable5 0,7
-	ImprimeXY	Mensaje 0,5
-	Imprime	Mensaje
-	ImprimeXY	AutoVariable6 0,6
-	Imprime	AutoVariable7
-	Imprime	AutoVariable8
-	ImprimeXY	AutoVariable9 0,7
-	Imprime	AutoVariable10
-	Imprime	AutoVariable11
-	Imprime	AutoVariable12
-	Imprime	AutoVariable13
-	Imprime	AutoVariable14
-	Imprime	AutoVariable15
-	Imprime	AutoVariable16
-	Imprime	AutoVariable17
-	Imprime	AutoVariable18
-	Imprime	AutoVariable19
-	Imprime	AutoVariable20
-	Imprime	AutoVariable21
-	Imprime	AutoVariable22
-	Imprime	AutoVariable23
-	Imprime	AutoVariable24
-	Imprime	AutoVariable25
-	Imprime	AutoVariable26
-	Imprime	AutoVariable27
-	ImprimeXY	AutoVariable28 0,7
+	ImprimeXY	AutoVariable0 0,0
+	Imprime	AutoVariable1
 PAUSA
 MOV Ah,4ch ;Asigna 4ch a Ah
 int 21h ;Interrupcion 21h (funciones de el DOS API)

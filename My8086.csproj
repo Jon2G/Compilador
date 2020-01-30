@@ -108,6 +108,7 @@
     <Compile Include="Clases\ElementoAutoCompletado.xaml.cs">
       <DependentUpon>ElementoAutoCompletado.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Clases\ExpresionesRegulares\ExpresionesRegulares.cs" />
     <Compile Include="Clases\Extensiones.cs" />
     <Compile Include="Clases\Log.cs" />
     <Compile Include="Images\MyImage.cs" />
