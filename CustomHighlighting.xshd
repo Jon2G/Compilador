@@ -21,7 +21,7 @@
 			<Word>Si</Word>
 			<Word>Sino</Word>
       <Word>Byte</Word>
-      <Word>Word</Word>
+      <Word>Entero</Word>
       <Word>Cadena</Word>
     </Keywords>
 
@@ -31,13 +31,22 @@
     </Keywords>
     <!--Metodos-->
     <Keywords fontWeight="bold" foreground="Khaki">
-      <Word>.Imprimir</Word>
-      <Word>.LimpiarPantalla</Word>
+      <Word>Imprimir</Word>
+      <Word>LimpiarPantalla</Word>
     </Keywords>
 
     <Keywords fontWeight="bold" foreground="LightSkyBlue">
       <Word>Inicia</Word>
+      <Word>Funcion</Word>
       <Word>Termina</Word>
+    </Keywords>
+
+    <Keywords fontWeight="bold" foreground="DodgerBlue">
+      <Word>Desde</Word>
+      <Word>Ejecutar</Word>
+      <Word>FinDesde</Word>
+      <Word>hasta</Word>
+      <Word>hacer</Word>
     </Keywords>
 
     <Keywords fontWeight="bold" foreground="Green">

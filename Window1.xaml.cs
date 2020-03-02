@@ -74,7 +74,8 @@ namespace My8086
             //propertyGridComboBox.SelectedIndex = 2;
 
             textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("My8086");
-            textEditor.Load($@"{AppData.Directorio}\..\..\Ejemplos\Variables.My8086.txt");
+            this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\Variables.My8086.txt";
+            textEditor.Load(currentFileName);
             //textEditor.SyntaxHighlighting = customHighlighting;
             // initial highlighting now set by XAML
 
@@ -194,6 +195,7 @@ namespace My8086
 
         private void Compilar(object sender, RoutedEventArgs e)
         {
+            saveFileClick(sender, e);
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 this.ProgresoCompilacion.Visibility = Visibility.Visible;
@@ -207,7 +209,7 @@ namespace My8086
             };
             Compilador.VerLinea += (o, i) =>
             {
-                int linea = Convert.ToInt32(o);
+                int linea = (o as DocumentLine).LineNumber;
                 if (linea > 0)
                 {
                     var l = this.textEditor.TextArea.Document.GetLineByNumber(linea);
@@ -243,5 +245,15 @@ namespace My8086
             var visualTop = textEditor.TextArea.TextView.GetVisualTopByDocumentLine(lineNumber);
             textEditor.ScrollToVerticalOffset(visualTop);
         }
+
+        private void CompilarYEjecutar(object sender, RoutedEventArgs e)
+        {
+            Compilar(sender, e);
+            if (Compilador.Compilado)
+            {
+                Ejecutar(sender, e);
+            }
+        }
     }
+
 }

@@ -1,5 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <Import Project="packages\EntityFramework.6.3.0\build\EntityFramework.props" Condition="Exists('packages\EntityFramework.6.3.0\build\EntityFramework.props')" />
+  <Import Project="packages\SQLite.3.13.0\build\net45\SQLite.props" Condition="Exists('packages\SQLite.3.13.0\build\net45\SQLite.props')" />
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
   <PropertyGroup>
     <ProjectGuid>{13A5B497-BA12-45AE-9033-22620C3153FB}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -7,7 +14,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>My8086</RootNamespace>
     <AssemblyName>My8086</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -47,6 +54,12 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>packages\EntityFramework.6.3.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>packages\EntityFramework.6.3.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.AvalonEdit, Version=6.0.1.278, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
       <HintPath>packages\AvalonEdit.6.0.1\lib\net40\ICSharpCode.AvalonEdit.dll</HintPath>
     </Reference>
@@ -57,12 +70,22 @@
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.SQLite, Version=1.0.112.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>packages\System.Data.SQLite.Core.1.0.112.0\lib\net46\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.112.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>packages\System.Data.SQLite.EF6.1.0.112.0\lib\net46\System.Data.SQLite.EF6.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.112.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>packages\System.Data.SQLite.Linq.1.0.112.0\lib\net46\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -98,18 +121,31 @@
     <Compile Include="Clases\AutoCompletar\AutoCompletado.cs" />
     <Compile Include="Clases\AutoCompletar\MyCompletionData.cs" />
     <Compile Include="Clases\AutoCompletar\Sugerencia.cs" />
-    <Compile Include="Clases\Compilador\Accion.cs" />
-    <Compile Include="Clases\Compilador\BorlandC.cs" />
+    <Compile Include="Clases\BaseDeDatos\SQLH.cs" />
+    <Compile Include="Clases\Compilador\CodigoIntermedio.cs" />
+    <Compile Include="Clases\Fases\3. Analisis Semantico\AnalizadorSemantico.cs" />
+    <Compile Include="Clases\Fases\4. Sintetizador\Sintesis.cs" />
+    <Compile Include="Clases\Funciones\Accion.cs" />
+    <Compile Include="Clases\Compilador\NetCompiler.cs" />
     <Compile Include="Clases\Compilador\Compilador.cs" />
-    <Compile Include="Clases\Compilador\EscritorAsm.cs" />
-    <Compile Include="Clases\Compilador\PropiedadesPrograma.cs" />
-    <Compile Include="Clases\Compilador\ReconoceTokens.cs" />
-    <Compile Include="Clases\Compilador\Variable.cs" />
+    <Compile Include="Clases\Fases\Programa.cs" />
     <Compile Include="Clases\ElementoAutoCompletado.xaml.cs">
       <DependentUpon>ElementoAutoCompletado.xaml</DependentUpon>
     </Compile>
     <Compile Include="Clases\ExpresionesRegulares\ExpresionesRegulares.cs" />
     <Compile Include="Clases\Extensiones.cs" />
+    <Compile Include="Clases\Fases\1. Analisis Lexico\AnalizadorLexico.cs" />
+    <Compile Include="Clases\Fases\1. Analisis Lexico\LineaLexica.cs" />
+    <Compile Include="Clases\Fases\1. Analisis Lexico\TablaDeSimbolos.cs" />
+    <Compile Include="Clases\Fases\2. Analisis Sintactico\AnalizadorSintactico.cs" />
+    <Compile Include="Clases\Funciones\Desde.cs" />
+    <Compile Include="Clases\Funciones\Ejecutar.cs" />
+    <Compile Include="Clases\Funciones\Funcion.cs" />
+    <Compile Include="Clases\Fases\Base\Analizador.cs" />
+    <Compile Include="Clases\Fases\Token.cs" />
+    <Compile Include="Clases\Funciones\IBloque.cs" />
+    <Compile Include="Clases\Funciones\Imprimir.cs" />
+    <Compile Include="Clases\Funciones\Variable.cs" />
     <Compile Include="Clases\Log.cs" />
     <Compile Include="Images\MyImage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -152,5 +188,23 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\CompilarEjecutar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Clases\BaseDeDatos\BaseDeDatos.sql" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Este proyecto hace referencia a los paquetes NuGet que faltan en este equipo. Use la restauración de paquetes NuGet para descargarlos. Para obtener más información, consulte http://go.microsoft.com/fwlink/?LinkID=322105. El archivo que falta es {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\SQLite.3.13.0\build\net45\SQLite.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\SQLite.3.13.0\build\net45\SQLite.props'))" />
+    <Error Condition="!Exists('packages\EntityFramework.6.3.0\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.3.0\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('packages\EntityFramework.6.3.0\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.3.0\build\EntityFramework.targets'))" />
+    <Error Condition="!Exists('packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets'))" />
+  </Target>
+  <Import Project="packages\EntityFramework.6.3.0\build\EntityFramework.targets" Condition="Exists('packages\EntityFramework.6.3.0\build\EntityFramework.targets')" />
+  <Import Project="packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets')" />
 </Project>
