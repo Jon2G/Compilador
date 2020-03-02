@@ -1,3 +1,3 @@
-# My8086
-Una ligera capa de abstracción para el lengiaje ensamlador del procesador 8086
+# *Nombre pendiente n.n*
+Un lenguaje que busca abstraer el lenguaje C# y heredar de CommonLanguaje Runtime.
 ![Alt text](Images/Captura.PNG?raw=true "Captura")
