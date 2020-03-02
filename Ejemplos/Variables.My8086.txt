@@ -1,19 +1,18 @@
  	Inicia MiCodigo
- 	
- 		Def Byte resultado_str=44h;
- 		Def Word posicion_pila=00h; 
- 		Def Word posicion_entrada=00h;
- 		Def Cadena Mensaje="Hola mundo yo soy una variable.\n";
+ 		Entero a = 0
  		
- 		Consola.Imprimir(Mensaje,0,5);
- 		Consola.Imprimir("Hola mundo yo fui auto declarada.\n",0,6);
- 		Consola.LimpiarPantalla();
- 		Consola.Imprimir("7u7",0,7);
- 		Consola.Imprimir(Mensaje,0,5);
-		Consola.Imprimir(Mensaje);
- 		Consola.Imprimir("Hola mundo yo fui auto declarada.\n",0,6);
-		Consola.Imprimir("Hola mundo yo fui auto declarada\n");
- 		Consola.Imprimir("7u7");
-		Consola.Imprimir("7u7",0,7);
-		
+ 		Ejecutar Saludar
+ 		
+ 		Imprimir "El valor de a es:"
+ 		Imprimir a
+ 		
  	Termina MiCodigo
+ 	
+ 	Funcion Saludar
+ 		Entero a = 0
+ 		Entero b = 10
+ 		Desde a hasta b hacer
+ 			Imprimir "Hola mundo :v\n"
+ 		FinDesde
+ 		
+ 	Termina Saludar
