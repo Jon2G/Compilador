@@ -33,8 +33,6 @@ namespace My8086.Clases.Fases
         public int Referencias { get => LineasDeReferencia?.Count ?? 0; }
         public string Lexema { get; private set; }
         public bool EsValido => (TipoToken != TipoToken.Invalido && TipoDato != TipoDato.Invalido);
-
-
         public Token(string lexema, TipoToken TipoToken, TipoDato TipoDato, DocumentLine Linea)
         {
             this.TipoDato = TipoDato;
@@ -44,7 +42,6 @@ namespace My8086.Clases.Fases
             this.LineasDeReferencia = new List<DocumentLine>();
             this.Lexema = lexema;
         }
-
         internal string ObtenerTipoDato(Funcion Fx)
         {
             switch (this.TipoDato)
@@ -76,6 +73,14 @@ namespace My8086.Clases.Fases
         public static Token Identificar(string Token, DocumentLine Linea, ResultadosCompilacion Errores)
         {
             Fases.Token token = new Token(Token, TipoToken.Invalido,TipoDato.Invalido, Linea);
+            //Especiales
+            if (Token == "++")
+            {
+                token.TipoToken = TipoToken.OperadorAritmetico;
+                token.TipoDato = TipoDato.Entero;
+                return token;
+            }
+            //
             if (EsPalabraReservada(Token))
             {
                 token.TipoToken = TipoToken.PalabraReservada;
@@ -120,6 +125,20 @@ namespace My8086.Clases.Fases
                 token.TipoDato = TipoDato.Cadena;
                 return token;
             }
+
+            if (Token == "==")
+            {
+                token.TipoToken = TipoToken.OperadorLogico;
+                token.TipoDato = TipoDato.Cadena;
+                return token;
+            }
+            if (Token == "+")
+            {
+                token.TipoToken = TipoToken.OperadorAritmetico;
+                token.TipoDato = TipoDato.Cadena;
+                return token;
+            }
+
             return token;
         }
 

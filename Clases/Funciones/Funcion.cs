@@ -7,7 +7,7 @@ using My8086.Clases.Fases;
 
 namespace My8086.Clases.Funciones
 {
-    internal class Funcion
+    public class Funcion
     {
         internal string Titulo { get; private set; }
         public bool Cerrado { get; set; }

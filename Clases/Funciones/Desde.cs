@@ -21,7 +21,7 @@ namespace My8086.Clases.Funciones
         }
 
         public bool Cerrado { get; set; }
-        public Desde(LineaLexica Linea, int InicioArgumentos = 1) : base(Linea, InicioArgumentos)
+        public Desde(Funcion Fx,LineaLexica Linea, int InicioArgumentos = 1) : base(Fx,Linea, InicioArgumentos)
         {
             this.InicioBloque = Linea.LineaDocumento;
         }
@@ -33,7 +33,7 @@ namespace My8086.Clases.Funciones
 
         public override bool RevisarSemantica(ResultadosCompilacion Errores)
         {
-            if (Argumentos.Count < 2)
+            if (Argumentos.Count < 3)
             {
                 Errores.ResultadoCompilacion("Hacen falta argumentos para la instrucción desde", LineaDocumento);
                 return false;
@@ -43,9 +43,17 @@ namespace My8086.Clases.Funciones
                 ((Argumentos[0].TipoDato == TipoDato.Entero) ||
                 (Argumentos[0].TipoDato == TipoDato.Cadena && Argumentos[0].TipoToken == TipoToken.Identificador))
                 &&
-                ((Argumentos[1].TipoDato == TipoDato.Entero) ||
-                 (Argumentos[1].TipoDato == TipoDato.Cadena && Argumentos[1].TipoToken == TipoToken.Identificador)))
+                ((Argumentos[2].TipoDato == TipoDato.Entero) ||
+                 (Argumentos[2].TipoDato == TipoDato.Cadena && Argumentos[2].TipoToken == TipoToken.Identificador)))
             {
+                if (Argumentos[0].TipoToken == TipoToken.Identificador)
+                {
+                    HacerReferencia(Argumentos[0]);
+                }
+                if (Argumentos[2].TipoToken == TipoToken.Identificador)
+                {
+                    HacerReferencia(Argumentos[2]);
+                }
                 return true;
             }
             return false;
@@ -64,7 +72,7 @@ namespace My8086.Clases.Funciones
             sb.Append(";");
             sb.Append(contador);
             sb.Append("<=");
-            sb.Append(this.Argumentos[1].Lexema);
+            sb.Append(this.Argumentos[2].Lexema);
             sb.Append(";");
             sb.Append(contador);
             sb.Append("++){");

@@ -8,7 +8,7 @@ using ICSharpCode.AvalonEdit.Document;
 
 namespace My8086.Clases.Fases._1._Analisis_Lexico
 {
-    internal class LineaLexica
+    public class LineaLexica
     {
         private readonly List<Token> Tokens;
         public int Elementos => Tokens.Count;
@@ -22,6 +22,10 @@ namespace My8086.Clases.Fases._1._Analisis_Lexico
         internal void Agregar(Token token)
         {
             this.Tokens.Add(token);
+        }
+        internal bool Remover(Token token)
+        {
+            return this.Tokens.Remove(token);
         }
         public override string ToString()
         {

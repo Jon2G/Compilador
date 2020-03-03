@@ -29,9 +29,9 @@ namespace My8086.Clases.Advertencias
         {
             InitializeComponent();
             this.Excepcion = ce;
-            this.Img.MySource = this.Excepcion.EsAdvertencia ? @"\Imgs\warning (2).png" : @"\Imgs\bug.png";
+            this.Img.MySource = this.Excepcion.EsAdvertencia ? @"\Imgs\StatusWarning_16x.png" : @"\Imgs\bug.png";
             this.Error.Text = this.Excepcion.Texto;
-            this.Linea.Text = this.Excepcion.Linea.ToString();
+            this.Linea.Text = this.Excepcion.Linea.LineNumber.ToString();
             this.VerLinea = VerLinea;
             this.MouseDoubleClick += (o, i) =>
             {

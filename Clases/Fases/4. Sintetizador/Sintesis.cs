@@ -26,7 +26,18 @@ namespace My8086.Clases.Fases._4._Sintetizador
 
         private void LeerFuncion(Funciones.Funcion Funcion)
         {
-        //?
+            for (var index = 0; index < Funcion.Variables.Count; index++)
+            {
+                Variable variable = Funcion.Variables[index];
+                if (variable.Referencias <= 0)
+                {
+                    Errores.ResultadoCompilacion($"La variable '{variable.Nombre}' se declara pero nunca se utiliza.",
+                        variable.LineaDocumento, true);
+                    Funcion.Variables.Remove(variable);
+                }
+            }
+
+            //?
         }
     }
 }

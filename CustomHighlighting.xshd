@@ -1,30 +1,33 @@
 ﻿<?xml version="1.0"?>
 <SyntaxDefinition name="Custom Highlighting" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
-	<Color name="Comment" foreground="Green" />
-	<Color name="String" foreground="Salmon" />
-	
-	<!-- This is the main ruleset. -->
-	<RuleSet>
-		<Span color="Comment" begin="//" />
-		<Span color="Comment" multiline="true" begin="/\*" end="\*/" />
-		
-		<Span color="String">
-			<Begin>"</Begin>
-			<End>"</End>
-			<RuleSet>
-				<!-- nested span for escape sequences -->
-				<Span begin="\\" end="." />
-			</RuleSet>
-		</Span>
-		
-		<Keywords fontWeight="bold" foreground="DodgerBlue">
-			<Word>Si</Word>
-			<Word>Sino</Word>
+  <Color name="Comment" foreground="Green" />
+  <Color name="String" foreground="Salmon" />
+
+  <!-- This is the main ruleset. -->
+  <RuleSet>
+    <Span color="Comment" begin="//" />
+    <Span color="Comment" multiline="true" begin="/\*" end="\*/" />
+
+    <Span color="String">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <!-- nested span for escape sequences -->
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+
+    <Keywords fontWeight="bold" foreground="DodgerBlue">
       <Word>Byte</Word>
       <Word>Entero</Word>
       <Word>Cadena</Word>
     </Keywords>
-
+    <Keywords fontWeight="bold" foreground="MediumSeaGreen">
+      <Word>Si</Word>
+      <Word>entonces</Word>
+      <Word>FinSi</Word>
+      <Word>Sino</Word>
+    </Keywords>
     <!--Clases-->
     <Keywords fontWeight="bold" foreground="DeepPink">
       <Word>Consola</Word>
@@ -54,17 +57,17 @@
     </Keywords>
 
     <Keywords fontWeight="bold" fontStyle="italic" foreground="Red">
-			<Word>No</Word>
+      <Word>No</Word>
     </Keywords>
-		
-		<!-- Digits -->
-		<Rule foreground="DarkSeaGreen">
-            \b0[xX][0-9a-fA-F]+  # hex number
-        |    \b
-            (    \d+(\.[0-9]+)?   #number with optional floating point
-            |    \.[0-9]+         #or just starting with floating point
-            )
-            ([eE][+-]?[0-9]+)? # optional exponent
-        </Rule>
-	</RuleSet>
+
+    <!-- Digits -->
+    <Rule foreground="DarkSeaGreen">
+      \b0[xX][0-9a-fA-F]+  # hex number
+      |    \b
+      (    \d+(\.[0-9]+)?   #number with optional floating point
+      |    \.[0-9]+         #or just starting with floating point
+      )
+      ([eE][+-]?[0-9]+)? # optional exponent
+    </Rule>
+  </RuleSet>
 </SyntaxDefinition>

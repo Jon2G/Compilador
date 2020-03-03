@@ -14,7 +14,7 @@ namespace My8086.Clases.Funciones
     internal class Imprimir : Accion
     {
 
-        public Imprimir(LineaLexica Linea, int InicioArgumentos = 1) : base(Linea, InicioArgumentos)
+        public Imprimir(Funcion Fx, LineaLexica Linea, int InicioArgumentos = 1) : base(Fx, Linea, InicioArgumentos)
         {
 
         }
@@ -38,7 +38,15 @@ namespace My8086.Clases.Funciones
                         return false;
                     }
 
-                    if (Argumentos[1].TipoDato == TipoDato.Entero && Argumentos[2].TipoDato == TipoDato.Entero)
+                    if (Argumentos[1].TipoToken == TipoToken.OperadorAritmetico)
+                    {
+                        if (Argumentos[1].Lexema != "+")
+                        {
+                            Errores.ResultadoCompilacion($"No se puede utilizar el operador '{Argumentos[1].Lexema}' en conjunto con la cadena",
+                                LineaDocumento);
+                        }
+                    }
+                    if (Argumentos[2].TipoDato == TipoDato.Entero || Argumentos[2].TipoDato == TipoDato.Cadena)
                     {
                         return true;
                     }
@@ -57,11 +65,26 @@ namespace My8086.Clases.Funciones
         public override StringBuilder Traduccion(Funcion Fx)
         {
             StringBuilder sb = new StringBuilder();
-            if (this.Argumentos.Count == 3)
+            if (this.Argumentos.Count >= 4)
             {
-                sb.AppendLine($"Console.SetCursorPosition({this.Argumentos[1].Lexema}, {this.Argumentos[2].Lexema});");
+                if (this.Argumentos[this.Argumentos.Count - 4].TipoToken == TipoToken.SeparadorParametros)
+                {
+                    var x = this.Argumentos[this.Argumentos.Count - 3];
+                    var y = this.Argumentos[this.Argumentos.Count - 1];
+                    if ((x.TipoDato == TipoDato.Entero || x.TipoToken == TipoToken.Identificador) &&
+                        (y.TipoDato == TipoDato.Entero || y.TipoToken == TipoToken.Identificador))
+                    {
+                        sb.AppendLine($"Console.SetCursorPosition({x.Lexema}, {y.Lexema});");
+                    }
+                }
             }
-            sb.AppendLine($@"Console.Write({this.Argumentos[0].Lexema});");
+
+            sb.AppendLine($@"Console.Write(");
+            for (int i = 0; i < this.Argumentos.Count; i++)
+            {
+                sb.Append(this.Argumentos[i].Lexema);
+            }
+            sb.AppendLine(");");
             return sb;
         }
     }

@@ -55,9 +55,10 @@ namespace My8086.Clases.ExpresionesRegulares
         //}
         public static Regex Cadena => new Regex(@"^("")(?<Cadena>(.)+)("")$", RegexOptions.Compiled);
         public static Regex Identificador => new Regex(@"^(?<Lexema>(([a-zA-Z]+[0-9a-zA-Z]*|\\w)+))$", RegexOptions.Compiled);
-        public static Regex Enteros => new Regex(@"^((\d)+)$", RegexOptions.Compiled);
+        public static Regex Enteros => new Regex(@"^(\+|\-)?((\d)+)$", RegexOptions.Compiled);
         public static Regex Decimales => new Regex(@"^((\d).(\d)+)$", RegexOptions.Compiled);
         public static Regex Signos => new Regex(@"^(\+||\-)$", RegexOptions.Compiled);
+        public static Regex Comentarios => new Regex(@"\/\/[\s\S]*$", RegexOptions.Compiled);
         public static Regex Documento => new Regex(@"(,|\s|\n)(?=(?:[^\""]*\""[^\""]*\"")*[^\""]*$)", RegexOptions.Compiled);
         public static bool Evaluar(Regex Expresion, string Texto)
         {

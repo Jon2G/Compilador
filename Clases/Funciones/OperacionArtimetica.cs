@@ -4,38 +4,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using My8086.Clases.Advertencias;
-using My8086.Clases.Fases;
 using My8086.Clases.Fases._1._Analisis_Lexico;
 
 namespace My8086.Clases.Funciones
 {
-    internal class Ejecutar:Accion
+    class OperacionArtimetica:Accion
     {
-        public Ejecutar(Funcion Fx,LineaLexica Linea, int InicioArgumentos) : base(Fx,Linea, InicioArgumentos)
+        private readonly Variable Variable;
+        public OperacionArtimetica(Funcion Fx, Variable Variable, LineaLexica Linea) : base(Fx, Linea, 1)
         {
-
+            this.Variable = Variable;
         }
 
         public override bool RevisarSemantica(ResultadosCompilacion Errores)
         {
-            if (this.Argumentos[0].TipoToken != TipoToken.Identificador)
+            this.Variable.HacerReferencia();
+            if (this.Argumentos[0].Lexema == "++")
             {
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         public override StringBuilder Traduccion(Funcion Fx)
         {
             StringBuilder sb=new StringBuilder();
+            sb.Append(Variable.Nombre);
             sb.Append(this.Argumentos[0].Lexema);
-            sb.AppendLine("();");
-            if (this.Argumentos.Count > 1)
-            {
-
-            }
-
+            sb.Append(";");
             return sb;
         }
     }

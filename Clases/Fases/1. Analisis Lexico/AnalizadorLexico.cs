@@ -15,7 +15,7 @@ namespace My8086.Clases.Fases._1._Analisis_Lexico
         {
             this.FinLineas = false;
             this.Tabla = new TablaDeSimbolos();
-            this.LineasLexicas=new List<LineaLexica>();
+            this.LineasLexicas = new List<LineaLexica>();
             this.FilaTabla = -1;
         }
         public override void Analizar()
@@ -26,6 +26,8 @@ namespace My8086.Clases.Fases._1._Analisis_Lexico
             {
                 LineaLexica LLex = new LineaLexica(linea);
                 string texto = this.Documento.GetText(linea).Trim();
+                //Remover comentarios
+                texto = ExpresionesRegulares.ExpresionesRegulares.Comentarios.Replace(texto, "").Trim();
                 if (string.IsNullOrEmpty(texto))
                 {
                     continue;
@@ -39,16 +41,19 @@ namespace My8086.Clases.Fases._1._Analisis_Lexico
                 foreach (string palabra in palabras)
                 {
                     token = Token.Identificar(palabra, linea, this.Errores);
-                    if (token.EsValido)
+                    if (token != null)
                     {
-                        this.Tabla.Agregar(token);
-                        LLex.Agregar(token);
-                    }
-                    else
-                    {
-                        this.Errores.ResultadoCompilacion(
-                            $"El nombre '{token.Lexema}' no existe en el contexto actual", linea);
-                        this.EsValido = false;
+                        if (token.EsValido)
+                        {
+                            this.Tabla.Agregar(token);
+                            LLex.Agregar(token);
+                        }
+                        else
+                        {
+                            this.Errores.ResultadoCompilacion(
+                                $"El nombre '{token.Lexema}' no existe en el contexto actual", linea);
+                            this.EsValido = false;
+                        }
                     }
                 }
                 this.LineasLexicas.Add(LLex);

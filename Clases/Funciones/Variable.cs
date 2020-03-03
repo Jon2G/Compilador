@@ -10,12 +10,13 @@ using My8086.Clases.Fases._1._Analisis_Lexico;
 
 namespace My8086.Clases.Funciones
 {
-    internal class Variable : Accion
+    public class Variable : Accion
     {
         public readonly string Nombre;
         public readonly Token Valor;
+        public int Referencias { get; private set; }
 
-        internal Variable(LineaLexica Linea) : base(Linea, 1)
+        internal Variable(Funcion Fx, LineaLexica Linea) : base(Fx, Linea, 1)
         {
             this.Nombre = this.Argumentos[0].Lexema;
             this.Valor = this.Argumentos[2];
@@ -37,5 +38,6 @@ namespace My8086.Clases.Funciones
             sb.AppendLine(";");
             return sb;
         }
+        public void HacerReferencia() => this.Referencias++;
     }
 }

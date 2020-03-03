@@ -140,10 +140,13 @@
     <Compile Include="Clases\Fases\2. Analisis Sintactico\AnalizadorSintactico.cs" />
     <Compile Include="Clases\Funciones\Desde.cs" />
     <Compile Include="Clases\Funciones\Ejecutar.cs" />
+    <Compile Include="Clases\Funciones\FinSi.cs" />
     <Compile Include="Clases\Funciones\Funcion.cs" />
     <Compile Include="Clases\Fases\Base\Analizador.cs" />
     <Compile Include="Clases\Fases\Token.cs" />
     <Compile Include="Clases\Funciones\IBloque.cs" />
+    <Compile Include="Clases\Funciones\OperacionArtimetica.cs" />
+    <Compile Include="Clases\Funciones\SI.cs" />
     <Compile Include="Clases\Funciones\Imprimir.cs" />
     <Compile Include="Clases\Funciones\Variable.cs" />
     <Compile Include="Clases\Log.cs" />
