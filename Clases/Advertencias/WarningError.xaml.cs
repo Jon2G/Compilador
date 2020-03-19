@@ -31,7 +31,7 @@ namespace My8086.Clases.Advertencias
             this.Excepcion = ce;
             this.Img.MySource = this.Excepcion.EsAdvertencia ? @"\Imgs\StatusWarning_16x.png" : @"\Imgs\bug.png";
             this.Error.Text = this.Excepcion.Texto;
-            this.Linea.Text = this.Excepcion.Linea.LineNumber.ToString();
+            this.Linea.Text = (this.Excepcion?.Linea?.LineNumber ?? -1).ToString();
             this.VerLinea = VerLinea;
             this.MouseDoubleClick += (o, i) =>
             {

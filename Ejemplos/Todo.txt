@@ -1,0 +1,36 @@
+Program Nom.programa
+	
+	Vars
+		Entero X1;
+		Entero Y2;
+		Decimal a1;
+		Cadena S1;
+	Begin
+		X1:=4;
+		a1:=9.50;
+		a1:=a1+x1;
+		
+		Imprime ('resultado: '+a1);
+		
+		S1:='hola';
+		
+		Imprime (S1);
+		
+		//Segundo segmento
+		Lee(a1);
+		Lee(Y2);
+		
+		For(Y2:=1;y<=10;y2+1)
+			begin
+			 //Instrucciones :)
+			 Imprime('Represento una instrucción');
+			end
+		Si(y2<9 and X>3)
+			begin
+				Imprime('Entre el intervalo');
+			end
+		Sino
+			begin
+				Imprime('No esta entre el intervalo');	
+			end		
+End;

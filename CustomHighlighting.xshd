@@ -9,65 +9,78 @@
     <Span color="Comment" multiline="true" begin="/\*" end="\*/" />
 
     <Span color="String">
-      <Begin>"</Begin>
-      <End>"</End>
+      <Begin>'</Begin>
+      <End>'</End>
       <RuleSet>
         <!-- nested span for escape sequences -->
         <Span begin="\\" end="." />
       </RuleSet>
     </Span>
 
-    <Keywords fontWeight="bold" foreground="DodgerBlue">
-      <Word>Byte</Word>
+    <Keywords fontWeight="bold" foreground="MediumSeaGreen">
       <Word>Entero</Word>
       <Word>Cadena</Word>
+      <Word>Decimal</Word>
     </Keywords>
-    <Keywords fontWeight="bold" foreground="MediumSeaGreen">
+
+    <Keywords fontWeight="bold" foreground="DeepPink">
+      <Word>Program</Word>
+      <Word>Vars</Word>
+      <Word>Begin</Word>
+      <Word>End;</Word>
+    </Keywords>
+
+    <!--<Keywords fontWeight="bold" foreground="MediumSeaGreen">
       <Word>Si</Word>
       <Word>entonces</Word>
       <Word>FinSi</Word>
       <Word>Sino</Word>
-    </Keywords>
-    <!--Clases-->
-    <Keywords fontWeight="bold" foreground="DeepPink">
-      <Word>Consola</Word>
-    </Keywords>
+    </Keywords>-->
+
     <!--Metodos-->
     <Keywords fontWeight="bold" foreground="Khaki">
-      <Word>Imprimir</Word>
+      <Word>Imprime</Word>
+      <Word>Lee</Word>
       <Word>LimpiarPantalla</Word>
     </Keywords>
 
     <Keywords fontWeight="bold" foreground="LightSkyBlue">
-      <Word>Inicia</Word>
-      <Word>Funcion</Word>
-      <Word>Termina</Word>
+      <Word>begin</Word>
+      <Word>end</Word>
     </Keywords>
 
     <Keywords fontWeight="bold" foreground="DodgerBlue">
-      <Word>Desde</Word>
-      <Word>Ejecutar</Word>
-      <Word>FinDesde</Word>
-      <Word>hasta</Word>
-      <Word>hacer</Word>
+      <Word>Si</Word>
+      <Word>For</Word>
+      <Word>Sino</Word>
+      <Word>begin</Word>
+      <Word>end</Word>
     </Keywords>
 
     <Keywords fontWeight="bold" foreground="Green">
-      <Word>Def</Word>
+      <Word>Nom.</Word>
     </Keywords>
 
-    <Keywords fontWeight="bold" fontStyle="italic" foreground="Red">
-      <Word>No</Word>
+    <Keywords fontWeight="bold" fontStyle="italic" foreground="Aquamarine">
+      <Word>:=</Word>
+      <Word>&lt;&gt;</Word>
+      <Word>=</Word>
+      <Word>&lt;</Word>
+      <Word>&gt;</Word>
+      <Word>+</Word>
     </Keywords>
 
     <!-- Digits -->
     <Rule foreground="DarkSeaGreen">
-      \b0[xX][0-9a-fA-F]+  # hex number
-      |    \b
-      (    \d+(\.[0-9]+)?   #number with optional floating point
-      |    \.[0-9]+         #or just starting with floating point
+      \b
+      (    \d+(\.[0-9]+)?   #numero con punto flotante opcional
+      |    \.[0-9]+         #o solo con punto decimal
       )
-      ([eE][+-]?[0-9]+)? # optional exponent
     </Rule>
+
+    <Rule foreground="LightGoldenrodYellow">
+      ((([a-zA-Z]+[0-9a-zA-Z]*|\\w)+))
+    </Rule>
+
   </RuleSet>
 </SyntaxDefinition>

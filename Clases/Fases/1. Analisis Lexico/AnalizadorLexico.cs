@@ -7,16 +7,14 @@ namespace My8086.Clases.Fases._1._Analisis_Lexico
 {
     internal class AnalizadorLexico : Base.Analizador
     {
-        private readonly TablaDeSimbolos Tabla;
         public readonly List<LineaLexica> LineasLexicas;
         public bool FinLineas { get; private set; }
-        private int FilaTabla;
+        internal ExpresionesRegulares.ExpresionesRegulares Expresiones;
         public AnalizadorLexico(TextDocument Documento, ResultadosCompilacion Errores) : base(Documento, Errores)
         {
-            this.FinLineas = false;
-            this.Tabla = new TablaDeSimbolos();
+            this.FinLineas = false; 
             this.LineasLexicas = new List<LineaLexica>();
-            this.FilaTabla = -1;
+            this.Expresiones=new ExpresionesRegulares.ExpresionesRegulares();
         }
         public override void Analizar()
         {
@@ -27,25 +25,24 @@ namespace My8086.Clases.Fases._1._Analisis_Lexico
                 LineaLexica LLex = new LineaLexica(linea);
                 string texto = this.Documento.GetText(linea).Trim();
                 //Remover comentarios
-                texto = ExpresionesRegulares.ExpresionesRegulares.Comentarios.Replace(texto, "").Trim();
+                texto = Expresiones.Comentarios.Replace(texto, "").Trim();
                 if (string.IsNullOrEmpty(texto))
                 {
                     continue;
                 }
                 string[] palabras =
-                    ExpresionesRegulares.ExpresionesRegulares.Documento
+                    Expresiones.Documento
                         .Split(texto)
                         .Select(s => s.Trim())
                         .Where(s => !string.IsNullOrEmpty(s))
                         .ToArray();
                 foreach (string palabra in palabras)
                 {
-                    token = Token.Identificar(palabra, linea, this.Errores);
+                    token = Token.Identificar(palabra, linea, this.Errores, Expresiones);
                     if (token != null)
                     {
                         if (token.EsValido)
                         {
-                            this.Tabla.Agregar(token);
                             LLex.Agregar(token);
                         }
                         else

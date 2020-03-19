@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using My8086.Clases.Advertencias;
+using My8086.Clases.Fases;
 using My8086.Clases.Fases._1._Analisis_Lexico;
 
 namespace My8086.Clases.Funciones
 {
     class FinSi:Accion
     {
-        public FinSi(Funcion Fx, LineaLexica Linea, int InicioArgumentos) : base(Fx, Linea, InicioArgumentos)
+        public FinSi(Programa Programa, LineaLexica Linea, int InicioArgumentos) : base(Programa, Linea, InicioArgumentos)
         {
         }
 
@@ -19,7 +20,7 @@ namespace My8086.Clases.Funciones
             throw new NotImplementedException();
         }
 
-        public override StringBuilder Traduccion(Funcion Fx)
+        public override StringBuilder Traduccion()
         {
             throw new NotImplementedException();
         }

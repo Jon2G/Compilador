@@ -11,15 +11,15 @@ using My8086.Clases.Fases._1._Analisis_Lexico;
 
 namespace My8086.Clases.Funciones
 {
-    class Si : Accion, IBloque
+    class Sino : Accion, IBloque
     {
         public DocumentLine InicioBloque { get; set; }
         public DocumentLine FinBloque { get; set; }
-        public readonly OperacionLogica[] Argumentos;
-        public Sino Sino { get; set; }
-        public Si(Programa Programa, LineaLexica Linea,params OperacionLogica[] Argumentos) : base(Programa, Linea, 0)
+
+
+        public Sino(Programa Programa, LineaLexica Linea) : base(Programa, Linea, 0)
         {
-            this.Argumentos = Argumentos;
+
         }
 
         public override bool RevisarSemantica(ResultadosCompilacion Errores)
@@ -32,7 +32,7 @@ namespace My8086.Clases.Funciones
             throw new NotImplementedException();
         }
 
-        StringBuilder IBloque.CerrarBloque()
+        public StringBuilder CerrarBloque()
         {
             throw new NotImplementedException();
         }

@@ -104,7 +104,7 @@
                                 <Border BorderThickness="1" Background="#FF7A7B7C" BorderBrush="#FF0078D7">
                                     <ContentPresenter>
                                         <ContentPresenter.Content>
-                                            <TextBlock Margin="4" Text="Lista de errores"/>
+                                            <TextBlock FontSize="18" Margin="4" Text="Lista de errores"/>
                                         </ContentPresenter.Content>
                                     </ContentPresenter>
                                 </Border>
@@ -122,14 +122,14 @@
                                 <Border BorderThickness="1" Background="#FF7A7B7C" BorderBrush="#FF0078D7">
                                     <ContentPresenter>
                                         <ContentPresenter.Content>
-                                            <TextBlock Margin="4" Text="Salida"/>
+                                            <TextBlock FontSize="18" Margin="4" Text="Salida"/>
                                         </ContentPresenter.Content>
                                     </ContentPresenter>
                                 </Border>
                             </TabItem.Header>
                             <Grid Margin="0">
                                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                                    <TextBox BorderBrush="#FF0078D7" Padding="0" Margin="0" x:Name="Salida" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Background="#FF7A7B7C">
+                                    <TextBox Foreground="GreenYellow" BorderBrush="#FF0078D7" Padding="0" Margin="0" x:Name="Salida" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Background="#FF2D2D30">
 
                                     </TextBox>
                                 </ScrollViewer>

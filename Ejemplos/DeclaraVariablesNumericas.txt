@@ -1,0 +1,23 @@
+Program Nom.programa
+	
+	Vars
+		Entero X1;
+		Entero X2;
+		Entero X3;
+		Decimal Y1;
+	Begin
+		X1:=4;
+		X2:=9.50;
+		X3:=4;
+		Y1:=X1+X2*X3/2-5;
+		Imprime('El resultado de (');
+		Imprime(X1);
+		Imprime(' + ');
+		Imprime(X2);
+		Imprime(' * ');
+		Imprime(X3);
+		Imprime('/2 -5)');
+		Imprime(' es :')
+		Imprime(Y1);
+		
+End;

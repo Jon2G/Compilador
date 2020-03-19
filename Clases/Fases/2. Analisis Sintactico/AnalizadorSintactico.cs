@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,141 +9,139 @@ using My8086.Clases.Advertencias;
 using My8086.Clases.Compilador;
 using My8086.Clases.Fases._1._Analisis_Lexico;
 using My8086.Clases.Funciones;
+using My8086.Clases.Funciones.CodigoTresDirecciones;
 
 namespace My8086.Clases.Fases._2._Analisis_Sintactico
 {
     class AnalizadorSintactico : Base.Analizador
     {
-        private Funcion FuncionActual;
         private readonly AnalizadorLexico Lexica;
-        internal readonly Programa Programa;
+        public Programa Programa { get; protected set; }
         private LineaLexica[] LineasLexicas => Lexica.LineasLexicas.ToArray();
+        internal ExpresionesRegulares.ExpresionesRegulares Expresiones;
         public AnalizadorSintactico(AnalizadorLexico Lexica, TextDocument Documento, ResultadosCompilacion Errores) : base(Documento, Errores)
         {
             this.Lexica = Lexica;
-            this.Programa = new Programa();
+            this.Expresiones = Lexica.Expresiones;
         }
 
         public override void Analizar()
         {
             foreach (LineaLexica linea in this.LineasLexicas)
             {
-                if (IniciaPrograma(linea)
+                if (NombrePrograma(linea))
+                {
+                    continue;
+                }
+
+                if (
+                    DeclaraVariable(linea)
+                    || IniciaPrograma(linea)
                     || TerminaPrograma(linea)
-                    || IniciaFuncion(linea)
-                    || Ejecutar(linea)
                     || Imprime(linea)
-                    || Desde(linea)
-                    || FinDesde(linea)
-                    || DeclaraVariable(linea)
+                    || Lee(linea)
                     || Si(linea)
-                    || FinSi(linea)
-                    || UsoVariableEntera(linea)
+                    || Sino(linea)
+                    || Begin(linea)
+                    || End(linea)
+                    || For(linea)
+                    || AsignacionCadena(linea)
+                    || UsoVariableNumerica(linea))
+                {
+                    if (this.Programa is null)
+                    {
+                        this.Errores.ResultadoCompilacion($"No se inicializo el nombre del programa!",
+                            linea.LineaDocumento);
+                        break;
+                    }
+                    continue;
+                }
+                if (
+                    NombrePrograma(linea)
+
                     )
                     continue;
 
                 this.Errores.ResultadoCompilacion("Sentencia no reconocida", linea.LineaDocumento);
             }
 
-            RevisarCierres();
+            RevisarBloques();
             this.EsValido = this.Errores.SinErrores;
         }
-
-        private void RevisarCierres()
+        private void RevisarBloques()
         {
-            foreach (Funcion fx in this.Programa.Funciones.Where(x => !x.Cerrado))
+            foreach (Accion fx in this.Programa.Acciones.OfType<IBloque>()
+                .Where(x => x.InicioBloque is null || x.FinBloque is null).OfType<Accion>())
             {
-                this.Errores.ResultadoCompilacion($"No se cerro la función '{fx.Titulo}'", null);
+                this.Errores.ResultadoCompilacion($"No se cerro la función '{fx.GetType().Name}'", fx.LineaDocumento);
             }
+        }
+        private bool NombrePrograma(LineaLexica linea)
+        {
+            if (linea[0].Lexema == "Program")
+            {
+                if (linea[1].TipoToken == TipoToken.PalabraReservada)
+                {
+                    if (linea[1].Lexema.StartsWith("Nom."))
+                    {
+                        //si se inicializo el nombre
+                        if (this.Programa != null)
+                        {
+                            this.Errores.ResultadoCompilacion($"El nombre del programa ya ha sido declarado como '{this.Programa.Titulo}'",
+                                linea.LineaDocumento);
+                            return true;
+                        }
+
+                        string nombre = linea[1].Lexema.Replace("Nom.", "").Trim();
+                        this.Programa = new Programa(nombre,this.Expresiones);
+                        if (string.IsNullOrEmpty(nombre))
+                        {
+                            this.Errores.ResultadoCompilacion("El nombre del programa no puede estar vacio.",
+                                linea.LineaDocumento);
+                        }
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         private bool IniciaPrograma(LineaLexica linea)
         {
-            if (linea[0].Lexema == "Inicia")
+            if (linea[0].Lexema == "Begin")
             {
-                if (linea[1].TipoToken == TipoToken.Identificador)
+                if (this.Programa.Inicia != null)
                 {
-                    if (this.Programa.FuncionPrincipal != null)
-                    {
-                        this.Errores.ResultadoCompilacion("Se declaro la función principal mas de una vez.",
-                            linea.LineaDocumento);
-                        return true;
-                    }
-
-                    if ((!this.FuncionActual?.Cerrado) ?? false)
-                    {
-                        this.Errores.ResultadoCompilacion("No puede iniciar una nueva función de usuario si no ha cerrado el bloque anterior.",
-                            linea.LineaDocumento);
-                        return true;
-                    }
-                    this.FuncionActual =
-                    this.Programa.FuncionPrincipal = new Funcion(linea[1].Linea, linea[1].Lexema);
+                    this.Errores.ResultadoCompilacion("Se declaro la función principal mas de una vez.",
+                        linea.LineaDocumento);
                     return true;
                 }
+
+                this.Programa.Inicia = linea.LineaDocumento;
+                return true;
             }
             return false;
         }
         private bool TerminaPrograma(LineaLexica linea)
         {
-            if (linea[0].Lexema == "Termina")
+            if (linea[0].Lexema == "End")
             {
-                if (linea[1].TipoToken == TipoToken.Identificador)
+                if (linea[1].TipoToken == TipoToken.FinInstruccion)
                 {
-                    if (this.FuncionActual is null)
+                    if (this.Programa is null)
                     {
                         this.Errores.ResultadoCompilacion("No se encontro ninguna función a la que le corresponda el cierre.",
                             linea.LineaDocumento);
                         return true;
                     }
-
-                    if (this.FuncionActual.Titulo == linea[1].Lexema)
+                    if (this.Programa.FinBloque != null)
                     {
-                        if (this.FuncionActual.Cerrado)
-                        {
-                            this.Errores.ResultadoCompilacion("La función principal ya habia sido cerrada anteriormente.",
-                                linea.LineaDocumento);
-                        }
-                        else
-                        {
-                            this.FuncionActual.Cerrar(linea.LineaDocumento);
-                        }
+                        this.Errores.ResultadoCompilacion("La función principal ya habia sido cerrada anteriormente.",
+                            linea.LineaDocumento);
                     }
                     else
                     {
-                        this.Errores.ResultadoCompilacion("La etiqueta de apertura y cierre de la función son diferentes!.",
-                            linea.LineaDocumento);
+                        this.Programa.FinBloque = linea.LineaDocumento;
                     }
-                    return true;
-                }
-            }
-            return false;
-        }
-        private bool IniciaFuncion(LineaLexica linea)
-        {
-            if (linea[0].Lexema == "Funcion")
-            {
-                if (linea[1].TipoToken == TipoToken.Identificador)
-                {
-                    if (this.Programa.Titulo == linea[1].Lexema)
-                    {
-                        this.Errores.ResultadoCompilacion("Una función de usuario no debe llevar el mismo nombre que la función principal.",
-                            linea.LineaDocumento);
-                        return true;
-                    }
-                    if ((!this.FuncionActual?.Cerrado) ?? false)
-                    {
-                        this.Errores.ResultadoCompilacion("No puede iniciar una nueva función de usuario si no ha cerrado el bloque anterior.",
-                            linea.LineaDocumento);
-                        return true;
-                    }
-                    if (this.Programa.Funciones.Any(x => x.Titulo.ToUpper() == linea[1].Lexema))
-                    {
-                        this.Errores.ResultadoCompilacion($"Ya existe una función de usuario con el nombre '{linea[1].Lexema}'",
-                            linea.LineaDocumento);
-                        return true;
-                    }
-
-                    this.FuncionActual = new Funcion(linea.LineaDocumento, linea[1].Lexema);
-                    this.Programa.Funciones.Add(this.FuncionActual);
                     return true;
                 }
             }
@@ -150,83 +149,258 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
         }
         private bool Imprime(LineaLexica linea)
         {
-            if (linea[0].Lexema != "Imprimir")
+            if (linea[0].Lexema != "Imprime")
             {
                 return false;
             }
-            this.FuncionActual.AgregarAccion(new Imprimir(FuncionActual,linea, 1));
-            return true;
-        }
 
-        private bool Ejecutar(LineaLexica linea)
-        {
-            if (linea[0].Lexema != "Ejecutar")
+            Token VariableImpresion;
+            bool sumando = false;
+            for (int i = 2; i < linea.Elementos; i++)
             {
-                return false;
-            }
-            this.FuncionActual.AgregarAccion(new Ejecutar(FuncionActual, linea, 1));
-            return true;
-        }
-        private bool Desde(LineaLexica linea)
-        {
-            if (linea[0].Lexema == "Desde"
-                && linea[2].Lexema == "hasta"
-                && linea[4].Lexema == "hacer")
-            {
-                Token desde = linea[1];
-                Token hasta = linea[3];
-                this.FuncionActual.AgregarAccion(new Desde(FuncionActual, linea));
-                return true;
-            }
-            return false;
-        }
-        private bool FinDesde(LineaLexica linea)
-        {
-            if (linea[0].Lexema == "FinDesde")
-            {
-                Desde desde = this.FuncionActual.Acciones.OfType<Desde>().LastOrDefault();
-                if (desde != null)
+                Token tk = linea[i];
+                if (tk.TipoToken == TipoToken.FinInstruccion)
                 {
-                    if (!desde.Cerrado)
+                    continue;
+                }
+
+                if (tk.Lexema == "+")
+                {
+                    if (sumando)
                     {
-                        desde.Cerrar(linea.LineaDocumento);
+                        Errores.ResultadoCompilacion($"Se esperaba una cadena o identificador en la función 'Imprime'",
+                            linea.LineaDocumento);
                         return true;
                     }
-                    else
-                    {
-                        this.Errores.ResultadoCompilacion("El ciclo Desde ya habia sido cerrado previamente", linea.LineaDocumento);
-                    }
+                    sumando = true;
+                    continue;
+                }
+
+                if (tk.TipoToken == TipoToken.ParentesCerrado)
+                {
+                    continue;
+                }
+                if (tk.TipoToken == TipoToken.Identificador && tk.TipoDato == TipoDato.Cadena)
+                {
+                    sumando = false;
+                    continue;
+                }
+                else if (tk.TipoDato == TipoDato.Cadena && tk.TipoToken == TipoToken.Cadena)
+                {
+                    //Es una cadena que no es una variable Ex. Imprime('Hola mundo');
+                    //Crearemos una variable con un identificador unico que guarde esta cadena
+                    Variable var = this.Programa.SegmentoDeDatos.Nueva(new Variable(this.Programa, tk, linea,tk.TipoDato));
+                    VariableImpresion = new Token(var.Nombre, TipoToken.Identificador, TipoDato.Cadena, linea.LineaDocumento);
+
+                    this.Programa.Acciones.Add(new AsignaCadena(Programa, linea, var, tk));
+                    this.Programa.AgregarAccion(new Imprimir(this.Programa, VariableImpresion, linea));
+                    return true;
                 }
                 else
                 {
-                    this.Errores.ResultadoCompilacion("No se encontro ningun cliclo para cerra en este contexto", linea.LineaDocumento);
+                    Errores.ResultadoCompilacion($"Sintaxis incorrecta cerca de '{tk.Lexema}' en la función 'Imprime'",
+                        linea.LineaDocumento);
+                    return true;
                 }
 
+            }
+
+            VariableImpresion = linea[2];
+            this.Programa.AgregarAccion(new Imprimir(this.Programa, VariableImpresion, linea));
+            return true;
+        }
+        private bool Begin(LineaLexica linea)
+        {
+            if (linea[0].Lexema != "begin")
+            {
+                return false;
+            }
+
+            if (this.Programa.Acciones.LastOrDefault() is IBloque bloque)
+            {
+                if (bloque.InicioBloque != null)
+                {
+                    this.Errores.ResultadoCompilacion($"Ya se habia declarado el inicio de este ciclo for en la linea '{bloque.InicioBloque.LineNumber}'.",
+                        linea.LineaDocumento);
+                    return true;
+                }
+                bloque.InicioBloque = linea.LineaDocumento;
+            }
+            else
+            {
+                this.Errores.ResultadoCompilacion($"Inicio de bloque incorrecto.",
+                    linea.LineaDocumento);
+            }
+            return true;
+        }
+        private bool End(LineaLexica linea)
+        {
+            if (linea[0].Lexema != "end")
+            {
+                return false;
+            }
+            if (this.Programa.Acciones.OfType<IBloque>().LastOrDefault() is { } bloque)
+            {
+                if (bloque.FinBloque != null)
+                {
+                    this.Errores.ResultadoCompilacion($"Ya se habia declarado el inicio de este ciclo for en la linea '{bloque.InicioBloque.LineNumber}'.",
+                        linea.LineaDocumento);
+                    return true;
+                }
+                bloque.FinBloque = linea.LineaDocumento;
+            }
+            else
+            {
+                this.Errores.ResultadoCompilacion($"Fin de bloque incorrecto.",
+                    linea.LineaDocumento);
+            }
+            return true;
+        }
+        private bool Lee(LineaLexica linea)
+        {
+            if (linea[0].Lexema != "Lee")
+            {
+                return false;
+            }
+            this.Programa.AgregarAccion(new Lee(Programa, linea));
+            return true;
+        }
+        private bool For(LineaLexica linea)
+        {
+            if (linea[0].Lexema == "For")
+            {
+                if (linea[1].TipoToken != TipoToken.ParentesisAbierto)
+                {
+                    this.Errores.ResultadoCompilacion($"Se esperaba un parentesis abierto", linea.LineaDocumento);
+                    return true;
+                }
+                if (Programa.SegmentoDeDatos.ObtenerVariable(linea[2].Lexema) is { } variable)
+                {
+                    variable.HacerReferencia();
+                }
+                else
+                {
+                    this.Errores.ResultadoCompilacion($"Variable del cliclo invalida", linea.LineaDocumento);
+                    return true;
+                }
+                if (!double.TryParse(linea[4].Lexema, out var Inicio))
+                {
+                    this.Errores.ResultadoCompilacion($"Valor de inicio del cliclo invalido", linea.LineaDocumento);
+                    return true;
+                }
+
+                List<OperacionLogica> Argumentos = new List<OperacionLogica>();
+                for (int i = 6; i < linea.Elementos; i += 3)
+                {
+                    if ((linea[i].TipoToken == TipoToken.Identificador &&
+                        linea[i].Lexema == "and") ||
+                        linea[i].TipoToken == TipoToken.ParentesisAbierto
+                        )
+                    {
+                        if (linea[i].TipoToken != TipoToken.ParentesisAbierto)
+                        {
+                            Token union = linea[i];
+                            switch (union.Lexema)
+                            {
+                                case "and":
+                                    Argumentos.Add(new OperacionLogica(null, union, null, linea));
+                                    break;
+                                default:
+                                    this.Errores.ResultadoCompilacion($"Operador lógico invalido", linea.LineaDocumento);
+                                    return true;
+                            }
+                        }
+
+                        i++;
+                    }
+
+                    if (linea[i].TipoToken == TipoToken.FinInstruccion)
+                    {
+                        break;
+                    }
+                    if (linea[i].TipoToken != TipoToken.Identificador)
+                    {
+                        this.Errores.ResultadoCompilacion($"Valor de comparación inicial erroneo.", linea.LineaDocumento);
+                        return true;
+                    }
+
+
+                    if (linea[i + 1].TipoToken != TipoToken.OperadorLogico)
+                    {
+                        this.Errores.ResultadoCompilacion($"Se esperaba una comparación lógica.", linea.LineaDocumento);
+                        return true;
+                    }
+
+                    while (linea[i + 2].TipoToken == TipoToken.OperadorLogico)
+                    {
+                        Argumentos.Add(new OperacionLogica(linea[i], linea[i + 1], linea[i + 2], linea));
+                        i++;
+                    }
+
+                    if (linea[i + 2].TipoToken != TipoToken.Identificador)
+                    {
+                        this.Errores.ResultadoCompilacion($"Valor de comparación inicial erroneo.", linea.LineaDocumento);
+                        return true;
+                    }
+                    Argumentos.Add(new OperacionLogica(linea[i], linea[i + 1], linea[i + 2], linea));
+                }
+
+                if (!double.TryParse(linea[linea.Elementos - 2].Lexema, out var Incremento))
+                {
+                    this.Errores.ResultadoCompilacion($"Valor de incremento del cliclo invalido", linea.LineaDocumento);
+                    return true;
+                }
+                this.Programa.AgregarAccion(new For(Programa, linea, Argumentos.ToArray(), Inicio, Incremento));
+
+                return true;
             }
             return false;
         }
         private bool DeclaraVariable(LineaLexica linea)
         {
-            if (linea.Elementos != 4)
+            if (linea[0].Lexema == "Vars")
+            {
+                if (this.Programa.SegmentoDeDatos != null)
+                {
+                    this.Errores.ResultadoCompilacion($"El inicio del segmento de datos ya habia sido declarado anteriormente.",
+                        linea.LineaDocumento);
+                    return true;
+                }
+                this.Programa.SegmentoDeDatos = new SegmentoDeDatos();
+                return true;
+            }
+            if (linea.Elementos != 3)
             {
                 return false;
             }
             if (linea[0].TipoToken == TipoToken.PalabraReservada &&
                 linea[0].Lexema == "Entero" ||
                 linea[0].Lexema == "Cadena" ||
-                linea[0].Lexema == "Byte" ||
-                linea[0].Lexema == "Caracter"
+                linea[0].Lexema == "Decimal"
                 )
             {
-                Variable variableNueva = new Variable(FuncionActual, linea);
-                if (this.FuncionActual.Variables.Any(x => x.Nombre == variableNueva.Nombre))
+                TipoDato TipoDato=TipoDato.Invalido;
+                switch (linea[0].Lexema)
+                {
+                    case "Entero":
+                        TipoDato = TipoDato.Entero;
+                        break;
+                    case "Cadena":
+                        TipoDato = TipoDato.Cadena;
+                        break;
+                    case "Decimal":
+                        TipoDato = TipoDato.Decimal;
+                        break;
+                }
+
+                Variable variableNueva = new Variable(Programa, linea,TipoDato);
+                if (this.Programa.SegmentoDeDatos.YaExisteVariable(variableNueva))
                 {
                     this.Errores.ResultadoCompilacion($"La variable '{variableNueva.Nombre}' ya fué declarada en este contexto.", linea.LineaDocumento);
                 }
                 else
                 {
-                    this.FuncionActual.Acciones.Add(variableNueva);
-                    this.FuncionActual.Variables.Add(variableNueva);
+                    this.Programa.SegmentoDeDatos.Nueva(variableNueva);
                 }
 
                 return true;
@@ -237,90 +411,137 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
         {
             if (linea[0].Lexema == "Si")
             {
-                if (linea[1].TipoToken != TipoToken.Identificador)
+                List<OperacionLogica> Argumentos = new List<OperacionLogica>();
+
+
+                if (linea[1].TipoToken != TipoToken.ParentesisAbierto)
                 {
-                    this.Errores.ResultadoCompilacion($"Valor de comparación inicial erroneo.", linea.LineaDocumento);
+                    this.Errores.ResultadoCompilacion($"Se esperaba un parentesis abierto", linea.LineaDocumento);
                     return true;
                 }
-
-                if (linea[2].TipoToken != TipoToken.OperadorLogico)
+                for (int i = 1; i < linea.Elementos; i += 3)
                 {
-                    this.Errores.ResultadoCompilacion($"Se esperaba una comparación lógica.", linea.LineaDocumento);
-                    return true;
-                }
-
-                if (linea[3].TipoToken != TipoToken.Identificador)
-                {
-                    this.Errores.ResultadoCompilacion($"Valor de comparación inicial erroneo.", linea.LineaDocumento);
-                    return true;
-                }
-
-                bool separacion = false;
-                for (int i = 4; i < linea.Elementos; i++)
-                {
-                    if (linea[i].TipoToken == TipoToken.SeparadorParametros)
+                    if ((linea[i].TipoToken == TipoToken.Identificador &&
+                        linea[i].Lexema == "and") ||
+                        linea[i].TipoToken == TipoToken.ParentesisAbierto
+                        )
                     {
-                        if (separacion)
+                        if (linea[i].TipoToken != TipoToken.ParentesisAbierto)
                         {
-                            this.Errores.ResultadoCompilacion($"Se esperaba un argumento de comparación.", linea.LineaDocumento);
-                        }
-                        separacion = true;
-                        continue;
-                    }
-
-                    if (linea[i].TipoToken == TipoToken.Identificador)
-                    {
-                        if (!separacion)
-                        {
-                            this.Errores.ResultadoCompilacion($"Se esperaba ',' como separador de los parametros de comparación.", linea.LineaDocumento);
+                            Token union = linea[i];
+                            switch (union.Lexema)
+                            {
+                                case "and":
+                                    Argumentos.Add(new OperacionLogica(null, union, null, linea));
+                                    break;
+                                default:
+                                    this.Errores.ResultadoCompilacion($"Operador lógico invalido", linea.LineaDocumento);
+                                    return true;
+                            }
                         }
 
-                        separacion = false;
+                        i++;
                     }
+
+                    if (linea[i].TipoToken == TipoToken.ParentesCerrado)
+                    {
+                        break;
+                    }
+                    if (linea[i].TipoToken != TipoToken.Identificador)
+                    {
+                        this.Errores.ResultadoCompilacion($"Valor de comparación inicial erroneo.", linea.LineaDocumento);
+                        return true;
+                    }
+                    if (linea[i + 1].TipoToken != TipoToken.OperadorLogico)
+                    {
+                        this.Errores.ResultadoCompilacion($"Se esperaba una comparación lógica.", linea.LineaDocumento);
+                        return true;
+                    }
+                    if (linea[i + 2].TipoToken != TipoToken.Identificador)
+                    {
+                        this.Errores.ResultadoCompilacion($"Valor de comparación inicial erroneo.", linea.LineaDocumento);
+                        return true;
+                    }
+                    Argumentos.Add(new OperacionLogica(linea[i], linea[i + 1], linea[i + 2], linea));
                 }
+                this.Programa.AgregarAccion(new Si(Programa, linea, Argumentos.ToArray()));
 
                 return true;
             }
 
             return false;
         }
-        private bool FinSi(LineaLexica linea)
+        private bool Sino(LineaLexica linea)
         {
-            if (linea[0].Lexema == "FinSi")
+            if (linea[0].Lexema == "Sino")
             {
-                if (linea.Elementos > 1)
+                if (this.Programa.Acciones.OfType<Si>().LastOrDefault() is { } si)
                 {
-                    LineaContigua(linea, 1);
+                    if (si.Sino != null)
+                    {
+                        this.Errores.ResultadoCompilacion("Sino mal colocado", linea.LineaDocumento);
+                        return true;
+                    }
+                    si.Sino = new Sino(Programa, linea);
+                    this.Programa.Acciones.Add(si.Sino);
+                    return true;
                 }
-                return true;
             }
+
             return false;
         }
-
-        private bool UsoVariableEntera(LineaLexica linea)
+        private bool UsoVariableNumerica(LineaLexica linea)
         {
             if (linea[0].TipoToken == TipoToken.Identificador)
             {
-                if (this.FuncionActual.Variables.FirstOrDefault(x => x.Nombre == linea[0].Lexema)
-                    is { } vv)
+                Variable var = this.Programa.SegmentoDeDatos.ObtenerVariable(linea[0].Lexema);
+                if (var != null)
                 {
-                    if (linea[1].TipoToken == TipoToken.OperadorAritmetico)
+                    if (linea[1].TipoToken == TipoToken.OperadorAritmetico || linea[1].TipoToken == TipoToken.Relacional)
                     {
-                        if (linea[1].Lexema == "++")
-                        {
-                            this.FuncionActual.AgregarAccion(new OperacionArtimetica(FuncionActual, vv,linea));
-                            return true;
-                        }
+                        this.Programa.AgregarAccion(new OperacionArtimetica(Programa, var, linea));
+                        return true;
                     }
-                    else
+                    else if (linea[1].TipoToken == TipoToken.OperadorLogico)
                     {
-                        
+                        return false;
                     }
+                }
+                else
+                {
+                    this.Errores.ResultadoCompilacion($"Variable '{linea[0].Lexema}' no declarada", linea.LineaDocumento);
+                    return true;
                 }
             }
 
             return false;
         }
+        private bool AsignacionCadena(LineaLexica linea)
+        {
+            if (linea[0].TipoToken == TipoToken.Identificador)
+            {
+                Variable var = this.Programa.SegmentoDeDatos.ObtenerVariable(linea[0].Lexema);
+                if (var != null)
+                {
+                    if (linea[1].TipoToken == TipoToken.Relacional)
+                    {
+                        if (linea[2].TipoToken == TipoToken.Cadena)
+                        {
+                            this.Programa.AgregarAccion(new AsignaCadena(this.Programa, linea, var, linea[2]));
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    this.Errores.ResultadoCompilacion($"Variable '{linea[0].Lexema}' no declarada", linea.LineaDocumento);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void LineaContigua(LineaLexica linea, int inicio)
         {
             int index = Lexica.LineasLexicas.IndexOf(linea) + 1;

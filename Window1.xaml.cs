@@ -74,7 +74,9 @@ namespace My8086
             //propertyGridComboBox.SelectedIndex = 2;
 
             textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("My8086");
-            this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\Variables.My8086.txt";
+            // this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\Todo.txt";
+            //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\ImprimeCadenas.txt";
+            this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\DeclaraVariablesNumericas.txt";
             textEditor.Load(currentFileName);
             //textEditor.SyntaxHighlighting = customHighlighting;
             // initial highlighting now set by XAML
@@ -119,141 +121,149 @@ namespace My8086
                     return;
                 }
             }
-            textEditor.Save(currentFileName);
-        }
 
+            try
+            {
+                textEditor.Save(currentFileName);
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
         //void propertyGridComboBoxSelectionChanged(object sender, RoutedEventArgs e)
-        //{
-        //    if (propertyGrid == null)
-        //        return;
-        //    switch (propertyGridComboBox.SelectedIndex)
-        //    {
-        //        case 0:
-        //            propertyGrid.SelectedObject = textEditor;
-        //            break;
-        //        case 1:
-        //            propertyGrid.SelectedObject = textEditor.TextArea;
-        //            break;
-        //        case 2:
-        //            propertyGrid.SelectedObject = textEditor.Options;
-        //            break;
-        //    }
-        //}
+            //{
+            //    if (propertyGrid == null)
+            //        return;
+            //    switch (propertyGridComboBox.SelectedIndex)
+            //    {
+            //        case 0:
+            //            propertyGrid.SelectedObject = textEditor;
+            //            break;
+            //        case 1:
+            //            propertyGrid.SelectedObject = textEditor.TextArea;
+            //            break;
+            //        case 2:
+            //            propertyGrid.SelectedObject = textEditor.Options;
+            //            break;
+            //    }
+            //}
 
-        void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
-        {
-            this.Compilador.Compilado = false;
-            if (e.Text == ".")
+            void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
             {
-                this.AutoCompletado.AutoCompletar();
-            }
-
-            if (e.Text == "(")
-            {
-                //this.AutoCompletado.SugerirVariable();
-            }
-        }
-
-        void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
-        {
-            if (e.Text.Length > 0 && AutoCompletado.CompletionWindow != null)
-            {
-                if (!char.IsLetterOrDigit(e.Text[0]))
+                this.Compilador.Compilado = false;
+                if (e.Text == ".")
                 {
-                    // Whenever a non-letter is typed while the completion window is open,
-                    // insert the currently selected element.
-                    AutoCompletado.CompletionWindow.CompletionList.RequestInsertion(e);
+                    this.AutoCompletado.AutoCompletar();
+                }
+
+                if (e.Text == "(")
+                {
+                    //this.AutoCompletado.SugerirVariable();
                 }
             }
-            // do not set e.Handled=true - we still want to insert the character that was typed
-        }
-        void foldingUpdateTimer_Tick(object sender, EventArgs e)
-        {
-            FoldingStrategy.UpdateFoldings(FoldingManager, textEditor.Document);
 
-        }
-
-        private void Ejecutar(object sender, RoutedEventArgs e)
-        {
-            if (!this.Compilador.Compilado)
+            void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
             {
-                if (MessageBox.Show("Debe compilar el código antes de poder ejecutarlo.\n¿Desea compilarlo ahora?",
-                        "Compilar código", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+                if (e.Text.Length > 0 && AutoCompletado.CompletionWindow != null)
                 {
-                    Compilar(sender, e);
-                    if (Compilador.Compilado)
+                    if (!char.IsLetterOrDigit(e.Text[0]))
                     {
-                        Ejecutar(sender, e);
+                        // Whenever a non-letter is typed while the completion window is open,
+                        // insert the currently selected element.
+                        AutoCompletado.CompletionWindow.CompletionList.RequestInsertion(e);
                     }
                 }
+                // do not set e.Handled=true - we still want to insert the character that was typed
             }
-            else
+            void foldingUpdateTimer_Tick(object sender, EventArgs e)
             {
-                Salida.Text = Compilador.Ejecutar();
+                FoldingStrategy.UpdateFoldings(FoldingManager, textEditor.Document);
+
             }
-        }
 
-        private void Compilar(object sender, RoutedEventArgs e)
-        {
-            saveFileClick(sender, e);
-            Dispatcher.BeginInvoke(new Action(() =>
+            private void Ejecutar(object sender, RoutedEventArgs e)
             {
-                this.ProgresoCompilacion.Visibility = Visibility.Visible;
-                this.ProgresoCompilacion.IsIndeterminate = true;
-            }));
-
-            this.Compilador = new Compilador(this.textEditor.TextArea.Document);
-            Compilador.OnProgreso += (o, i) =>
-            {
-                this.ProgresoCompilacion.SetPercent(Compilador.Progreso);
-            };
-            Compilador.VerLinea += (o, i) =>
-            {
-                int linea = (o as DocumentLine).LineNumber;
-                if (linea > 0)
+                if (!this.Compilador.Compilado)
                 {
-                    var l = this.textEditor.TextArea.Document.GetLineByNumber(linea);
-                    SelectText(l.Offset, l.Length);
-                    this.textEditor.ScrollToLine(linea);
+                    if (MessageBox.Show("Debe compilar el código antes de poder ejecutarlo.\n¿Desea compilarlo ahora?",
+                            "Compilar código", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+                    {
+                        Compilar(sender, e);
+                        if (Compilador.Compilado)
+                        {
+                            Ejecutar(sender, e);
+                        }
+                    }
                 }
-            };
-            this.Salida.Text = Compilador.Compilar();
-            ErroresList.ItemsSource = Compilador.Resultados;
-            ErroresList.Items.Refresh();
-            Dispatcher.Invoke(() => { this.ProgresoCompilacion.Visibility = Visibility.Collapsed; },
-                DispatcherPriority.ApplicationIdle);
-            this.Salida.Text += string.Join("\n", Compilador.Resultados
-                .Select(x => $"->[{x.Excepcion.Linea}] " + x.Excepcion.Texto));
+                else
+                {
+                    Salida.Text = Compilador.Ejecutar();
+                }
+            }
 
-            this.ProgresoCompilacion.Visibility = Visibility.Collapsed;
-            this.ProgresoCompilacion.IsIndeterminate = false;
-
-
-
-        }
-        private void SelectText(int offset, int length)
-        {
-            //Get the line number based off the offset.
-            var line = textEditor.Document.GetLineByOffset(offset);
-            var lineNumber = line.LineNumber;
-
-            //Select the text.
-            textEditor.SelectionStart = offset;
-            textEditor.SelectionLength = length;
-
-            //Scroll the textEditor to the selected line.
-            var visualTop = textEditor.TextArea.TextView.GetVisualTopByDocumentLine(lineNumber);
-            textEditor.ScrollToVerticalOffset(visualTop);
-        }
-
-        private void CompilarYEjecutar(object sender, RoutedEventArgs e)
-        {
-            Compilar(sender, e);
-            if (Compilador.Compilado)
+            private void Compilar(object sender, RoutedEventArgs e)
             {
-                Ejecutar(sender, e);
+                saveFileClick(sender, e);
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    this.ProgresoCompilacion.Visibility = Visibility.Visible;
+                    this.ProgresoCompilacion.IsIndeterminate = true;
+                }));
+
+                this.Compilador = new Compilador(this.textEditor.TextArea.Document);
+                Compilador.OnProgreso += (o, i) =>
+                {
+                    this.ProgresoCompilacion.SetPercent(Compilador.Progreso);
+                };
+                Compilador.VerLinea += (o, i) =>
+                {
+                    int linea = (o as DocumentLine)?.LineNumber??-1;
+                    if (linea > 0)
+                    {
+                        var l = this.textEditor.TextArea.Document.GetLineByNumber(linea);
+                        SelectText(l.Offset, l.Length);
+                        this.textEditor.ScrollToLine(linea);
+                    }
+                };
+                this.Salida.Text = Compilador.Compilar();
+                ErroresList.ItemsSource = Compilador.Resultados;
+                ErroresList.Items.Refresh();
+                Dispatcher.Invoke(() => { this.ProgresoCompilacion.Visibility = Visibility.Collapsed; },
+                    DispatcherPriority.ApplicationIdle);
+                this.Salida.Text += string.Join("\n", Compilador.Resultados
+                    .Select(x => $"->[{x.Excepcion.Linea}] " + x.Excepcion.Texto));
+
+                this.ProgresoCompilacion.Visibility = Visibility.Collapsed;
+                this.ProgresoCompilacion.IsIndeterminate = false;
+
+
+
+            }
+            private void SelectText(int offset, int length)
+            {
+                //Get the line number based off the offset.
+                var line = textEditor.Document.GetLineByOffset(offset);
+                var lineNumber = line.LineNumber;
+
+                //Select the text.
+                textEditor.SelectionStart = offset;
+                textEditor.SelectionLength = length;
+
+                //Scroll the textEditor to the selected line.
+                var visualTop = textEditor.TextArea.TextView.GetVisualTopByDocumentLine(lineNumber);
+                textEditor.ScrollToVerticalOffset(visualTop);
+            }
+
+            private void CompilarYEjecutar(object sender, RoutedEventArgs e)
+            {
+                Compilar(sender, e);
+                if (Compilador.Compilado)
+                {
+                    Ejecutar(sender, e);
+                }
             }
         }
-    }
 
-}
+    }

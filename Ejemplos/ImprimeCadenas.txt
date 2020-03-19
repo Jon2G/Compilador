@@ -1,0 +1,22 @@
+Program Nom.programa
+	
+	Vars
+		Cadena Mensaje;
+		Cadena Mensaje2;
+		Cadena Mensaje3;
+	Begin
+	
+		Mensaje:='ABCDEFGHIJKLMNOPQRSTUWXYZ\n';
+		Mensaje2:='Hola mundo\n';
+		Mensaje3:='Pues no se puede mas\n';
+		
+		Imprime (Mensaje);
+		Imprime(Mensaje2);
+		Imprime(Mensaje3);
+		
+		Mensaje:='Cadena mas corta\n';
+		Imprime(Mensaje);
+		
+		Imprime('Sale pues,te la compro');
+		
+	End;

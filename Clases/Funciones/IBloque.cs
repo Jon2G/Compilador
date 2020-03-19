@@ -10,7 +10,7 @@ namespace My8086.Clases.Funciones
     interface IBloque
     {
         DocumentLine FinBloque { get; set; }
-        DocumentLine InicioBloque { get; set; } 
-        string CerrarBloque();
+        DocumentLine InicioBloque { get; set; }
+        StringBuilder CerrarBloque();
     }
 }

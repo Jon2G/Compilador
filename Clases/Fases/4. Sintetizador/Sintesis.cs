@@ -21,23 +21,18 @@ namespace My8086.Clases.Fases._4._Sintetizador
         public override void Analizar()
         {
             this.EsValido = true;
-            this.Programa.Funciones.ForEach(LeerFuncion);
-        }
-
-        private void LeerFuncion(Funciones.Funcion Funcion)
-        {
-            for (var index = 0; index < Funcion.Variables.Count; index++)
+            for (var index = 0; index < Programa.SegmentoDeDatos.Variables.Count; index++)
             {
-                Variable variable = Funcion.Variables[index];
+                Variable variable = Programa.SegmentoDeDatos.Variables[index];
                 if (variable.Referencias <= 0)
                 {
                     Errores.ResultadoCompilacion($"La variable '{variable.Nombre}' se declara pero nunca se utiliza.",
                         variable.LineaDocumento, true);
-                    Funcion.Variables.Remove(variable);
+                    Programa.SegmentoDeDatos.Variables.Remove(variable);
                 }
             }
-
-            //?
         }
+
+
     }
 }

@@ -23,20 +23,13 @@ namespace My8086.Clases.Fases._3._Analisis_Semantico
         public override void Analizar()
         {
             this.EsValido = true;
-            this.Programa.Funciones.ForEach(Analizar);
-        }
-        private void Analizar(Funcion Funcion)
-        {
-            if (!Funcion.Cerrado)
+
+            foreach (Accion Accion in Programa.Acciones)
             {
-                this.Errores.ResultadoCompilacion(
-                    $"Se esperaba el cierre de la función '{Funcion.Titulo}' y no se econtro", Funcion.InicioBloque);
-            }
-            foreach (Accion Accion in Funcion.Acciones)
-            {
-                if (!Accion.RevisarSemantica(this.Errores)&&this.EsValido)
+                if (!Accion.RevisarSemantica(this.Errores))
                 {
-                    this.EsValido = false;
+                    this.EsValido= false;
+                    break;
                 }
             }
         }

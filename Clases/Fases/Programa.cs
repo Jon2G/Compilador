@@ -1,22 +1,38 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using ICSharpCode.AvalonEdit.Document;
 using My8086.Clases.Funciones;
 
 namespace My8086.Clases.Fases
 {
-    internal class Programa
+    public class Programa:IBloque
     {
-        public string Titulo => this.FuncionPrincipal.Titulo;
-
-        public Funcion FuncionPrincipal
+        public string Titulo;
+        public SegmentoDeDatos SegmentoDeDatos;
+        public DocumentLine Inicia;
+        public readonly List<Accion> Acciones;
+        public readonly ExpresionesRegulares.ExpresionesRegulares Expresiones;
+        public Programa(string Titulo, ExpresionesRegulares.ExpresionesRegulares Expresiones)
         {
-            get => this.Funciones.FirstOrDefault();
-            set => this.Funciones.Insert(0, value);
+            this.Acciones=new List<Accion>();
+            this.Expresiones = Expresiones;
         }
-        public List<Funcion> Funciones { get; set; }
-        public Programa()
+        public void AgregarAccion(Accion accion)
         {
-            this.Funciones = new List<Funcion>();
+            this.Acciones.Add(accion);
+        }
+
+        public DocumentLine FinBloque { get; set; }
+        public DocumentLine InicioBloque { get; set; }
+        public string CerrarBloque()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        StringBuilder IBloque.CerrarBloque()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

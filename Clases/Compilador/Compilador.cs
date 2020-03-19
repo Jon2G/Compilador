@@ -23,7 +23,7 @@ namespace My8086.Clases.Compilador
         private readonly TextDocument Document;
         public EventHandler OnProgreso;
         private EventHandler _VerLinea;
-        private NetCompiler CompiladorNet;
+        private BorlandC TurboC;
         public bool Compilado { get; set; }
 
         public EventHandler VerLinea
@@ -52,6 +52,7 @@ namespace My8086.Clases.Compilador
             this.Document = Document;
 
             this.ResultadosCompilacion = new ResultadosCompilacion(this.VerLinea);
+            this.TurboC = new BorlandC();
             //this.ReconceTokens = new ReconoceTokens(this.ResultadosCompilacion, this.PropiedadesPrograma);
         }
 
@@ -93,6 +94,7 @@ namespace My8086.Clases.Compilador
         }
         public string Compilar()
         {
+
             this.Progreso = 0;
             this.ResultadosCompilacion.Clear();
             //try
@@ -123,11 +125,11 @@ namespace My8086.Clases.Compilador
                         {
                             CodigoIntermedio intermedio = new CodigoIntermedio((Sintesis)analizador);
                             intermedio.Generar();
-                            NetCompiler net = new NetCompiler(intermedio);
-                            this.CompiladorNet = net;
-                            this.Compilado = net.GeneraEjecutable();
-                            string idal = net.GenerarIdalsm();
-                            return "Compilación exitosa :D";
+                            this.TurboC.Limpiar();
+                            this.Compilado = this.TurboC.GeneraEjecutable(intermedio.Codigo.ToString());
+                            string ASM = intermedio.Codigo.ToString();
+
+                            return this.TurboC.ResultadosCompilacion;
                         }
                     }
                 }
@@ -140,7 +142,8 @@ namespace My8086.Clases.Compilador
         {
             if (this.Compilado)
             {
-                this.CompiladorNet.Ejecutar();
+               this.TurboC.Ejecutar();
+               return this.TurboC.ResultadosCompilacion;
             }
 
             return "No se ha compilado el archivo";

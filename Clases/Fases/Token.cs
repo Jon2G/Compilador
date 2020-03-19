@@ -9,19 +9,19 @@ using System.Threading.Tasks;
 using My8086.Clases.Advertencias;
 using My8086.Clases.BaseDeDatos;
 using My8086.Clases.Funciones;
-using static My8086.Clases.ExpresionesRegulares.ExpresionesRegulares;
+using My8086.Clases.ExpresionesRegulares;
 namespace My8086.Clases.Fases
 {
     public enum TipoToken
     {
         OperadorLogico, OperadorAritmetico,
         Identificador, Relacional, SeparadorParametros,
-        PalabraReservada, Invalido
+        PalabraReservada, Invalido, FinInstruccion,
+        ParentesisAbierto, ParentesCerrado, Cadena, NumeroEntero, NumeroDecimal
     }
     public enum TipoDato
     {
-        Entero, Decimal, Cadena, 
-        Exponencial, Invalido
+        Entero, Decimal, Cadena, Invalido, NoAplica
     }
     public class Token
     {
@@ -31,7 +31,7 @@ namespace My8086.Clases.Fases
         public DocumentLine Linea { get; private set; }
         public List<DocumentLine> LineasDeReferencia { get; private set; }
         public int Referencias { get => LineasDeReferencia?.Count ?? 0; }
-        public string Lexema { get; private set; }
+        public string Lexema { get; internal set; }
         public bool EsValido => (TipoToken != TipoToken.Invalido && TipoDato != TipoDato.Invalido);
         public Token(string lexema, TipoToken TipoToken, TipoDato TipoDato, DocumentLine Linea)
         {
@@ -41,21 +41,6 @@ namespace My8086.Clases.Fases
             this.Linea = Linea;
             this.LineasDeReferencia = new List<DocumentLine>();
             this.Lexema = lexema;
-        }
-        internal string ObtenerTipoDato(Funcion Fx)
-        {
-            switch (this.TipoDato)
-            {
-                case TipoDato.Entero:
-                    return "int";
-            }
-
-            if (this.TipoDato == TipoDato.Cadena && this.TipoToken == TipoToken.Identificador)
-            {
-                Variable var = Fx.Variables.First(x => x.Nombre == this.Lexema);
-                return var.Valor.ObtenerTipoDato(Fx);
-            }
-            return null;
         }
 
         public override string ToString()
@@ -70,43 +55,36 @@ namespace My8086.Clases.Fases
             return sb.ToString();
         }
 
-        public static Token Identificar(string Token, DocumentLine Linea, ResultadosCompilacion Errores)
+        public static Token Identificar(string Token, DocumentLine Linea, ResultadosCompilacion Errores, ExpresionesRegulares.ExpresionesRegulares Patrones)
         {
-            Fases.Token token = new Token(Token, TipoToken.Invalido,TipoDato.Invalido, Linea);
-            //Especiales
-            if (Token == "++")
-            {
-                token.TipoToken = TipoToken.OperadorAritmetico;
-                token.TipoDato = TipoDato.Entero;
-                return token;
-            }
-            //
-            if (EsPalabraReservada(Token))
+            Fases.Token token = new Token(Token, TipoToken.Invalido, TipoDato.Invalido, Linea);
+            if (Patrones.Evaluar(Patrones.PalabrasReservadas, Token))
             {
                 token.TipoToken = TipoToken.PalabraReservada;
-                token.TipoDato = TipoDato.Cadena;
+                token.TipoDato = TipoDato.NoAplica;
                 return token;
             }
             //
-            if (Evaluar(Enteros, Token))
+            if (Patrones.Evaluar(Patrones.Enteros, Token))
             {
-                token.TipoToken = TipoToken.Identificador;
+                token.TipoToken = TipoToken.NumeroEntero;
                 token.TipoDato = TipoDato.Entero;
                 return token;
             }
-            if (Evaluar(Decimales, Token))
+            if (Patrones.Evaluar(Patrones.Decimales, Token))
             {
-                token.TipoToken = TipoToken.Identificador;
+                token.TipoToken = TipoToken.NumeroDecimal;
                 token.TipoDato = TipoDato.Decimal;
                 return token;
             }
-            if (Evaluar(Cadena, Token))
+            if (Patrones.Evaluar(Patrones.Cadena, Token))
             {
-                token.TipoToken = TipoToken.Identificador;
+                token.TipoToken = TipoToken.Cadena;
                 token.TipoDato = TipoDato.Cadena;
+                token.Lexema = Patrones["Cadena"];
                 return token;
             }
-            if (Evaluar(ExpresionesRegulares.ExpresionesRegulares.Identificador, Token))
+            if (Patrones.Evaluar(Patrones.Identificador, Token))
             {
                 token.TipoToken = TipoToken.Identificador;
                 token.TipoDato = TipoDato.Cadena;
@@ -118,34 +96,46 @@ namespace My8086.Clases.Fases
                 token.TipoDato = TipoDato.Cadena;
                 return token;
             }
+            if (Token == ";")
+            {
+                token.TipoToken = TipoToken.FinInstruccion;
+                token.TipoDato = TipoDato.NoAplica;
+                return token;
+            }
 
-            if (Token == "=")
+            if (Token == ":=")
             {
                 token.TipoToken = TipoToken.Relacional;
-                token.TipoDato = TipoDato.Cadena;
+                token.TipoDato = TipoDato.NoAplica;
                 return token;
             }
 
-            if (Token == "==")
+            if (Patrones.Evaluar(Patrones.OperadoresLogicos, Token))
             {
                 token.TipoToken = TipoToken.OperadorLogico;
-                token.TipoDato = TipoDato.Cadena;
+                token.TipoDato = TipoDato.NoAplica;
                 return token;
             }
-            if (Token == "+")
+            if (Token == "(")
+            {
+                token.TipoToken = TipoToken.ParentesisAbierto;
+                token.TipoDato = TipoDato.NoAplica;
+                return token;
+            }
+            if (Token == ")")
+            {
+                token.TipoToken = TipoToken.ParentesCerrado;
+                token.TipoDato = TipoDato.NoAplica;
+                return token;
+            }
+            if (Token == "+"|| Token == "*"||Token == "-"||Token == "/")
             {
                 token.TipoToken = TipoToken.OperadorAritmetico;
-                token.TipoDato = TipoDato.Cadena;
+                token.TipoDato = TipoDato.NoAplica;
                 return token;
             }
 
             return token;
-        }
-
-        private static bool EsPalabraReservada(string Token)
-        {
-            return AppData.SQLH.Exists("SELECT *FROM PALABRAS_RESERVADAS WHERE TOKEN=@TOKEN",
-                new SQLiteParameter("TOKEN", Token));
         }
     }
 }

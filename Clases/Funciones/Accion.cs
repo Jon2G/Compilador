@@ -14,11 +14,15 @@ namespace My8086.Clases.Funciones
     {
         protected List<Token> Argumentos { get; private set; }
         public readonly DocumentLine LineaDocumento;
-        private readonly Funcion FuncionActual;
-        protected Accion(Funcion FuncionActual, LineaLexica Linea, int InicioArgumentos)
+        protected readonly Programa Programa;
+        protected Accion(Programa Programa)
         {
+            this.Programa = Programa;
+        }
+        protected Accion(Programa Programa,LineaLexica Linea, int InicioArgumentos)
+        {
+            this.Programa = Programa;
             this.Argumentos = new List<Token>();
-            this.FuncionActual = FuncionActual;
             this.LineaDocumento = Linea.LineaDocumento;
             for (int i = InicioArgumentos; i < Linea.Elementos; i++)
             {
@@ -31,11 +35,11 @@ namespace My8086.Clases.Funciones
         }
         protected void HacerReferencia(Token tk)
         {
-            Variable variable = this.FuncionActual.Variables.FirstOrDefault(x => x.Nombre == tk.Lexema);
+            Variable variable = this.Programa.SegmentoDeDatos.ObtenerVariable(tk.Lexema);
             variable?.HacerReferencia();
         }
         public abstract bool RevisarSemantica(ResultadosCompilacion Errores);
-        public abstract StringBuilder Traduccion(Funcion Fx);
+        public abstract StringBuilder Traduccion();
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(this.GetType().Name);

@@ -8,83 +8,47 @@ using My8086.Clases.Advertencias;
 using My8086.Clases.Compilador;
 using My8086.Clases.Fases;
 using My8086.Clases.Fases._1._Analisis_Lexico;
+using My8086.Clases.Funciones.CodigoTresDirecciones;
+using TipoToken = My8086.Clases.Fases.TipoToken;
 
 namespace My8086.Clases.Funciones
 {
     internal class Imprimir : Accion
     {
+        private readonly Variable VariableImpresion;
 
-        public Imprimir(Funcion Fx, LineaLexica Linea, int InicioArgumentos = 1) : base(Fx, Linea, InicioArgumentos)
+        public Imprimir(Programa Programa, Token VariableImpresion, LineaLexica Linea) : base(Programa, Linea, 1)
         {
-
+            this.VariableImpresion = this.Programa.SegmentoDeDatos.ObtenerVariable(VariableImpresion.Lexema);
+            //this.VariableImpresion = VariableImpresion;
         }
 
         public override bool RevisarSemantica(ResultadosCompilacion Errores)
         {
-            if (!Argumentos.Any())
+            if (this.VariableImpresion is null)
             {
-                Errores.ResultadoCompilacion("Hace falta un argumento para la función imprimir",
-                    LineaDocumento);
+                Errores.VariableNoDeclarada("Variable no identificada", this.LineaDocumento);
+                return false;
             }
-
-            if (this.Argumentos[0].TipoDato == TipoDato.Cadena || this.Argumentos[0].TipoToken == TipoToken.Identificador)
-            {
-                if (Argumentos.Count > 1)
-                {
-                    if (Argumentos.Count < 3)
-                    {
-                        Errores.ResultadoCompilacion("Hacen falta los argumentos de coordenada x,y",
-                            LineaDocumento);
-                        return false;
-                    }
-
-                    if (Argumentos[1].TipoToken == TipoToken.OperadorAritmetico)
-                    {
-                        if (Argumentos[1].Lexema != "+")
-                        {
-                            Errores.ResultadoCompilacion($"No se puede utilizar el operador '{Argumentos[1].Lexema}' en conjunto con la cadena",
-                                LineaDocumento);
-                        }
-                    }
-                    if (Argumentos[2].TipoDato == TipoDato.Entero || Argumentos[2].TipoDato == TipoDato.Cadena)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
-        public override StringBuilder Traduccion(Funcion Fx)
+        public override StringBuilder Traduccion()
         {
             StringBuilder sb = new StringBuilder();
-            if (this.Argumentos.Count >= 4)
+            switch (this.VariableImpresion.TipoDato)
             {
-                if (this.Argumentos[this.Argumentos.Count - 4].TipoToken == TipoToken.SeparadorParametros)
-                {
-                    var x = this.Argumentos[this.Argumentos.Count - 3];
-                    var y = this.Argumentos[this.Argumentos.Count - 1];
-                    if ((x.TipoDato == TipoDato.Entero || x.TipoToken == TipoToken.Identificador) &&
-                        (y.TipoDato == TipoDato.Entero || y.TipoToken == TipoToken.Identificador))
-                    {
-                        sb.AppendLine($"Console.SetCursorPosition({x.Lexema}, {y.Lexema});");
-                    }
-                }
+                case TipoDato.Decimal:
+                case TipoDato.Entero:
+                    sb.AppendLine($"LEA DI,SGN_{this.VariableImpresion.Nombre}");
+                    sb.AppendLine($"CALL MOSTRAR_RESULTADO");
+                    break;
+                default:
+                    sb.AppendLine($"MOV DX,{this.VariableImpresion.Nombre}");
+                    sb.AppendLine("MOV AH,09H");
+                    sb.AppendLine("INT 21H");
+                    break;
             }
-
-            sb.AppendLine($@"Console.Write(");
-            for (int i = 0; i < this.Argumentos.Count; i++)
-            {
-                sb.Append(this.Argumentos[i].Lexema);
-            }
-            sb.AppendLine(");");
             return sb;
         }
     }
