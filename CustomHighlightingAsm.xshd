@@ -1,0 +1,88 @@
+﻿<?xml version="1.0"?>
+<SyntaxDefinition name="ResaltarTexto" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" foreground="Green" />
+
+  <Color name="Hex" foreground="LightSeaGreen" />
+  <Color name="Args" foreground="DodgerBlue" />
+
+  <!-- This is the main ruleset. -->
+  <RuleSet>
+    <Span color="Comment" begin=";" />
+    <Span color="Comment" multiline="true" begin="/\'" end="\'/" />
+
+    <Span color="Hex" multiline="false" begin="(\s[0-9]|,[0-9]H?|(,?[0-9]H))"/>
+    <Span color="Args" begin="\[" end="\]" />
+
+
+    <Keywords fontWeight="bold" foreground="LightSkyBlue">
+      <Word>DB</Word>
+      <Word>DW</Word>
+      <Word>MOV</Word>
+      <Word>[</Word>
+      <Word>]</Word>
+      <Word>RET</Word>
+    </Keywords>
+
+    <Keywords fontWeight="bold" foreground="DodgerBlue">
+      <Word>PROC</Word>
+      <Word>CALL</Word>
+      <Word>CMP</Word>
+      <Word>JE</Word>
+      <Word>JA</Word>
+      <Word>JNE</Word>
+      <Word>JS</Word>
+      <Word>JNS</Word>
+      <Word>JL</Word>
+      <Word>JZ</Word>
+      <Word>JNZ</Word>
+      <Word>ADD</Word>
+      <Word>SUB</Word>
+      <Word>JMP</Word>
+      <Word>XOR</Word>
+      <Word>MUL</Word>
+      <Word>AAM</Word>
+      <Word>ENDP</Word>
+      <Word>END</Word>
+      <Word>INC</Word>
+      <Word>DEC</Word>
+      <Word>.MODEL SMALL</Word>
+      <Word>.386</Word>
+      <Word>.STACK</Word>
+    </Keywords>
+
+    <Keywords fontWeight="bold" foreground="Green">
+      <Word>NEAR</Word>
+      <Word>FAR</Word>
+    </Keywords>
+
+    <Keywords fontWeight="bold" foreground="Aquamarine">
+      <Word>DS</Word>
+      <Word>@DATA</Word>
+      <Word>.DATA</Word>
+    </Keywords>
+
+    <Keywords fontWeight="bold" foreground="Khaki">
+      <Word>SI</Word>
+      <Word>DI</Word>
+      <Word>AX</Word>
+      <Word>AL</Word>
+      <Word>AH</Word>
+      <Word>BX</Word>
+      <Word>BH</Word>
+      <Word>BL</Word>
+      <Word>CX</Word>
+      <Word>CH</Word>
+      <Word>CL</Word>
+      <Word>DX</Word>
+      <Word>DH</Word>
+      <Word>DL</Word>
+    </Keywords>
+
+    <Keywords fontWeight="bold" foreground="IndianRed">
+      <Word>INT</Word>
+      <Word>LEA</Word>
+    </Keywords>
+
+
+  </RuleSet>
+</SyntaxDefinition>

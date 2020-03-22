@@ -93,7 +93,7 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
                         }
 
                         string nombre = linea[1].Lexema.Replace("Nom.", "").Trim();
-                        this.Programa = new Programa(nombre,this.Expresiones);
+                        this.Programa = new Programa(nombre, this.Expresiones);
                         if (string.IsNullOrEmpty(nombre))
                         {
                             this.Errores.ResultadoCompilacion("El nombre del programa no puede estar vacio.",
@@ -189,7 +189,7 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
                 {
                     //Es una cadena que no es una variable Ex. Imprime('Hola mundo');
                     //Crearemos una variable con un identificador unico que guarde esta cadena
-                    Variable var = this.Programa.SegmentoDeDatos.Nueva(new Variable(this.Programa, tk, linea,tk.TipoDato));
+                    Variable var = this.Programa.SegmentoDeDatos.Nueva(new Variable(this.Programa, tk, linea, tk.TipoDato));
                     VariableImpresion = new Token(var.Nombre, TipoToken.Identificador, TipoDato.Cadena, linea.LineaDocumento);
 
                     this.Programa.Acciones.Add(new AsignaCadena(Programa, linea, var, tk));
@@ -239,7 +239,7 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
             {
                 return false;
             }
-            if (this.Programa.Acciones.OfType<IBloque>().LastOrDefault() is { } bloque)
+            if (this.Programa.Acciones.OfType<IBloque>().Where(x=>x.FinBloque is null).FirstOrDefault() is { } bloque)
             {
                 if (bloque.FinBloque != null)
                 {
@@ -269,90 +269,90 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
         {
             if (linea[0].Lexema == "For")
             {
-                if (linea[1].TipoToken != TipoToken.ParentesisAbierto)
-                {
-                    this.Errores.ResultadoCompilacion($"Se esperaba un parentesis abierto", linea.LineaDocumento);
-                    return true;
-                }
-                if (Programa.SegmentoDeDatos.ObtenerVariable(linea[2].Lexema) is { } variable)
-                {
-                    variable.HacerReferencia();
-                }
-                else
-                {
-                    this.Errores.ResultadoCompilacion($"Variable del cliclo invalida", linea.LineaDocumento);
-                    return true;
-                }
-                if (!double.TryParse(linea[4].Lexema, out var Inicio))
-                {
-                    this.Errores.ResultadoCompilacion($"Valor de inicio del cliclo invalido", linea.LineaDocumento);
-                    return true;
-                }
+                //if (linea[1].TipoToken != TipoToken.ParentesisAbierto)
+                //{
+                //    this.Errores.ResultadoCompilacion($"Se esperaba un parentesis abierto", linea.LineaDocumento);
+                //    return true;
+                //}
+                //if (Programa.SegmentoDeDatos.ObtenerVariable(linea[2].Lexema) is { } variable)
+                //{
+                //    variable.HacerReferencia();
+                //}
+                //else
+                //{
+                //    this.Errores.ResultadoCompilacion($"Variable del cliclo invalida", linea.LineaDocumento);
+                //    return true;
+                //}
+                //if (!double.TryParse(linea[4].Lexema, out var Inicio))
+                //{
+                //    this.Errores.ResultadoCompilacion($"Valor de inicio del cliclo invalido", linea.LineaDocumento);
+                //    return true;
+                //}
 
-                List<OperacionLogica> Argumentos = new List<OperacionLogica>();
-                for (int i = 6; i < linea.Elementos; i += 3)
-                {
-                    if ((linea[i].TipoToken == TipoToken.Identificador &&
-                        linea[i].Lexema == "and") ||
-                        linea[i].TipoToken == TipoToken.ParentesisAbierto
-                        )
-                    {
-                        if (linea[i].TipoToken != TipoToken.ParentesisAbierto)
-                        {
-                            Token union = linea[i];
-                            switch (union.Lexema)
-                            {
-                                case "and":
-                                    Argumentos.Add(new OperacionLogica(null, union, null, linea));
-                                    break;
-                                default:
-                                    this.Errores.ResultadoCompilacion($"Operador lógico invalido", linea.LineaDocumento);
-                                    return true;
-                            }
-                        }
+                //List<OperacionLogica> Argumentos = new List<OperacionLogica>();
+                //for (int i = 6; i < linea.Elementos; i += 3)
+                //{
+                //    if ((linea[i].TipoToken == TipoToken.Identificador &&
+                //        linea[i].Lexema == "and") ||
+                //        linea[i].TipoToken == TipoToken.ParentesisAbierto
+                //        )
+                //    {
+                //        if (linea[i].TipoToken != TipoToken.ParentesisAbierto)
+                //        {
+                //            Token union = linea[i];
+                //            switch (union.Lexema)
+                //            {
+                //                case "and":
+                //                    Argumentos.Add(new OperacionLogica(null, union, null, linea));
+                //                    break;
+                //                default:
+                //                    this.Errores.ResultadoCompilacion($"Operador lógico invalido", linea.LineaDocumento);
+                //                    return true;
+                //            }
+                //        }
 
-                        i++;
-                    }
+                //        i++;
+                //    }
 
-                    if (linea[i].TipoToken == TipoToken.FinInstruccion)
-                    {
-                        break;
-                    }
-                    if (linea[i].TipoToken != TipoToken.Identificador)
-                    {
-                        this.Errores.ResultadoCompilacion($"Valor de comparación inicial erroneo.", linea.LineaDocumento);
-                        return true;
-                    }
+                //    if (linea[i].TipoToken == TipoToken.FinInstruccion)
+                //    {
+                //        break;
+                //    }
+                //    if (linea[i].TipoToken != TipoToken.Identificador)
+                //    {
+                //        this.Errores.ResultadoCompilacion($"Valor de comparación inicial erroneo.", linea.LineaDocumento);
+                //        return true;
+                //    }
 
 
-                    if (linea[i + 1].TipoToken != TipoToken.OperadorLogico)
-                    {
-                        this.Errores.ResultadoCompilacion($"Se esperaba una comparación lógica.", linea.LineaDocumento);
-                        return true;
-                    }
+                //    if (linea[i + 1].TipoToken != TipoToken.OperadorLogico)
+                //    {
+                //        this.Errores.ResultadoCompilacion($"Se esperaba una comparación lógica.", linea.LineaDocumento);
+                //        return true;
+                //    }
 
-                    while (linea[i + 2].TipoToken == TipoToken.OperadorLogico)
-                    {
-                        Argumentos.Add(new OperacionLogica(linea[i], linea[i + 1], linea[i + 2], linea));
-                        i++;
-                    }
+                //    while (linea[i + 2].TipoToken == TipoToken.OperadorLogico)
+                //    {
+                //        Argumentos.Add(new OperacionLogica(linea[i], linea[i + 1], linea[i + 2], linea));
+                //        i++;
+                //    }
 
-                    if (linea[i + 2].TipoToken != TipoToken.Identificador)
-                    {
-                        this.Errores.ResultadoCompilacion($"Valor de comparación inicial erroneo.", linea.LineaDocumento);
-                        return true;
-                    }
-                    Argumentos.Add(new OperacionLogica(linea[i], linea[i + 1], linea[i + 2], linea));
-                }
+                //    if (linea[i + 2].TipoToken != TipoToken.Identificador)
+                //    {
+                //        this.Errores.ResultadoCompilacion($"Valor de comparación inicial erroneo.", linea.LineaDocumento);
+                //        return true;
+                //    }
+                //    Argumentos.Add(new OperacionLogica(linea[i], linea[i + 1], linea[i + 2], linea));
+                //}
 
-                if (!double.TryParse(linea[linea.Elementos - 2].Lexema, out var Incremento))
-                {
-                    this.Errores.ResultadoCompilacion($"Valor de incremento del cliclo invalido", linea.LineaDocumento);
-                    return true;
-                }
-                this.Programa.AgregarAccion(new For(Programa, linea, Argumentos.ToArray(), Inicio, Incremento));
+                //if (!double.TryParse(linea[linea.Elementos - 2].Lexema, out var Incremento))
+                //{
+                //    this.Errores.ResultadoCompilacion($"Valor de incremento del cliclo invalido", linea.LineaDocumento);
+                //    return true;
+                //}
+                //this.Programa.AgregarAccion(new For(Programa, linea, Argumentos.ToArray(), Inicio, Incremento));
 
-                return true;
+                //return true;
             }
             return false;
         }
@@ -379,7 +379,7 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
                 linea[0].Lexema == "Decimal"
                 )
             {
-                TipoDato TipoDato=TipoDato.Invalido;
+                TipoDato TipoDato = TipoDato.Invalido;
                 switch (linea[0].Lexema)
                 {
                     case "Entero":
@@ -393,7 +393,7 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
                         break;
                 }
 
-                Variable variableNueva = new Variable(Programa, linea,TipoDato);
+                Variable variableNueva = new Variable(Programa, linea, TipoDato);
                 if (this.Programa.SegmentoDeDatos.YaExisteVariable(variableNueva))
                 {
                     this.Errores.ResultadoCompilacion($"La variable '{variableNueva.Nombre}' ya fué declarada en este contexto.", linea.LineaDocumento);
@@ -411,7 +411,7 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
         {
             if (linea[0].Lexema == "Si")
             {
-                List<OperacionLogica> Argumentos = new List<OperacionLogica>();
+                List<Token> Argumentos = new List<Token>();
 
 
                 if (linea[1].TipoToken != TipoToken.ParentesisAbierto)
@@ -419,53 +419,32 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
                     this.Errores.ResultadoCompilacion($"Se esperaba un parentesis abierto", linea.LineaDocumento);
                     return true;
                 }
-                for (int i = 1; i < linea.Elementos; i += 3)
+                int i = 2;
+                while (linea[i].TipoToken != TipoToken.ParentesCerrado)
                 {
-                    if ((linea[i].TipoToken == TipoToken.Identificador &&
-                        linea[i].Lexema == "and") ||
-                        linea[i].TipoToken == TipoToken.ParentesisAbierto
-                        )
+                    Argumentos.Add(linea[i]);
+                    i++;
+                    if (linea.Elementos > i)
                     {
-                        if (linea[i].TipoToken != TipoToken.ParentesisAbierto)
+                        if (linea[1].TipoToken != TipoToken.ParentesisAbierto)
                         {
-                            Token union = linea[i];
-                            switch (union.Lexema)
-                            {
-                                case "and":
-                                    Argumentos.Add(new OperacionLogica(null, union, null, linea));
-                                    break;
-                                default:
-                                    this.Errores.ResultadoCompilacion($"Operador lógico invalido", linea.LineaDocumento);
-                                    return true;
-                            }
+                            this.Errores.ResultadoCompilacion($"Se esperaba un parentesis cerrado", linea.LineaDocumento);
+                            return true;
                         }
-
-                        i++;
                     }
-
-                    if (linea[i].TipoToken == TipoToken.ParentesCerrado)
-                    {
-                        break;
-                    }
-                    if (linea[i].TipoToken != TipoToken.Identificador)
-                    {
-                        this.Errores.ResultadoCompilacion($"Valor de comparación inicial erroneo.", linea.LineaDocumento);
-                        return true;
-                    }
-                    if (linea[i + 1].TipoToken != TipoToken.OperadorLogico)
-                    {
-                        this.Errores.ResultadoCompilacion($"Se esperaba una comparación lógica.", linea.LineaDocumento);
-                        return true;
-                    }
-                    if (linea[i + 2].TipoToken != TipoToken.Identificador)
-                    {
-                        this.Errores.ResultadoCompilacion($"Valor de comparación inicial erroneo.", linea.LineaDocumento);
-                        return true;
-                    }
-                    Argumentos.Add(new OperacionLogica(linea[i], linea[i + 1], linea[i + 2], linea));
                 }
-                this.Programa.AgregarAccion(new Si(Programa, linea, Argumentos.ToArray()));
-
+                OperacionesLogicas operaciones = OperacionesLogicas.Analizar(Argumentos, this.Programa,this.Errores);
+                if(operaciones is null)
+                {
+                    this.Errores.ResultadoCompilacion($"Comparación lógica incorrecta", linea.LineaDocumento);
+                    return true;
+                }
+                Si si = new Si(Programa, linea, operaciones);
+                //if (this.Programa.Acciones.Last() is Sino sino)
+                //{
+                //    sino.Si = si;
+                //}
+                this.Programa.AgregarAccion(si);
                 return true;
             }
 
@@ -482,7 +461,7 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
                         this.Errores.ResultadoCompilacion("Sino mal colocado", linea.LineaDocumento);
                         return true;
                     }
-                    si.Sino = new Sino(Programa, linea);
+                    si.Sino = new Sino(si,Programa, linea);
                     this.Programa.Acciones.Add(si.Sino);
                     return true;
                 }

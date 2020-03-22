@@ -4,7 +4,8 @@
         xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
         TextOptions.TextFormattingMode="Display"
-        Title="My8086" Height="500" Width="700">
+        WindowState="Maximized"
+        Title="My8086" Height="562" Width="834">
     <DockPanel>
         <ToolBarPanel ClipToBounds="True" DockPanel.Dock="Top" Background="#FF2D2D30">
             <ToolBar Margin="-5,0,-13,0" Padding="5,0,0,0" ToolBarTray.IsLocked="True" OverflowMode="Never" Background="#FF2D2D30" BorderThickness="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" >
@@ -68,6 +69,11 @@
                         <ProgressBar MinHeight="16" DockPanel.Dock="Top" MinWidth="200" Visibility="Collapsed"  Grid.Column="1" x:Name="ProgresoCompilacion"/>
                     </DockPanel>
                 </Button>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock FontSize="16" Margin="5,0" VerticalAlignment="Center" Text="Ejemplos" Foreground="White"/>
+                    <ComboBox x:Name="CmbxEjemplos" SelectionChanged="CmbxEjemplos_SelectionChanged" FontSize="16" Margin="5,0" MinWidth="200"/>
+                </StackPanel>
+                <TextBlock Foreground="White" x:Name="TxtArchivo" VerticalAlignment="Center" FontSize="18"/>
             </ToolBar>
         </ToolBarPanel>
         <Grid>
@@ -81,37 +87,79 @@
                     <RowDefinition Height="5"/>
                     <RowDefinition MinHeight="50" MaxHeight="250"/>
                 </Grid.RowDefinitions>
-                <avalonedit:TextEditor
-                    Name="textEditor"
+                <TabControl Background="#FF2D2D30" Margin="0" Padding="0" BorderBrush="#FF2D2D30">
+                    <TabItem  Padding="0" Margin="0" Background="#FF2D2D30">
+                        <TabItem.Header>
+                            <Border BorderThickness="1" Background="#FF2D2D30" BorderBrush="#FFABADB3">
+                                <ContentPresenter>
+                                    <ContentPresenter.Content>
+                                        <TextBlock FontSize="18" Margin="4" Text="Código fuente" Foreground="White"/>
+                                    </ContentPresenter.Content>
+                                </ContentPresenter>
+                            </Border>
+
+                        </TabItem.Header>
+
+                        <avalonedit:TextEditor
+                    Name="TxtMy"
                     FontFamily="Consolas"
                     Background="#FF2D2D30"
                     Foreground="White"
                     FontSize="14pt"
-                    SyntaxHighlighting="C#"
+                    SyntaxHighlighting="My8086"
                     ShowLineNumbers="True" WordWrap="True">
-                    <avalonedit:TextEditor.VerticalScrollBarVisibility>Auto</avalonedit:TextEditor.VerticalScrollBarVisibility>
-                    <avalonedit:TextEditor.Resources>
-                        <Style TargetType="ScrollBar">
-                            <Setter Property="Background" Value="#FF686868"/>
-                        </Style>
-                    </avalonedit:TextEditor.Resources>
-                </avalonedit:TextEditor>
+                            <avalonedit:TextEditor.VerticalScrollBarVisibility>Auto</avalonedit:TextEditor.VerticalScrollBarVisibility>
+                            <avalonedit:TextEditor.Resources>
+                                <Style TargetType="ScrollBar">
+                                    <Setter Property="Background" Value="#FF686868"/>
+                                </Style>
+                            </avalonedit:TextEditor.Resources>
+                        </avalonedit:TextEditor>
+                    </TabItem>
+                    <TabItem  Padding="0" Margin="0" Background="#FF2D2D30">
+                        <TabItem.Header>
+                            <Border BorderThickness="1" Background="#FF2D2D30" BorderBrush="#FFABADB3">
+                                <ContentPresenter>
+                                    <ContentPresenter.Content>
+                                        <TextBlock FontSize="18" Margin="4" Text="Ensamblador" Foreground="White"/>
+                                    </ContentPresenter.Content>
+                                </ContentPresenter>
+                            </Border>
+                        </TabItem.Header>
+                        <avalonedit:TextEditor
+                    Name="TxtAsm"
+                    IsReadOnly="True"        
+                    FontFamily="Consolas"
+                    Background="#FF2D2D30"
+                    Foreground="White"
+                    FontSize="14pt"
+                    SyntaxHighlighting="ASM"
+                    ShowLineNumbers="True" WordWrap="True">
+                            <avalonedit:TextEditor.VerticalScrollBarVisibility>Auto</avalonedit:TextEditor.VerticalScrollBarVisibility>
+                            <avalonedit:TextEditor.Resources>
+                                <Style TargetType="ScrollBar">
+                                    <Setter Property="Background" Value="#FF686868"/>
+                                </Style>
+                            </avalonedit:TextEditor.Resources>
+                        </avalonedit:TextEditor>
+                    </TabItem>
+                </TabControl>
                 <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" Background="#FF434346"/>
                 <DockPanel Grid.Row="2">
-                    <TabControl DockPanel.Dock="Bottom" Background="#FF7A7B7C">
+                    <TabControl x:Name="TabErrores" DockPanel.Dock="Bottom" Background="#FF7A7B7C">
                         <TabItem Padding="0" Margin="0" Background="#FF2D2D30">
                             <TabItem.Header>
-                                <Border BorderThickness="1" Background="#FF7A7B7C" BorderBrush="#FF0078D7">
+                                <Border BorderThickness="1" Background="#FF2D2D30" BorderBrush="#FFABADB3">
                                     <ContentPresenter>
                                         <ContentPresenter.Content>
-                                            <TextBlock FontSize="18" Margin="4" Text="Lista de errores"/>
+                                            <TextBlock FontSize="18" Margin="4" Text="Lista de errores" Foreground="White"/>
                                         </ContentPresenter.Content>
                                     </ContentPresenter>
                                 </Border>
                             </TabItem.Header>
                             <Grid>
-                                <ScrollViewer  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="#FF7A7B7C">
-                                    <ListView Background="#FF7A7B7C" x:Name="ErroresList" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                <ScrollViewer  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="#FF2D2D30">
+                                    <ListView Background="#FF2D2D30" x:Name="ErroresList" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
 
                                     </ListView>
                                 </ScrollViewer>
@@ -119,10 +167,10 @@
                         </TabItem>
                         <TabItem Padding="0" Margin="0">
                             <TabItem.Header>
-                                <Border BorderThickness="1" Background="#FF7A7B7C" BorderBrush="#FF0078D7">
+                                <Border BorderThickness="1" Background="#FF2D2D30" BorderBrush="#FFABADB3">
                                     <ContentPresenter>
                                         <ContentPresenter.Content>
-                                            <TextBlock FontSize="18" Margin="4" Text="Salida"/>
+                                            <TextBlock FontSize="18" Margin="4" Text="Salida" Foreground="White"/>
                                         </ContentPresenter.Content>
                                     </ContentPresenter>
                                 </Border>

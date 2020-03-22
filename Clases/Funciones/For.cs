@@ -19,8 +19,8 @@ namespace My8086.Clases.Funciones
         private double Incremento { get; set; } = 0;
         private double Inicio { get; set; } = 0;
         private Variable Contador { get; set; }
-        private readonly OperacionLogica[] OperacionLogica;
-        public For(Programa Programa, LineaLexica Linea, OperacionLogica[] OperacionLogica, double Inicio, double Incremento) : base(Programa, Linea, 1)
+        private readonly OperacionesLogicas OperacionLogica;
+        public For(Programa Programa, LineaLexica Linea, OperacionesLogicas OperacionLogica, double Inicio, double Incremento) : base(Programa, Linea, 1)
         {
             this.OperacionLogica = OperacionLogica;
             this.Inicio = Inicio;

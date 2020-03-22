@@ -59,6 +59,7 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
         }
         private void DeclararTemporales(Programa programa, TokenAritmetico tk)
         {
+            programa.OperacionesConNumeros = true;
             if (tk is Nodo nd)
             {
                 string[] variables = new[]{
@@ -108,7 +109,6 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
             }
             return Asm;
         }
-
         private List<StringBuilder> Traducir(List<StringBuilder> operaciones, TokenAritmetico Token)
         {
             if (Token is Nodo nd)
@@ -144,7 +144,6 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
 
             return operaciones;
         }
-
         private string EscribeNumero(TokenAritmetico tk, int n)
         {
             StringBuilder sb = new StringBuilder();

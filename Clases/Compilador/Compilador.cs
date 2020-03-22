@@ -24,6 +24,7 @@ namespace My8086.Clases.Compilador
         public EventHandler OnProgreso;
         private EventHandler _VerLinea;
         private BorlandC TurboC;
+        public StringBuilder ASM { get; private set; }
         public bool Compilado { get; set; }
 
         public EventHandler VerLinea
@@ -54,43 +55,6 @@ namespace My8086.Clases.Compilador
             this.ResultadosCompilacion = new ResultadosCompilacion(this.VerLinea);
             this.TurboC = new BorlandC();
             //this.ReconceTokens = new ReconoceTokens(this.ResultadosCompilacion, this.PropiedadesPrograma);
-        }
-
-
-
-        public string _Compilar()
-        {
-            this.Progreso = 0;
-            this.ResultadosCompilacion.Clear();
-            try
-            {
-                Convertir();
-                if (!this.ResultadosCompilacion.SinErrores)
-                {
-                    this.Compilado = false;
-                    return "Se encontrarón errores previos a la compilación\n";
-                }
-
-                //TraductorAsm traductor = new TraductorAsm(this.PropiedadesPrograma);
-                //string documento = traductor.ObtenerAsm();
-                //Clipboard.SetText(documento);
-                //if (this.Borland.GeneraEjecutable(documento))
-                //{
-                //    this.Compilado = true;
-                //}
-
-                //return this.Borland.ResultadosCompilacion;
-            }
-            catch (RegexMatchTimeoutException Rex)
-            {
-                this.ResultadosCompilacion.ResultadoCompilacion(Rex.Pattern + Environment.NewLine + "->" + Rex.Input, null);
-                this.Compilado = false;
-            }
-            catch (Exception e)
-            {
-                this.Compilado = false;
-            }
-            return "Error desconocido,la compilación no se realizo\n";
         }
         public string Compilar()
         {
@@ -127,7 +91,7 @@ namespace My8086.Clases.Compilador
                             intermedio.Generar();
                             this.TurboC.Limpiar();
                             this.Compilado = this.TurboC.GeneraEjecutable(intermedio.Codigo.ToString());
-                            string ASM = intermedio.Codigo.ToString();
+                            this.ASM = intermedio.Codigo;
 
                             return this.TurboC.ResultadosCompilacion;
                         }

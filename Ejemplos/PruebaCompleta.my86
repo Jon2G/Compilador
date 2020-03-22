@@ -23,7 +23,7 @@ Program Nom.programa
 		For(Y2:=1;y<=10;y2+1)
 			begin
 			 //Instrucciones :)
-			 Imprime('Represento una instrucciÃ³n');
+			 Imprime('Represento una instrucción');
 			end
 		Si(y2<9 and X>3)
 			begin

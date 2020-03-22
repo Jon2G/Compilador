@@ -48,6 +48,7 @@ namespace My8086
     {
         private readonly AutoCompletado AutoCompletado;
         readonly FoldingManager FoldingManager;
+        readonly FoldingManager FoldingManagerAsm;
         readonly BraceFoldingStrategy FoldingStrategy;
         private Compilador Compilador;
         public Window1()
@@ -65,31 +66,52 @@ namespace My8086
                         HighlightingLoader.Load(reader, HighlightingManager.Instance);
                 }
             }
+            IHighlightingDefinition customHighlighting2;
+            using (Stream s = typeof(Window1).Assembly.GetManifestResourceStream("My8086.CustomHighlightingAsm.xshd"))
+            {
+                if (s == null)
+                    throw new InvalidOperationException("Could not find embedded resource");
+                using (XmlReader reader = new XmlTextReader(s))
+                {
+                    customHighlighting2 = ICSharpCode.AvalonEdit.Highlighting.Xshd.
+                        HighlightingLoader.Load(reader, HighlightingManager.Instance);
+                }
+            }
+            HighlightingManager.Instance.RegisterHighlighting("My8086", new string[] { ".my86" }, customHighlighting);
 
-            HighlightingManager.Instance.RegisterHighlighting("My8086", new string[] { ".txt", ".asm" }, customHighlighting);
+            HighlightingManager.Instance.RegisterHighlighting("ASM", new string[] { ".asm" }, customHighlighting2);
 
             InitializeComponent();
-            this.FoldingManager = new FoldingManager(textEditor.Document);
-            this.AutoCompletado = new AutoCompletado(this.textEditor.TextArea);
+            this.CmbxEjemplos.ItemsSource = Ejemplos.Ejemplo.ListarEjemplos();
+            //this.CmbxEjemplos.SelectedItem = this.CmbxEjemplos.ItemsSource.OfType<Ejemplos.Ejemplo>().Last();
+            this.FoldingManager = new FoldingManager(TxtMy.Document);
+            this.AutoCompletado = new AutoCompletado(this.TxtMy.TextArea);
+
+            this.FoldingManagerAsm = new FoldingManager(TxtAsm.Document);
+
             //propertyGridComboBox.SelectedIndex = 2;
 
-            textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("My8086");
-            // this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\Todo.txt";
+            TxtMy.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("My8086");
+            TxtAsm.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("ASM");
+
+            //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\PruebaCompleta.my86";
+            this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\QueMesEs.my86";
+            TxtArchivo.Text = this.currentFileName;
             //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\ImprimeCadenas.txt";
-            this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\DeclaraVariablesNumericas.txt";
-            textEditor.Load(currentFileName);
+            //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\UsoVariablesNumericas.txt";
+            TxtMy.Load(currentFileName);
             //textEditor.SyntaxHighlighting = customHighlighting;
             // initial highlighting now set by XAML
 
-            textEditor.TextArea.TextEntering += textEditor_TextArea_TextEntering;
-            textEditor.TextArea.TextEntered += textEditor_TextArea_TextEntered;
+            TxtMy.TextArea.TextEntering += textEditor_TextArea_TextEntering;
+            TxtMy.TextArea.TextEntered += textEditor_TextArea_TextEntered;
 
             DispatcherTimer foldingUpdateTimer = new DispatcherTimer();
             foldingUpdateTimer.Interval = TimeSpan.FromSeconds(2);
             foldingUpdateTimer.Tick += foldingUpdateTimer_Tick;
             foldingUpdateTimer.Start();
 
-            this.Compilador = new Compilador(textEditor.TextArea.Document);
+            this.Compilador = new Compilador(TxtMy.TextArea.Document);
         }
 
         string currentFileName;
@@ -101,8 +123,9 @@ namespace My8086
             {
                 this.Compilador.Compilado = false;
                 currentFileName = dlg.FileName;
-                textEditor.Load(currentFileName);
-                textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(Path.GetExtension(currentFileName));
+                TxtArchivo.Text = dlg.FileName;
+                TxtMy.Load(currentFileName);
+                TxtMy.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(Path.GetExtension(currentFileName));
             }
         }
 
@@ -124,7 +147,7 @@ namespace My8086
 
             try
             {
-                textEditor.Save(currentFileName);
+                TxtMy.Save(currentFileName);
 
             }
             catch (Exception ex)
@@ -133,137 +156,151 @@ namespace My8086
             }
         }
         //void propertyGridComboBoxSelectionChanged(object sender, RoutedEventArgs e)
-            //{
-            //    if (propertyGrid == null)
-            //        return;
-            //    switch (propertyGridComboBox.SelectedIndex)
-            //    {
-            //        case 0:
-            //            propertyGrid.SelectedObject = textEditor;
-            //            break;
-            //        case 1:
-            //            propertyGrid.SelectedObject = textEditor.TextArea;
-            //            break;
-            //        case 2:
-            //            propertyGrid.SelectedObject = textEditor.Options;
-            //            break;
-            //    }
-            //}
+        //{
+        //    if (propertyGrid == null)
+        //        return;
+        //    switch (propertyGridComboBox.SelectedIndex)
+        //    {
+        //        case 0:
+        //            propertyGrid.SelectedObject = textEditor;
+        //            break;
+        //        case 1:
+        //            propertyGrid.SelectedObject = textEditor.TextArea;
+        //            break;
+        //        case 2:
+        //            propertyGrid.SelectedObject = textEditor.Options;
+        //            break;
+        //    }
+        //}
 
-            void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
+        void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
+        {
+            this.Compilador.Compilado = false;
+            if (e.Text == ".")
             {
-                this.Compilador.Compilado = false;
-                if (e.Text == ".")
-                {
-                    this.AutoCompletado.AutoCompletar();
-                }
-
-                if (e.Text == "(")
-                {
-                    //this.AutoCompletado.SugerirVariable();
-                }
+                this.AutoCompletado.AutoCompletar();
             }
 
-            void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
+            if (e.Text == "(")
             {
-                if (e.Text.Length > 0 && AutoCompletado.CompletionWindow != null)
-                {
-                    if (!char.IsLetterOrDigit(e.Text[0]))
-                    {
-                        // Whenever a non-letter is typed while the completion window is open,
-                        // insert the currently selected element.
-                        AutoCompletado.CompletionWindow.CompletionList.RequestInsertion(e);
-                    }
-                }
-                // do not set e.Handled=true - we still want to insert the character that was typed
-            }
-            void foldingUpdateTimer_Tick(object sender, EventArgs e)
-            {
-                FoldingStrategy.UpdateFoldings(FoldingManager, textEditor.Document);
-
-            }
-
-            private void Ejecutar(object sender, RoutedEventArgs e)
-            {
-                if (!this.Compilador.Compilado)
-                {
-                    if (MessageBox.Show("Debe compilar el código antes de poder ejecutarlo.\n¿Desea compilarlo ahora?",
-                            "Compilar código", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
-                    {
-                        Compilar(sender, e);
-                        if (Compilador.Compilado)
-                        {
-                            Ejecutar(sender, e);
-                        }
-                    }
-                }
-                else
-                {
-                    Salida.Text = Compilador.Ejecutar();
-                }
-            }
-
-            private void Compilar(object sender, RoutedEventArgs e)
-            {
-                saveFileClick(sender, e);
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    this.ProgresoCompilacion.Visibility = Visibility.Visible;
-                    this.ProgresoCompilacion.IsIndeterminate = true;
-                }));
-
-                this.Compilador = new Compilador(this.textEditor.TextArea.Document);
-                Compilador.OnProgreso += (o, i) =>
-                {
-                    this.ProgresoCompilacion.SetPercent(Compilador.Progreso);
-                };
-                Compilador.VerLinea += (o, i) =>
-                {
-                    int linea = (o as DocumentLine)?.LineNumber??-1;
-                    if (linea > 0)
-                    {
-                        var l = this.textEditor.TextArea.Document.GetLineByNumber(linea);
-                        SelectText(l.Offset, l.Length);
-                        this.textEditor.ScrollToLine(linea);
-                    }
-                };
-                this.Salida.Text = Compilador.Compilar();
-                ErroresList.ItemsSource = Compilador.Resultados;
-                ErroresList.Items.Refresh();
-                Dispatcher.Invoke(() => { this.ProgresoCompilacion.Visibility = Visibility.Collapsed; },
-                    DispatcherPriority.ApplicationIdle);
-                this.Salida.Text += string.Join("\n", Compilador.Resultados
-                    .Select(x => $"->[{x.Excepcion.Linea}] " + x.Excepcion.Texto));
-
-                this.ProgresoCompilacion.Visibility = Visibility.Collapsed;
-                this.ProgresoCompilacion.IsIndeterminate = false;
-
-
-
-            }
-            private void SelectText(int offset, int length)
-            {
-                //Get the line number based off the offset.
-                var line = textEditor.Document.GetLineByOffset(offset);
-                var lineNumber = line.LineNumber;
-
-                //Select the text.
-                textEditor.SelectionStart = offset;
-                textEditor.SelectionLength = length;
-
-                //Scroll the textEditor to the selected line.
-                var visualTop = textEditor.TextArea.TextView.GetVisualTopByDocumentLine(lineNumber);
-                textEditor.ScrollToVerticalOffset(visualTop);
-            }
-
-            private void CompilarYEjecutar(object sender, RoutedEventArgs e)
-            {
-                Compilar(sender, e);
-                if (Compilador.Compilado)
-                {
-                    Ejecutar(sender, e);
-                }
+                //this.AutoCompletado.SugerirVariable();
             }
         }
 
+        void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
+        {
+            if (e.Text.Length > 0 && AutoCompletado.CompletionWindow != null)
+            {
+                if (!char.IsLetterOrDigit(e.Text[0]))
+                {
+                    // Whenever a non-letter is typed while the completion window is open,
+                    // insert the currently selected element.
+                    AutoCompletado.CompletionWindow.CompletionList.RequestInsertion(e);
+                }
+            }
+            // do not set e.Handled=true - we still want to insert the character that was typed
+        }
+        void foldingUpdateTimer_Tick(object sender, EventArgs e)
+        {
+            FoldingStrategy.UpdateFoldings(FoldingManager, TxtMy.Document);
+
+        }
+
+        private void Ejecutar(object sender, RoutedEventArgs e)
+        {
+            if (!this.Compilador.Compilado)
+            {
+                if (MessageBox.Show("Debe compilar el código antes de poder ejecutarlo.\n¿Desea compilarlo ahora?",
+                        "Compilar código", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+                {
+                    Compilar(sender, e);
+                    if (Compilador.Compilado)
+                    {
+                        Ejecutar(sender, e);
+                    }
+                }
+            }
+            else
+            {
+                Salida.Text = Compilador.Ejecutar();
+            }
+        }
+
+        private void Compilar(object sender, RoutedEventArgs e)
+        {
+            saveFileClick(sender, e);
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                this.ProgresoCompilacion.Visibility = Visibility.Visible;
+                this.ProgresoCompilacion.IsIndeterminate = true;
+            }));
+
+            this.Compilador = new Compilador(this.TxtMy.TextArea.Document);
+            Compilador.OnProgreso += (o, i) =>
+            {
+                this.ProgresoCompilacion.SetPercent(Compilador.Progreso);
+            };
+            Compilador.VerLinea += (o, i) =>
+            {
+                int linea = (o as DocumentLine)?.LineNumber ?? -1;
+                if (linea > 0)
+                {
+                    var l = this.TxtMy.TextArea.Document.GetLineByNumber(linea);
+                    SelectText(l.Offset, l.Length);
+                    this.TxtMy.ScrollToLine(linea);
+                }
+            };
+            this.Salida.Text = Compilador.Compilar();
+            TxtAsm.Text = Compilador.ASM?.ToString();
+            ErroresList.ItemsSource = Compilador.Resultados;
+            if (!this.Compilador.Resultados.Any())
+            {
+                TabErrores.SelectedIndex = 1;
+            }
+            else
+            {
+                TabErrores.SelectedIndex = 0;
+            }
+            ErroresList.Items.Refresh();
+            Dispatcher.Invoke(() => { this.ProgresoCompilacion.Visibility = Visibility.Collapsed; },
+                DispatcherPriority.ApplicationIdle);
+            this.Salida.Text += string.Join("\n", Compilador.Resultados
+                .Select(x => $"->[{x.Excepcion.Linea}] " + x.Excepcion.Texto));
+
+            this.ProgresoCompilacion.Visibility = Visibility.Collapsed;
+            this.ProgresoCompilacion.IsIndeterminate = false;
+
+
+
+        }
+        private void SelectText(int offset, int length)
+        {
+            //Get the line number based off the offset.
+            var line = TxtMy.Document.GetLineByOffset(offset);
+            var lineNumber = line.LineNumber;
+
+            //Select the text.
+            TxtMy.SelectionStart = offset;
+            TxtMy.SelectionLength = length;
+
+            //Scroll the textEditor to the selected line.
+            var visualTop = TxtMy.TextArea.TextView.GetVisualTopByDocumentLine(lineNumber);
+            TxtMy.ScrollToVerticalOffset(visualTop);
+        }
+
+        private void CompilarYEjecutar(object sender, RoutedEventArgs e)
+        {
+            Compilar(sender, e);
+            if (Compilador.Compilado)
+            {
+                Ejecutar(sender, e);
+            }
+        }
+
+        private void CmbxEjemplos_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TxtMy.Text = (CmbxEjemplos.SelectedItem as Ejemplos.Ejemplo).GetDocumento();
+        }
     }
+
+}

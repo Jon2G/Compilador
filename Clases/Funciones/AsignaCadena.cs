@@ -8,7 +8,7 @@ using My8086.Clases.Advertencias;
 using My8086.Clases.Fases;
 using My8086.Clases.Fases._1._Analisis_Lexico;
 
-namespace My8086.Clases.Funciones.CodigoTresDirecciones
+namespace My8086.Clases.Funciones
 {
     class AsignaCadena : Accion
     {
@@ -16,13 +16,14 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
         private readonly Variable Variable;
         public AsignaCadena(Programa Programa, LineaLexica Linea, Variable Variable, Token ValorCadena) : base(Programa, Linea, 0)
         {
+            this.Programa.OperacionesConCadenas = true;
             this.ValorCadena = ValorCadena;
             this.Variable = Variable;
         }
 
         public override bool RevisarSemantica(ResultadosCompilacion Errores)
         {
-            this.Variable.HacerReferencia();
+            Variable.HacerReferencia();
             return true;
         }
 
@@ -30,15 +31,15 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(";=================[ASIGNAR VALOR A LA CADENA]=================");
-            if (this.ValorCadena.TipoDato == TipoDato.Cadena)
+            if (ValorCadena.TipoDato == TipoDato.Cadena)
             {
-                int TamanioCadena=0;
+                int TamanioCadena = 0;
 
                 //Revisar si la cadena contiene \n para escaparlo en ensambaldor '10,13'
-                string cadena = this.ValorCadena.Lexema;
+                string cadena = ValorCadena.Lexema;
 
                 string[] partes =
-                    this.Programa.Expresiones.SaltoLinea
+                    Programa.Expresiones.SaltoLinea
                         .Split(cadena)
                         .Where(s => !string.IsNullOrEmpty(s))
                         .ToArray();
@@ -74,9 +75,9 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
                 sb.AppendLine($"MOV {Variable.Nombre},DX");
 
                 //Inicio
-                StringBuilder inicio=new StringBuilder();
+                StringBuilder inicio = new StringBuilder();
                 inicio.Append(";================[-ALOGAR CADENA-]================\n");
-                inicio.Append($@"MOV BLOQUE_ACTUAL,{Math.Ceiling(TamanioCadena / 14.0)+10}");
+                inicio.Append($@"MOV BLOQUE_ACTUAL,{Math.Ceiling(TamanioCadena / 14.0) + 10}");
                 inicio.AppendLine("D");
 
                 inicio.AppendLine("CALL ALOGAR_CADENA");

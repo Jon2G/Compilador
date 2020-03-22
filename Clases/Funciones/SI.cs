@@ -13,28 +13,55 @@ namespace My8086.Clases.Funciones
 {
     class Si : Accion, IBloque
     {
+        private static int ConsecutivoSalto = 0;
+        public string IdentifiacadorSalto { get; private set; }
         public DocumentLine InicioBloque { get; set; }
         public DocumentLine FinBloque { get; set; }
-        public readonly OperacionLogica[] Argumentos;
+        public readonly OperacionesLogicas OperacionLogica;
         public Sino Sino { get; set; }
-        public Si(Programa Programa, LineaLexica Linea,params OperacionLogica[] Argumentos) : base(Programa, Linea, 0)
+        public Si(Programa Programa, LineaLexica Linea, OperacionesLogicas OperacionLogica) : base(Programa, Linea, 0)
         {
-            this.Argumentos = Argumentos;
+            this.IdentifiacadorSalto = (++ConsecutivoSalto).ToString();
+            // this.IdentifiacadorSalto = Guid.NewGuid().ToString().Replace("-", "");
+            this.OperacionLogica = OperacionLogica;
         }
-
         public override bool RevisarSemantica(ResultadosCompilacion Errores)
         {
+            OperacionLogica.DeclararTemporales();
             return true;
         }
 
         public override StringBuilder Traduccion()
         {
-            throw new NotImplementedException();
+            if (this.Sino != null)
+            {
+                this.Sino.IdentifiacadorSalto = this.IdentifiacadorSalto;
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.Append(";");
+            sb.Append(this.OperacionLogica.GenerarAsm());
+            sb.AppendLine("MOV AL,1H");
+            sb.AppendLine("CMP R_COMPARADOR,AL");
+            sb.AppendLine($"JE IF_VERDADERO_{this.IdentifiacadorSalto}");
+            if (this.Sino != null)
+            {
+                sb.AppendLine($"JMP INICIO_SINO_{this.IdentifiacadorSalto}");
+            }
+            else
+            {
+                sb.AppendLine($"JMP IF_FALSO_{this.IdentifiacadorSalto}");
+            }
+            sb.AppendLine($"IF_VERDADERO_{this.IdentifiacadorSalto}:");
+            sb.AppendLine(";ACCIONES VERDADERAS :)");
+            return sb;
         }
 
         StringBuilder IBloque.CerrarBloque()
         {
-            throw new NotImplementedException();
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"IF_FALSO_{this.IdentifiacadorSalto}:");
+            sb.AppendLine(";ACCIONES FALSAS :(");
+            return sb;
         }
     }
 }

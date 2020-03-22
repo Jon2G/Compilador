@@ -64,6 +64,11 @@ namespace My8086.Clases.Funciones
                     sb.AppendLine(" DW 00");
                     sb.AppendLine($"LONGUITUD_{Nombre} DW 0");
                     break;
+                case TipoDato.BitLogico:
+                    sb.Append($"\n;=======>[{Nombre}-{this.TipoDato}]\n");
+                    sb.Append(this.Nombre);
+                    sb.AppendLine(" DB 0");
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

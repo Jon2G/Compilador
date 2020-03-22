@@ -25,6 +25,15 @@ namespace My8086.Clases.Fases
 
         public DocumentLine FinBloque { get; set; }
         public DocumentLine InicioBloque { get; set; }
+        public bool UsarSuma { get; internal set; }
+        public bool UsarDivision { get; internal set; }
+        public bool UsarResta { get; internal set; }
+        public bool UsarMultiplicacion { get; internal set; }
+        public bool OperadoresAritmeticos => UsarSuma || UsarDivision || UsarResta || UsarMultiplicacion|| OperacionesConNumeros;
+        public bool OperacionesConCadenas { get; internal set; }
+        public bool OperacionesConNumeros { get; internal set; }
+        public bool OperacionesLogicas { get; internal set; }
+
         public string CerrarBloque()
         {
             throw new System.NotImplementedException();

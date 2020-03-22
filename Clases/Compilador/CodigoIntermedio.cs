@@ -15,12 +15,12 @@ namespace My8086.Clases.Compilador
     {
         internal readonly Programa Programa;
         internal readonly StringBuilder Codigo;
-        private Stack<IBloque> BloquesPorCerrar;
+        private Queue<IBloque> BloquesPorCerrar;
         internal CodigoIntermedio(Fases._4._Sintetizador.Sintesis sintetizado)
         {
             this.Codigo = new StringBuilder();
             this.Programa = sintetizado.Programa;
-            this.BloquesPorCerrar = new Stack<IBloque>();
+            this.BloquesPorCerrar = new Queue<IBloque>();
 
         }
         public void Generar()
@@ -29,37 +29,49 @@ namespace My8086.Clases.Compilador
             this.Codigo.AppendLine(".stack");
             this.Codigo.AppendLine(".386");
             this.Codigo.AppendLine(".data");
-            this.Codigo.AppendLine(";=========================================================");
-            this.Codigo.AppendLine(";VARIABLES TEMPORALES PARA LAS OPERACIONES ARITMETICAS");
-            this.Codigo.AppendLine(";PRIMER OPERADOR");
-            this.Codigo.AppendLine("SGN1 db 0");
-            this.Codigo.AppendLine("NUM1 db 0,0,0,0");
-            this.Codigo.AppendLine("DEC1 db 0,0,0,0 ");
-            this.Codigo.AppendLine(";SEGUNDO OPERADOR");
-            this.Codigo.AppendLine("SGN2 db 0");
-            this.Codigo.AppendLine("NUM2 db 0,0,0,0");
-            this.Codigo.AppendLine("DEC2 db 0,0,0,0");
-            this.Codigo.AppendLine(";VARIABLES DE RESULTADOS GLOBAL");
-            this.Codigo.AppendLine("SIGNOT     db 0");
-            this.Codigo.AppendLine("ENTEROST   db 0,0,0,0");
-            this.Codigo.AppendLine("DECIMALEST db 0,0,0,0");
-            this.Codigo.AppendLine(";AUXILIARES GLOBALES PARA LAS OPERACIONES");
-            this.Codigo.AppendLine("TEMP db 0,0,0,0,0,0,0,0,0");
-            this.Codigo.AppendLine("AUX  dw 0");
-            this.Codigo.AppendLine("POSICION_DIV dw 0");
-            this.Codigo.AppendLine("OVERFLOWDIV dw 0");
-            this.Codigo.AppendLine("DIVISON dw 0,0,0");
-            this.Codigo.AppendLine(";=========================================================");
-            this.Codigo.AppendLine(";VARIABLES PARA LA LEECTURA DE CADENAS");
-            this.Codigo.AppendLine("CADENA DW 00");
-            this.Codigo.AppendLine("LONGUITUD_CADENA DW 0");
-            this.Codigo.AppendLine("BLOQUE_ACTUAL DB 0");
-            this.Codigo.AppendLine("ULTIMO_SEGMENTO DW 0");
-            this.Codigo.AppendLine("ERROR DB 'ERROR','$'");
-            this.Codigo.AppendLine("REALLOC DB 10,13,'REALLOC',10,13,'$'");
-            this.Codigo.AppendLine("ERROR_ALLOC_CADENA DB 10,13,'OCURRIO UN ERROR RESERVANDO MEMORIA PARA LA CADENA',10,13,'$'");
-            this.Codigo.AppendLine("FIN_CADENA DB '$'");
-            this.Codigo.AppendLine(";=========================================================");
+            if (this.Programa.OperadoresAritmeticos)
+            {
+                this.Codigo.AppendLine(";=========================================================");
+                this.Codigo.AppendLine(";VARIABLES TEMPORALES PARA LAS OPERACIONES ARITMETICAS");
+                this.Codigo.AppendLine(";PRIMER OPERADOR");
+                this.Codigo.AppendLine("SGN1 db 0");
+                this.Codigo.AppendLine("NUM1 db 0,0,0,0");
+                this.Codigo.AppendLine("DEC1 db 0,0,0,0 ");
+                this.Codigo.AppendLine(";SEGUNDO OPERADOR");
+                this.Codigo.AppendLine("SGN2 db 0");
+                this.Codigo.AppendLine("NUM2 db 0,0,0,0");
+                this.Codigo.AppendLine("DEC2 db 0,0,0,0");
+                this.Codigo.AppendLine(";VARIABLES DE RESULTADOS GLOBAL");
+                this.Codigo.AppendLine("SIGNOT     db 0");
+                this.Codigo.AppendLine("ENTEROST   db 0,0,0,0");
+                this.Codigo.AppendLine("DECIMALEST db 0,0,0,0");
+                this.Codigo.AppendLine(";AUXILIARES GLOBALES PARA LAS OPERACIONES");
+                this.Codigo.AppendLine("TEMP db 0,0,0,0,0,0,0,0,0");
+                this.Codigo.AppendLine("AUX  dw 0");
+                this.Codigo.AppendLine("POSICION_DIV dw 0");
+                this.Codigo.AppendLine("OVERFLOWDIV dw 0");
+                this.Codigo.AppendLine("DIVISON dw 0,0,0");
+            }
+            if (this.Programa.OperacionesConCadenas)
+            {
+                this.Codigo.AppendLine(";=========================================================");
+                this.Codigo.AppendLine(";VARIABLES PARA LA LEECTURA DE CADENAS");
+                this.Codigo.AppendLine("CADENA DW 00");
+                this.Codigo.AppendLine("LONGUITUD_CADENA DW 0");
+                this.Codigo.AppendLine("BLOQUE_ACTUAL DB 0");
+                this.Codigo.AppendLine("ULTIMO_SEGMENTO DW 0");
+                this.Codigo.AppendLine("ERROR DB 'ERROR','$'");
+                this.Codigo.AppendLine("REALLOC DB 10,13,'REALLOC',10,13,'$'");
+                this.Codigo.AppendLine("ERROR_ALLOC_CADENA DB 10,13,'OCURRIO UN ERROR RESERVANDO MEMORIA PARA LA CADENA',10,13,'$'");
+                this.Codigo.AppendLine("FIN_CADENA DB '$'");
+            }
+            if (this.Programa.OperacionesLogicas)
+            {
+                this.Codigo.AppendLine(";=========================================================");
+                this.Codigo.AppendLine(";VARIABLES TEMPORALES PARA LAS OPERACIONES LOGICAS");
+                this.Codigo.AppendLine("R_COMPARADOR  db 0");
+                this.Codigo.AppendLine(";=========================================================");
+            }
             this.Codigo.AppendLine(";VARIABLES DEPENDIENTES DE LA PROGRAMACION");
             this.Codigo.Append(this.Programa.SegmentoDeDatos.Traduccion());
             this.Codigo.AppendLine(".code");
@@ -81,18 +93,21 @@ namespace My8086.Clases.Compilador
             this.Codigo.AppendLine(";==============>[FIN CODIGO GENERADO POR EL COMPILADOR]<==============");
             this.Codigo.AppendLine("XOR AX,AX");
             this.Codigo.AppendLine("INT 16H");
-            this.Codigo.AppendLine(";================>[LIBERAR TODA LA MEMORIA DE CADENAS]<================");
-            this.Codigo.Append(this.Programa.SegmentoDeDatos.Free());
-
+            if (this.Programa.OperacionesConCadenas)
+            {
+                this.Codigo.AppendLine(";================>[LIBERAR TODA LA MEMORIA DE CADENAS]<================");
+                this.Codigo.Append(this.Programa.SegmentoDeDatos.Free());
+            }
             this.Codigo.AppendLine("MOV AH,4CH");
             this.Codigo.AppendLine("INT 21H");
             this.Codigo.AppendLine("RET");
             this.Codigo.AppendLine("");
 
             #region Procedimientos
-
             this.Codigo.AppendLine(";==============>[PROCEDIMIENTOS INTERNOS GENERADOS POR EL COMPILADOR]<==============");
-            this.Codigo.AppendLine(@";====================================[SUMA]====================================        
+            if (this.Programa.UsarSuma)
+            {
+                this.Codigo.AppendLine(@";====================================[SUMA]====================================        
     SUMA PROC NEAR
     ;LIMPIAR VARIABLES
     LEA DX,SIGNOT
@@ -182,8 +197,12 @@ namespace My8086.Clases.Compilador
             JNS siguiente_acarreo
             RET
         
-    SUMA ENDP
-;====================================[DIVIDE]====================================    
+    SUMA ENDP");
+            }
+            if (this.Programa.UsarDivision)
+            {
+                this.Programa.UsarResta = true;
+                this.Codigo.AppendLine(@";====================================[DIVIDE]====================================    
     DIVIDE PROC NEAR
         MOV DIVISON[0H],0
         MOV DIVISON[2H],0
@@ -299,9 +318,11 @@ namespace My8086.Clases.Compilador
            MOV SIGNOT,AL  ;RECUPERAR SINGO
         RET 
         
-    DIVIDE ENDP    
-    
-;====================================[RESTA]====================================        
+    DIVIDE ENDP");
+            }
+            if (this.Programa.UsarResta)
+            {
+                this.Codigo.AppendLine(@";====================================[RESTA]====================================        
     RESTA PROC NEAR  
     ;LIMPIAR OPERADORES 
     LEA DX,SIGNOT
@@ -382,8 +403,11 @@ namespace My8086.Clases.Compilador
             RET
     
         
-    RESTA ENDP        
-;====================================[MULTIPLICA]====================================
+    RESTA ENDP");
+            }
+            if (this.Programa.UsarMultiplicacion)
+            {
+                this.Codigo.AppendLine(@";====================================[MULTIPLICA]====================================
     MULTIPLICA PROC NEAR
     ;LIMPIAR VARIABLES
     LEA DX,SIGNOT
@@ -458,9 +482,11 @@ namespace My8086.Clases.Compilador
             JNS siguiente_acarreo_multiplica
             RET
         
-    MULTIPLICA ENDP 
-
-;====================================[USAR_N1]====================================    
+    MULTIPLICA ENDP");
+            }
+            if (this.Programa.OperadoresAritmeticos)
+            {
+                this.Codigo.AppendLine(@";====================================[USAR_N1]====================================    
     USAR_N1 PROC NEAR 
     MOV SI,08H
     ADD SI,DX 
@@ -517,8 +543,9 @@ namespace My8086.Clases.Compilador
         
         limpiar_siguienteT: 
         MOV DI,SI
-        ADD DI,CX    
-        MOV [DI],0H
+        ADD DI,CX 
+        MOV AL,0H
+        MOV [DI],AL
         ;MOV SIGNOT[SI],0H  
         
         DEC SI
@@ -636,12 +663,13 @@ namespace My8086.Clases.Compilador
 ;====================================[IMPRIME_CARACTER]==================================== 
     IMPRIME_CARACTER PROC NEAR
        MOV AH,02H
-       INT 21H     
-        
+       INT 21H          
     RET
     IMPRIME_CARACTER ENDP");
-            this.Codigo.AppendLine(@"
-        ;==============>[ALOGAR_CADENA]<==============
+            }
+            if (this.Programa.OperacionesConCadenas)
+            {
+                this.Codigo.AppendLine(@";==============>[ALOGAR_CADENA]<==============
         ALOGAR_CADENA PROC NEAR 
     
         ;MOV BLOQUE_ACTUAL,0AH ;INDICA EL BLOQUE EN EL QUE SE ESTA ESCRIBIENDO
@@ -691,7 +719,7 @@ ERROR_ALLOC:
         RET
          
     ALOGAR_CADENA ENDP");
-            this.Codigo.AppendLine(@"
+                this.Codigo.AppendLine(@"
         ;==============>[ALOGAR_CADENA]<==============
         LIBERAR_CADENA PROC NEAR ;(FREE)
             ;Funcion AH   49h  
@@ -705,69 +733,115 @@ ERROR_ALLOC:
    
             RET
             LIBERAR_CADENA ENDP ");
+            }
+            if (this.Programa.OperacionesLogicas)
+            {
+                this.Codigo.AppendLine(@"IGUAL PROC NEAR
 
+    MOV AL,SGN1
+    MOV AH,SGN2
+    CMP AL,AH
+    JE signo_igual_igualdad 
+    
+    MOV R_COMPARADOR,0H
+    JMP salir_igualdad               
+    
+signo_igual_igualdad:    
+    MOV SI,0FFFFH
+    ;  
+    siguiente_igualdad:
+        INC SI 
+        CMP SI,07H
+        JA iguales
+        
+        MOV AL,NUM1[SI]
+        MOV AH,NUM2[SI]
+        CMP AL,AH
+        JE siguiente_igualdad
+        JNE diferente
+    ;     
+    
+diferente:
+    MOV R_COMPARADOR,0H
+    JMP salir_igualdad
+iguales:
+    MOV R_COMPARADOR,1H
+    
+salir_igualdad:    
+    RET    
+IGUAL ENDP
+
+
+MAYOR_QUE PROC NEAR
+
+    MOV AL,SGN1
+    MOV AH,SGN2
+    CMP AL,AH
+    JE signo_igual_mayorque
+    JL menor_que_exit
+    JC mayor_que_exit
+    
+    MOV R_COMPARADOR,0H
+    JMP salir_mayorque               
+    
+signo_igual_mayorque:    
+    MOV SI,0FFFFH
+    ;  
+    siguiente_mayorque:
+        INC SI 
+        CMP SI,07H
+        JA iguales
+        
+        MOV AL,NUM1[SI]
+        MOV AH,NUM2[SI]
+        CMP AL,AH
+        JA  mayor_que_exit    
+        JL  menor_que_exit
+        JE  siguiente_mayorque
+        JMP siguiente_mayorque
+    ;     
+    
+menor_que_exit:
+    MOV R_COMPARADOR,0H
+    JMP salir_igualdad
+mayor_que_exit:
+    MOV R_COMPARADOR,1H
+    
+salir_mayorque:    
+    RET    
+MAYOR_QUE ENDP");
+            }
             #endregion
             this.Codigo.AppendLine("begin endp");
             this.Codigo.AppendLine("end begin");
-            this.Codigo.AppendLine("");
-            this.Codigo.AppendLine("");
-            Clipboard.SetText(this.Codigo.ToString());
-
-
-
-
-
-
-
-            //this.Codigo.Append($"namespace {this.Programa.FuncionPrincipal.Titulo} {{"); //namespace
-            //this.Codigo.Append($"class {this.Programa.FuncionPrincipal.Titulo} {{"); //clase principal
-            //GenerarFuncionPrincipal(this.Programa.FuncionPrincipal);
-            //foreach (Funcion Fx in
-            //    this.Programa.Funciones.Where(x => x != this.Programa.FuncionPrincipal))
-            //{
-            //    GenerarFuncion(Fx);
-            //}
-
-            //while (this.BloquesPorCerrar.Any())
-            //{
-            //    this.Codigo.Append(this.BloquesPorCerrar.Pop().CerrarBloque());
-            //}
-            //this.Codigo.Append("}}"); //namespace,clase principal
-            //AgregarLibrerias();
+            Clipboard.SetText(this.Codigo.ToString().Replace(".386", "").Replace("begin endp", ""));
         }
-        //private void GenerarFuncionPrincipal(Funcion Fx)
-        //{
-        //    this.Codigo.AppendLine("static void Main(string[] args){");
-        //    this.Codigo.AppendLine("try {");
-        //    foreach (Accion accion in Fx.Acciones)
-        //    {
-        //        AgregarAccion(accion, Fx);
-        //    }
-        //    this.Codigo.AppendLine("}catch(Exception ex){Console.Clear();Console.WriteLine(\"Excepción no controlada X.x:\"); Console.WriteLine(ex.Message);}");
-        //    this.Codigo.AppendLine("Console.ReadKey();}");
-        //}
-        //private void GenerarFuncion(Funcion Fx)
-        //{
-        //    this.Codigo.AppendLine($"static void {Fx.Titulo}(){{");
-        //    foreach (Accion accion in Fx.Acciones)
-        //    {
-        //        AgregarAccion(accion, Fx);
-        //    }
-        //    this.Codigo.AppendLine("}");
-        //}
         private void AgregarAccion(Accion accion)
         {
             if (this.BloquesPorCerrar.Any())
             {
+                if (this.Programa.Acciones.Where(x => !(x is IBloque)).LastOrDefault() == accion)
+                {
+                    CerrarBLoquesPendientes();
+                    AgregarAccion(accion);
+                    return;
+                }
                 if (accion.LineaDocumento.LineNumber >= this.BloquesPorCerrar.Peek().FinBloque.LineNumber)
                 {
-                    this.Codigo.Append(this.BloquesPorCerrar.Pop().CerrarBloque());
+                    this.Codigo.Append(this.BloquesPorCerrar.Dequeue().CerrarBloque());
                 }
             }
             this.Codigo.Append(accion.Traduccion());
             if (accion is IBloque bloque)
             {
-                BloquesPorCerrar.Push(bloque);
+                BloquesPorCerrar.Enqueue(bloque);
+            }
+        }
+        private void CerrarBLoquesPendientes()
+        {
+            while (this.BloquesPorCerrar.Any())
+            {
+                this.Codigo.Append(this.BloquesPorCerrar.Dequeue().CerrarBloque());
             }
         }
     }

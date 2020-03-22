@@ -138,7 +138,7 @@
     <Compile Include="Clases\Fases\1. Analisis Lexico\AnalizadorLexico.cs" />
     <Compile Include="Clases\Fases\1. Analisis Lexico\LineaLexica.cs" />
     <Compile Include="Clases\Fases\2. Analisis Sintactico\AnalizadorSintactico.cs" />
-    <Compile Include="Clases\Funciones\CodigoTresDirecciones\AsignaCadena.cs" />
+    <Compile Include="Clases\Funciones\AsignaCadena.cs" />
     <Compile Include="Clases\Funciones\CodigoTresDirecciones\Nodo.cs" />
     <Compile Include="Clases\Funciones\CodigoTresDirecciones\TokenAritmetico.cs" />
     <Compile Include="Clases\Funciones\CodigoTresDirecciones\TresDirecciones.cs" />
@@ -148,13 +148,16 @@
     <Compile Include="Clases\Fases\Token.cs" />
     <Compile Include="Clases\Funciones\IBloque.cs" />
     <Compile Include="Clases\Funciones\Lee.cs" />
-    <Compile Include="Clases\Funciones\OperacionLogica.cs" />
+    <Compile Include="Clases\Funciones\OperacionLogica\OperacionesLogicas.cs" />
     <Compile Include="Clases\Funciones\CodigoTresDirecciones\OperacionArtimetica.cs" />
+    <Compile Include="Clases\Funciones\OperacionLogica\Nodo.cs" />
+    <Compile Include="Clases\Funciones\OperacionLogica\TokenLogico.cs" />
     <Compile Include="Clases\Funciones\Sino.cs" />
     <Compile Include="Clases\Funciones\Si.cs" />
     <Compile Include="Clases\Funciones\Imprimir.cs" />
     <Compile Include="Clases\Funciones\Variable.cs" />
     <Compile Include="Clases\Log.cs" />
+    <Compile Include="Ejemplos\Ejemplo.cs" />
     <Compile Include="Images\MyImage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\WPFAssemblyInfo.cs" />
@@ -194,6 +197,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <EmbeddedResource Include="Ejemplos\UsoVariablesNumericas.my86" />
+    <EmbeddedResource Include="Ejemplos\UsoCadenas.my86" />
+    <EmbeddedResource Include="Ejemplos\PruebaCompleta.my86" />
+    <EmbeddedResource Include="CustomHighlightingAsm.xshd" />
+    <EmbeddedResource Include="Ejemplos\QueMesEs.my86" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

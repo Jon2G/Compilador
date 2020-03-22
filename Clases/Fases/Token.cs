@@ -21,12 +21,12 @@ namespace My8086.Clases.Fases
     }
     public enum TipoDato
     {
-        Entero, Decimal, Cadena, Invalido, NoAplica
+        Entero, Decimal, Cadena,BitLogico, Invalido, NoAplica
     }
     public class Token
     {
         public TipoToken TipoToken { get; private set; }
-        public TipoDato TipoDato { get; private set; }
+        public TipoDato TipoDato { get; set; }
         public Guid Id { get; private set; }
         public DocumentLine Linea { get; private set; }
         public List<DocumentLine> LineasDeReferencia { get; private set; }
@@ -42,7 +42,7 @@ namespace My8086.Clases.Fases
             this.LineasDeReferencia = new List<DocumentLine>();
             this.Lexema = lexema;
         }
-
+        protected Token() { }
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
