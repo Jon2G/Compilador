@@ -92,7 +92,7 @@ namespace My8086.Clases.Funciones
                     sb.AppendLine("CALL LEER_ENTERO");
                     break;
                 case TipoDato.Decimal:
-                    sb.AppendLine($"MOV DI,{VariableDestino.Nombre}");
+                    sb.AppendLine($"LEA DI,SGN_{VariableDestino.Nombre}");
                     sb.AppendLine("CALL LEER_DECIMAL");
                     break;
             }

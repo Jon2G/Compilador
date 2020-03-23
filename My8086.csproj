@@ -204,6 +204,7 @@
     <EmbeddedResource Include="Ejemplos\QueMesEs.my86" />
     <EmbeddedResource Include="Ejemplos\DimeTuNombre.my86" />
     <EmbeddedResource Include="Ejemplos\SioNo.my86" />
+    <EmbeddedResource Include="Ejemplos\CicloFor.my86" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

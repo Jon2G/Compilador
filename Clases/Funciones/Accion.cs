@@ -19,12 +19,17 @@ namespace My8086.Clases.Funciones
         {
             this.Programa = Programa;
         }
-        protected Accion(Programa Programa,LineaLexica Linea, int InicioArgumentos)
+        protected Accion(Programa Programa,LineaLexica Linea, int InicioArgumentos, int FinArgumentos=-1)
         {
             this.Programa = Programa;
             this.Argumentos = new List<Token>();
             this.LineaDocumento = Linea.LineaDocumento;
-            for (int i = InicioArgumentos; i < Linea.Elementos; i++)
+            if (FinArgumentos == -1)
+            {
+                FinArgumentos = Linea.Elementos;
+            }
+
+            for (int i = InicioArgumentos; i < FinArgumentos; i++)
             {
                 Token tk = Linea[i];
                 //if (tk.TipoToken != TipoToken.PalabraReservada&& tk.TipoToken != TipoToken.SeparadorParametros)

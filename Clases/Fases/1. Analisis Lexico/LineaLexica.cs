@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ICSharpCode.AvalonEdit.Document;
+using My8086.Clases.Funciones.OperacionLogica;
 
 namespace My8086.Clases.Fases._1._Analisis_Lexico
 {

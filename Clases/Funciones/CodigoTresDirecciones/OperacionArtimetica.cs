@@ -10,7 +10,7 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
     {
         private readonly Variable Variable;
         private TresDirecciones TresDirecciones;
-        public OperacionArtimetica(Programa Programa, Variable Variable, LineaLexica Linea) : base(Programa, Linea, 1)
+        public OperacionArtimetica(Programa Programa, Variable Variable, LineaLexica Linea, int  InicioArgumentos=1,int FinArgumentos=-1) : base(Programa, Linea, InicioArgumentos,FinArgumentos)
         {
             this.Variable = Variable;
         }
@@ -25,7 +25,8 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
                     return false;
                 }
 
-                if (this.Argumentos[2].TipoToken == Fases.TipoToken.FinInstruccion)
+                if (this.Argumentos[2].TipoToken == Fases.TipoToken.FinInstruccion
+                    || this.Argumentos[2].TipoToken == Fases.TipoToken.ParentesCerrado)
                 {
                     this.TresDirecciones = new TresDirecciones
                     {

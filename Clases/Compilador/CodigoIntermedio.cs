@@ -63,8 +63,8 @@ namespace My8086.Clases.Compilador
                 this.Codigo.AppendLine("ERROR DB 'ERROR','$'");
                 this.Codigo.AppendLine("REALLOC DB 10,13,'REALLOC',10,13,'$'");
                 this.Codigo.AppendLine("ERROR_ALLOC_CADENA DB 10,13,'OCURRIO UN ERROR RESERVANDO MEMORIA PARA LA CADENA',10,13,'$'");
-                this.Codigo.AppendLine("FIN_CADENA DB '$'");
             }
+            this.Codigo.AppendLine("FIN_CADENA DB '$'");
             if (this.Programa.OperacionesLogicas)
             {
                 this.Codigo.AppendLine(";=========================================================");
@@ -134,6 +134,9 @@ namespace My8086.Clases.Compilador
     JMP signos_diferentes_suma 
     
     signos_iguales_suma:
+;;;;
+MOV SIGNOT,AL
+;;;
     CMP SGN1,0FFH
     JE sumar_y_negar  
     JNE sumar_con_normalidad
@@ -334,7 +337,7 @@ namespace My8086.Clases.Compilador
         
     DIVIDE ENDP");
             }
-            if (this.Programa.UsarResta)
+            if (this.Programa.UsarResta||this.Programa.UsarSuma)
             {
                 this.Codigo.AppendLine(@";====================================[RESTA]====================================        
     RESTA PROC NEAR  
@@ -583,7 +586,11 @@ namespace My8086.Clases.Compilador
             ;MIENTRAS SEA CERO A LA IZQUIERDA EVITAR
             siguiente_numero_entero:
             INC SI 
-            
+            ;;;;;;;;;;
+            CMP SI,04H
+            JE un_cero_entero
+            ;;;;;;;;;; 
+
             ;;;;;;
             MOV CX,DI
             ADD CX,SI
@@ -934,7 +941,49 @@ mayor_que_exit:
     
 salir_mayorque:    
     RET    
-MAYOR_QUE ENDP");
+MAYOR_QUE ENDP
+
+MENOR_QUE PROC NEAR
+
+CALL MAYOR_QUE
+MOV AL,R_COMPARADOR
+CMP AL,01H
+JE A_CERO 
+JMP A_UNO
+
+A_CERO:
+MOV R_COMPARADOR,0H
+JMP SALIR_MENOR_QUE
+
+A_UNO:
+MOV R_COMPARADOR,1H
+
+SALIR_MENOR_QUE:
+RET   
+MENOR_QUE ENDP
+
+MENOR_QUE_IGUAL PROC NEAR
+
+CALL MENOR_QUE  
+MOV AL,R_COMPARADOR
+CMP AL,01H
+JE VERDADERO
+CALL IGUAL
+MOV AL,R_COMPARADOR
+CMP AL,01H
+JE VERDADERO
+JMP FALSO
+ 
+VERDADERO:
+MOV R_COMPARADOR,01H
+JMP FIN_COMPARACION
+FALSO:
+MOV R_COMPARADOR,0H
+
+FIN_COMPARACION: 
+RET
+MENOR_QUE_IGUAL ENDP
+");
                 this.Codigo.AppendLine(@"IGUAL_CADENA PROC NEAR
     MOV R_COMPARADOR,1H
     

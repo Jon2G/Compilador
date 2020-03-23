@@ -1,0 +1,13 @@
+Program Nom.programa
+	
+	Vars
+		Entero Y2;
+	Begin
+	
+		For(Y2:=0;Y2<=10;Y2:=Y2+1)
+			begin
+			 //Instrucciones :)
+			 Imprime(Y2);
+			 Imprime('\n');
+			end	
+End;

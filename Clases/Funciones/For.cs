@@ -8,56 +8,56 @@ using My8086.Clases.Advertencias;
 using My8086.Clases.Compilador;
 using My8086.Clases.Fases;
 using My8086.Clases.Fases._1._Analisis_Lexico;
+using My8086.Clases.Funciones.CodigoTresDirecciones;
 
 namespace My8086.Clases.Funciones
 {
     internal class For : Accion, IBloque
     {
-
+        private static int ConsecutivoSalto = 0;
+        private string IdentifiacadorSalto;
         public DocumentLine InicioBloque { get; set; }
         public DocumentLine FinBloque { get; set; }
-        private double Incremento { get; set; } = 0;
-        private double Inicio { get; set; } = 0;
         private Variable Contador { get; set; }
+        private OperacionArtimetica ContadorOp { get; set; }
+        private OperacionArtimetica Incremento { get; set; }
         private readonly OperacionesLogicas OperacionLogica;
-        public For(Programa Programa, LineaLexica Linea, OperacionesLogicas OperacionLogica, double Inicio, double Incremento) : base(Programa, Linea, 1)
+        public For(Programa Programa, LineaLexica Linea, Variable Contador, OperacionesLogicas OperacionLogica) : base(Programa, Linea, 1)
         {
+            this.Contador = Contador;
             this.OperacionLogica = OperacionLogica;
-            this.Inicio = Inicio;
-            this.Incremento = Incremento;
-           
+            this.Contador = new Variable(Programa, $"CONTADOR_FOR{++For.ConsecutivoSalto}", TipoDato.Entero) { EsAutomatica = true };
+            this.ContadorOp = new OperacionArtimetica(Programa, Contador, Linea, 3, 6);
+            this.Incremento = new OperacionArtimetica(Programa, Contador, Linea, 12, 17);
+            this.OperacionLogica = OperacionLogica;
+            this.IdentifiacadorSalto = (++For.ConsecutivoSalto).ToString();
+            OperacionLogica.DeclararTemporales();
+
         }
 
         public override bool RevisarSemantica(ResultadosCompilacion Errores)
         {
-
-
-            return true;
+            return this.ContadorOp.RevisarSemantica(Errores) && this.Incremento.RevisarSemantica(Errores);
         }
 
         public override StringBuilder Traduccion()
         {
-            string contador = "AUTOCONTADOR_" + Guid.NewGuid().ToString().Replace("-", "");
             StringBuilder sb = new StringBuilder();
-            sb.Append($"for(");
-            //sb.Append(this.Argumentos[0].ObtenerTipoDato());
-            sb.Append(" ");
-            sb.Append(contador);
-            sb.Append(" = ");
-            sb.Append(this.Argumentos[0].Lexema);
-            sb.Append(";");
-            sb.Append(contador);
-            sb.Append("<=");
-            sb.Append(this.Argumentos[2].Lexema);
-            sb.Append(";");
-            sb.Append(contador);
-            sb.Append("++){");
+            sb.AppendLine($"INICIO_FOR_{IdentifiacadorSalto}:");
+            sb.Append(this.ContadorOp.Traduccion());
+            sb.AppendLine($"INICIO_CICLO_{IdentifiacadorSalto}:");
             return sb;
         }
 
         public StringBuilder CerrarBloque()
         {
-            throw new NotImplementedException();
+            StringBuilder sb = new StringBuilder();
+            sb.Append(this.Incremento.Traduccion())
+                .Append(this.OperacionLogica.GenerarAsm())
+                .AppendLine("MOV AL,1H")
+                .AppendLine("CMP R_COMPARADOR,AL")
+                .AppendLine($"JE INICIO_CICLO_{this.IdentifiacadorSalto}");
+            return sb;
         }
     }
 }

@@ -55,10 +55,11 @@ namespace My8086.Clases.Advertencias
             this.Img.MySource = this.Excepcion.EsAdvertencia ? @"\Imgs\StatusWarning_16x.png" : @"\Imgs\bug.png";
             this.Error.Text = this.Excepcion.Texto;
             this.Linea.Text = (this.Excepcion?.Linea?.LineNumber ?? -1).ToString();
-            this.MouseDoubleClick += (o, i) =>
-            {
-                this.VerLinea?.Invoke(this.Excepcion.Linea, i);
-            };
+        }
+
+        private void UserControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            this.VerLinea?.Invoke(this.Excepcion.Linea, e);
         }
     }
 }

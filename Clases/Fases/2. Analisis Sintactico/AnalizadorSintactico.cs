@@ -276,25 +276,59 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
         {
             if (linea[0].Lexema == "For")
             {
-                //if (linea[1].TipoToken != TipoToken.ParentesisAbierto)
-                //{
-                //    this.Errores.ResultadoCompilacion($"Se esperaba un parentesis abierto", linea.LineaDocumento);
-                //    return true;
-                //}
-                //if (Programa.SegmentoDeDatos.ObtenerVariable(linea[2].Lexema) is { } variable)
-                //{
-                //    variable.HacerReferencia();
-                //}
-                //else
-                //{
-                //    this.Errores.ResultadoCompilacion($"Variable del cliclo invalida", linea.LineaDocumento);
-                //    return true;
-                //}
+                List<Token> Argumentos = new List<Token>();
+                if (linea[1].TipoToken != TipoToken.ParentesisAbierto)
+                {
+                    this.Errores.ResultadoCompilacion($"Se esperaba un parentesis abierto", linea.LineaDocumento);
+                    return true;
+                }
+                ////////
+                Variable variableCiclo = Programa.SegmentoDeDatos.ObtenerVariable(linea[2].Lexema);
+                if (variableCiclo!=null)
+                {
+                    variableCiclo.HacerReferencia();
+                }
+                else
+                {
+                    this.Errores.ResultadoCompilacion($"Variable del cliclo invalida", linea.LineaDocumento);
+                    return true;
+                }
                 //if (!double.TryParse(linea[4].Lexema, out var Inicio))
                 //{
                 //    this.Errores.ResultadoCompilacion($"Valor de inicio del cliclo invalido", linea.LineaDocumento);
                 //    return true;
                 //}
+                ////////
+                int i = 6;
+                while (linea[i].TipoToken != TipoToken.FinInstruccion)
+                {
+                    Argumentos.Add(linea[i]);
+                    i++;
+                }
+                OperacionesLogicas operaciones = OperacionesLogicas.Analizar(Argumentos, this.Programa, this.Errores);
+                if (operaciones is null)
+                {
+                    this.Errores.ResultadoCompilacion($"Comparación lógica incorrecta", linea.LineaDocumento);
+                    return true;
+                }
+                ///////
+                //if (!double.TryParse(linea[linea.Elementos - 2].Lexema, out var Incremento))
+                //{
+                //    this.Errores.ResultadoCompilacion($"Valor de incremento del cliclo invalido", linea.LineaDocumento);
+                //    return true;
+                //}
+                //////
+                
+                For fur = new For(Programa, linea,variableCiclo, operaciones);
+                this.Programa.AgregarAccion(fur);
+                return true;
+
+                //if (linea[1].TipoToken != TipoToken.ParentesisAbierto)
+                //{
+                //    this.Errores.ResultadoCompilacion($"Se esperaba un parentesis abierto", linea.LineaDocumento);
+                //    return true;
+                //}
+                
 
                 //List<OperacionLogica> Argumentos = new List<OperacionLogica>();
                 //for (int i = 6; i < linea.Elementos; i += 3)
@@ -352,11 +386,7 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
                 //    Argumentos.Add(new OperacionLogica(linea[i], linea[i + 1], linea[i + 2], linea));
                 //}
 
-                //if (!double.TryParse(linea[linea.Elementos - 2].Lexema, out var Incremento))
-                //{
-                //    this.Errores.ResultadoCompilacion($"Valor de incremento del cliclo invalido", linea.LineaDocumento);
-                //    return true;
-                //}
+
                 //this.Programa.AgregarAccion(new For(Programa, linea, Argumentos.ToArray(), Inicio, Incremento));
 
                 //return true;

@@ -10,8 +10,8 @@ Program Nom.programa
 		a1:=9.50;
 		a1:=a1+x1;
 		
-		Imprime ('resultado: '+a1);
-		
+		Imprime ('resultado: ');
+		Imprime(a1);
 		S1:='hola';
 		
 		Imprime (S1);
@@ -20,12 +20,12 @@ Program Nom.programa
 		Lee(a1);
 		Lee(Y2);
 		
-		For(Y2:=1;y<=10;y2+1)
+		For(Y2:=1;Y2<=10;Y2+1)
 			begin
 			 //Instrucciones :)
-			 Imprime('Represento una instrucción');
+			 Imprime('Represento una instrucciÃ³n');
 			end
-		Si(y2<9 and X>3)
+		Si(Y2<9 and X1>3)
 			begin
 				Imprime('Entre el intervalo');
 			end

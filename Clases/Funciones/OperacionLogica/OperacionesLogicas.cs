@@ -77,6 +77,21 @@ namespace My8086.Clases.Funciones
                     programa.SegmentoDeDatos.Nueva(NuevaVariable)
                         .HacerReferencia();
                 }
+                ///////////
+                string[] variables = new[]{
+                    $"SIGNOT{nd.NOrden}",
+                    $"ENTEROST{nd.NOrden}",
+                    $"DECIMALEST{nd.NOrden}"
+                };
+                foreach (string vv in variables)
+                {
+                    if (!programa.SegmentoDeDatos.YaExisteVariable(vv))
+                    {
+                        programa.SegmentoDeDatos.Nueva(new Variable(programa, vv, TipoDato.Decimal) {EsAutomatica=true })
+                            .HacerReferencia();
+                    }
+                }
+                //////////////
                 DeclararTemporales(programa, nd.Numero1);
                 DeclararTemporales(programa, nd.Numero2);
             }
@@ -224,7 +239,8 @@ namespace My8086.Clases.Funciones
                             sb.AppendLine($"MOV AH,R_COMPARADOR_{((Nodo)nd.Numero2).NOrden}");
                             if (nd.Operador.Token.Lexema == "and")
                             {
-                                sb.AppendLine("MUL AH,AL");
+                                sb.AppendLine("MUL AH");
+
                             }
                             else
                             {

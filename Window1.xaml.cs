@@ -104,11 +104,10 @@ namespace My8086
             //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\PruebaCompleta.my86";
             // this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\QueMesEs.my86";
             //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\DimeTuNombre.my86";
-            this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\SIoNo.my86";
-            TxtArchivo.Text = this.currentFileName;
+            TxtMy.Load($@"{AppData.Directorio}\..\..\Ejemplos\SIoNo.my86");
+            TxtArchivo.Text = TxtMy.Document.FileName;
             //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\ImprimeCadenas.txt";
             //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\UsoVariablesNumericas.txt";
-            TxtMy.Load(currentFileName);
 
 
             // initial highlighting now set by XAML
@@ -134,7 +133,6 @@ namespace My8086
             }
         }
 
-        string currentFileName;
 
         void openFileClick(object sender, RoutedEventArgs e)
         {
@@ -142,22 +140,21 @@ namespace My8086
             if (dlg.ShowDialog() ?? false)
             {
                 this.Compilador.Compilado = false;
-                currentFileName = dlg.FileName;
                 TxtArchivo.Text = dlg.FileName;
-                TxtMy.Load(currentFileName);
-                TxtMy.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(Path.GetExtension(currentFileName));
+                TxtMy.Load(dlg.FileName);
+                TxtMy.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(Path.GetExtension(dlg.FileName));
             }
         }
 
         void saveFileClick(object sender, EventArgs e)
         {
-            if (currentFileName == null)
+            if (TxtMy.Document.FileName == null)
             {
                 SaveFileDialog dlg = new SaveFileDialog();
                 dlg.DefaultExt = ".txt";
                 if (dlg.ShowDialog() ?? false)
                 {
-                    currentFileName = dlg.FileName;
+                    TxtMy.Document.FileName = dlg.FileName;
                 }
                 else
                 {
@@ -167,7 +164,7 @@ namespace My8086
 
             try
             {
-                TxtMy.Save(currentFileName);
+                TxtMy.Save(TxtMy.Document.FileName);
 
             }
             catch (Exception ex)
@@ -202,6 +199,7 @@ namespace My8086
         {
             if (TxtMy.Document != null)
             {
+                this.ProgresoCompilacion.IsIndeterminate = true;
                 FoldingStrategy.UpdateFoldings(FoldingManager, TxtMy.Document);
                 if (!this.AutoCompletado.Analizando)
                 {
@@ -211,6 +209,7 @@ namespace My8086
                     this.ErroresList.ItemsSource = this.Errores.Resultados;
                     this.ErroresList.Items.Refresh();
                     //}));
+                    this.ProgresoCompilacion.IsIndeterminate = false;
                 }
             }
 
@@ -232,18 +231,17 @@ namespace My8086
             }
             else
             {
+                this.ProgresoCompilacion.IsIndeterminate = true;
                 Salida.Text = Compilador.Ejecutar();
             }
         }
 
         private void Compilar(object sender, RoutedEventArgs e)
         {
-            saveFileClick(sender, e);
-            Dispatcher.BeginInvoke(new Action(() =>
+            if (TxtMy.Document.FileName != null)
             {
-                this.ProgresoCompilacion.Visibility = Visibility.Visible;
-                this.ProgresoCompilacion.IsIndeterminate = true;
-            }));
+                saveFileClick(sender, e);
+            }
 
             this.Compilador = new Compilador(this.TxtMy.TextArea.Document, this.Errores);
             Compilador.OnProgreso += (o, i) =>
@@ -262,16 +260,8 @@ namespace My8086
             {
                 TabErrores.SelectedIndex = 0;
             }
-
-            Dispatcher.Invoke(() => { this.ProgresoCompilacion.Visibility = Visibility.Collapsed; },
-                DispatcherPriority.ApplicationIdle);
             this.Salida.Text += string.Join("\n", this.Errores.Resultados
                 .Select(x => $"->[{x.Linea}] " + x.Texto));
-
-            this.ProgresoCompilacion.Visibility = Visibility.Collapsed;
-            this.ProgresoCompilacion.IsIndeterminate = false;
-
-
 
         }
         private void SelectText(int offset, int length)

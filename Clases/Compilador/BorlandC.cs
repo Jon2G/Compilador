@@ -136,6 +136,7 @@ namespace My8086.Clases.Compilador
                   });
                 th.SetApartmentState(ApartmentState.STA);
                 th.Start();
+                //th.Join();
             }
             catch (Exception e)
             {
