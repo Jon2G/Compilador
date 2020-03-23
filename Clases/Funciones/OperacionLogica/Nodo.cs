@@ -13,16 +13,17 @@ namespace My8086.Clases.Funciones.OperacionLogica
         public TokenLogico Numero2 { get; private set; }
         public TokenLogico Operador { get; private set; }
         public int NOrden { get; private set; }
-
+        public TipoDato TipoDato { get; private set; }
         public Nodo() : base() { }
-        public Nodo(int NOrden, TokenLogico Numero1, TokenLogico Operador, TokenLogico Numero2) : base(new Token($"T{NOrden}", Fases.TipoToken.Identificador, TipoDato.NoAplica, Numero1.Token.Linea), TipoToken.Temporal)
+        public Nodo(int NOrden, TokenLogico Numero1, TokenLogico Operador, TokenLogico Numero2, TipoDato TipoDato) : base(new Token($"T{NOrden}", Fases.TipoToken.Identificador, TipoDato.NoAplica, Numero1.Token.Linea), TipoToken.Temporal)
         {
             this.Numero1 = Numero1;
             this.Operador = Operador;
             this.Numero2 = Numero2;
             this.NOrden = NOrden;
+            this.TipoDato = TipoDato;
         }
-        public string NemonicoOperacion(string destino, int orden)
+        public string NemonicoOperacion(string destino,TipoDato TipoDato)
         {
             StringBuilder sb = new StringBuilder();
             switch (this.Operador.Token.Lexema)
@@ -34,7 +35,14 @@ namespace My8086.Clases.Funciones.OperacionLogica
                     sb.AppendLine("CALL MAYOR_QUE_IGUAL");
                     break;
                 case "=":
-                    sb.AppendLine("CALL IGUAL");
+                    if (TipoDato == TipoDato.Cadena)
+                    {
+                        sb.AppendLine("CALL IGUAL_CADENA");
+                    }
+                    else
+                    {
+                        sb.AppendLine("CALL IGUAL");
+                    }
                     break;
                 case "<":
                     sb.AppendLine("CALL MENOR_QUE");

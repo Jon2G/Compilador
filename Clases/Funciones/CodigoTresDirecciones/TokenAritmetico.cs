@@ -20,7 +20,7 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
             this.Token = Token;
             this.TipoToken = TipoToken;
         }
-        public static List<TokenAritmetico> Analizar(List<Token> Tks)
+        public static List<TokenAritmetico> Analizar(List<Token> Tks,Programa programa)
         {
             List<TokenAritmetico> tokens = new List<TokenAritmetico>();
 
@@ -47,10 +47,26 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
                     char simbolo = tk.Lexema.First();
                     if (simbolo == '+' || simbolo == '-')
                     {
+                        if (simbolo == '+')
+                        {
+                            programa.UsarSuma = true;
+                        }
+                        if (simbolo == '-')
+                        {
+                            programa.UsarResta = true;
+                        }
                         tokens.Add(new TokenAritmetico(tk, TipoToken.OperadorSecundario));
                     }
                     if (simbolo == '*' || simbolo == '/')
                     {
+                        if (simbolo == '*')
+                        {
+                            programa.UsarMultiplicacion = true;
+                        }
+                        if (simbolo == '/')
+                        {
+                            programa.UsarDivision = true;
+                        }
                         tokens.Add(new TokenAritmetico(tk, TipoToken.OperadorPrioritario));
                     }
                     continue;

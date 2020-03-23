@@ -24,10 +24,10 @@ namespace My8086.Clases.Funciones
             this.IdentifiacadorSalto = (++ConsecutivoSalto).ToString();
             // this.IdentifiacadorSalto = Guid.NewGuid().ToString().Replace("-", "");
             this.OperacionLogica = OperacionLogica;
+            OperacionLogica.DeclararTemporales();
         }
         public override bool RevisarSemantica(ResultadosCompilacion Errores)
         {
-            OperacionLogica.DeclararTemporales();
             return true;
         }
 

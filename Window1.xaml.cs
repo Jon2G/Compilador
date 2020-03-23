@@ -48,9 +48,9 @@ namespace My8086
     {
         private readonly AutoCompletado AutoCompletado;
         readonly FoldingManager FoldingManager;
-        readonly FoldingManager FoldingManagerAsm;
         readonly BraceFoldingStrategy FoldingStrategy;
         private Compilador Compilador;
+        public ResultadosCompilacion Errores { get; set; }
         public Window1()
         {
             this.FoldingStrategy = new BraceFoldingStrategy();
@@ -80,29 +80,38 @@ namespace My8086
             HighlightingManager.Instance.RegisterHighlighting("My8086", new string[] { ".my86" }, customHighlighting);
 
             HighlightingManager.Instance.RegisterHighlighting("ASM", new string[] { ".asm" }, customHighlighting2);
+            this.Errores = new ResultadosCompilacion();
 
             InitializeComponent();
             this.CmbxEjemplos.ItemsSource = Ejemplos.Ejemplo.ListarEjemplos();
             //this.CmbxEjemplos.SelectedItem = this.CmbxEjemplos.ItemsSource.OfType<Ejemplos.Ejemplo>().Last();
-            this.FoldingManager = new FoldingManager(TxtMy.Document);
-            this.AutoCompletado = new AutoCompletado(this.TxtMy.TextArea);
 
-            this.FoldingManagerAsm = new FoldingManager(TxtAsm.Document);
 
+            this.FoldingManager = FoldingManager.Install(TxtMy.TextArea);
+            this.FoldingStrategy = new BraceFoldingStrategy();
+            this.FoldingStrategy.UpdateFoldings(this.FoldingManager, TxtMy.Document);
+
+
+            this.AutoCompletado = new AutoCompletado(this.TxtMy.TextArea, this.Errores);
+            this.AutoCompletado.Analizar();
+            this.ErroresList.ItemsSource = this.Errores.Resultados;
+            this.ErroresList.Items.Refresh();
             //propertyGridComboBox.SelectedIndex = 2;
 
             TxtMy.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("My8086");
             TxtAsm.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("ASM");
 
             //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\PruebaCompleta.my86";
-            this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\QueMesEs.my86";
+            // this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\QueMesEs.my86";
+            //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\DimeTuNombre.my86";
+            this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\SIoNo.my86";
             TxtArchivo.Text = this.currentFileName;
             //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\ImprimeCadenas.txt";
             //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\UsoVariablesNumericas.txt";
             TxtMy.Load(currentFileName);
-            //textEditor.SyntaxHighlighting = customHighlighting;
-            // initial highlighting now set by XAML
 
+
+            // initial highlighting now set by XAML
             TxtMy.TextArea.TextEntering += textEditor_TextArea_TextEntering;
             TxtMy.TextArea.TextEntered += textEditor_TextArea_TextEntered;
 
@@ -111,7 +120,18 @@ namespace My8086
             foldingUpdateTimer.Tick += foldingUpdateTimer_Tick;
             foldingUpdateTimer.Start();
 
-            this.Compilador = new Compilador(TxtMy.TextArea.Document);
+            this.Compilador = new Compilador(TxtMy.TextArea.Document, this.Errores);
+        }
+
+        private void VerLinea(object sender, EventArgs e)
+        {
+            int linea = (sender as DocumentLine)?.LineNumber ?? -1;
+            if (linea > 0)
+            {
+                var l = this.TxtMy.TextArea.Document.GetLineByNumber(linea);
+                SelectText(l.Offset, l.Length);
+                this.TxtMy.ScrollToLine(linea);
+            }
         }
 
         string currentFileName;
@@ -155,35 +175,13 @@ namespace My8086
 
             }
         }
-        //void propertyGridComboBoxSelectionChanged(object sender, RoutedEventArgs e)
-        //{
-        //    if (propertyGrid == null)
-        //        return;
-        //    switch (propertyGridComboBox.SelectedIndex)
-        //    {
-        //        case 0:
-        //            propertyGrid.SelectedObject = textEditor;
-        //            break;
-        //        case 1:
-        //            propertyGrid.SelectedObject = textEditor.TextArea;
-        //            break;
-        //        case 2:
-        //            propertyGrid.SelectedObject = textEditor.Options;
-        //            break;
-        //    }
-        //}
 
         void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
         {
             this.Compilador.Compilado = false;
-            if (e.Text == ".")
-            {
-                this.AutoCompletado.AutoCompletar();
-            }
-
             if (e.Text == "(")
             {
-                //this.AutoCompletado.SugerirVariable();
+                this.AutoCompletado.AutoCompletar();
             }
         }
 
@@ -202,7 +200,19 @@ namespace My8086
         }
         void foldingUpdateTimer_Tick(object sender, EventArgs e)
         {
-            FoldingStrategy.UpdateFoldings(FoldingManager, TxtMy.Document);
+            if (TxtMy.Document != null)
+            {
+                FoldingStrategy.UpdateFoldings(FoldingManager, TxtMy.Document);
+                if (!this.AutoCompletado.Analizando)
+                {
+                    //Dispatcher.BeginInvoke(new Action(() =>
+                    //{
+                    this.AutoCompletado.Analizar();
+                    this.ErroresList.ItemsSource = this.Errores.Resultados;
+                    this.ErroresList.Items.Refresh();
+                    //}));
+                }
+            }
 
         }
 
@@ -235,37 +245,28 @@ namespace My8086
                 this.ProgresoCompilacion.IsIndeterminate = true;
             }));
 
-            this.Compilador = new Compilador(this.TxtMy.TextArea.Document);
+            this.Compilador = new Compilador(this.TxtMy.TextArea.Document, this.Errores);
             Compilador.OnProgreso += (o, i) =>
             {
                 this.ProgresoCompilacion.SetPercent(Compilador.Progreso);
             };
-            Compilador.VerLinea += (o, i) =>
-            {
-                int linea = (o as DocumentLine)?.LineNumber ?? -1;
-                if (linea > 0)
-                {
-                    var l = this.TxtMy.TextArea.Document.GetLineByNumber(linea);
-                    SelectText(l.Offset, l.Length);
-                    this.TxtMy.ScrollToLine(linea);
-                }
-            };
             this.Salida.Text = Compilador.Compilar();
             TxtAsm.Text = Compilador.ASM?.ToString();
-            ErroresList.ItemsSource = Compilador.Resultados;
-            if (!this.Compilador.Resultados.Any())
+
+            if (!this.Errores.Resultados.Any())
             {
+                ErroresList.Items.Refresh();
                 TabErrores.SelectedIndex = 1;
             }
             else
             {
                 TabErrores.SelectedIndex = 0;
             }
-            ErroresList.Items.Refresh();
+
             Dispatcher.Invoke(() => { this.ProgresoCompilacion.Visibility = Visibility.Collapsed; },
                 DispatcherPriority.ApplicationIdle);
-            this.Salida.Text += string.Join("\n", Compilador.Resultados
-                .Select(x => $"->[{x.Excepcion.Linea}] " + x.Excepcion.Texto));
+            this.Salida.Text += string.Join("\n", this.Errores.Resultados
+                .Select(x => $"->[{x.Linea}] " + x.Texto));
 
             this.ProgresoCompilacion.Visibility = Visibility.Collapsed;
             this.ProgresoCompilacion.IsIndeterminate = false;
@@ -299,7 +300,12 @@ namespace My8086
 
         private void CmbxEjemplos_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            TxtMy.Text = (CmbxEjemplos.SelectedItem as Ejemplos.Ejemplo).GetDocumento();
+            Ejemplos.Ejemplo ex = (CmbxEjemplos.SelectedItem as Ejemplos.Ejemplo);
+            TxtMy.Document.Text = ex.GetDocumento();
+            TxtMy.Document.FileName = null;
+            TxtArchivo.Text = ex.Nombre;
+
+
         }
     }
 

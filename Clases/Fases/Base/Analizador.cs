@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using ICSharpCode.AvalonEdit.Document;
 using My8086.Clases.Advertencias;
 
@@ -16,5 +18,9 @@ namespace My8086.Clases.Fases.Base
             this.Errores = Errores;
         }
         public abstract void Analizar();
+        public virtual void Analizar(List<Tuple<string, DocumentLine>> Lineas)
+        {
+
+        }
     }
 }

@@ -16,14 +16,14 @@ namespace My8086.Clases.Funciones
         private Nodo ArbolDeDirecciones { get; set; }
         private readonly StringBuilder Asm;
         private readonly Programa Programa;
-        internal OperacionesLogicas(List<TokenLogico> Tokens, Programa Programa)
+        internal OperacionesLogicas(List<TokenLogico> Tokens, Programa Programa, ResultadosCompilacion Errores)
         {
             this.Programa = Programa;
             this.Programa.OperacionesLogicas = true;
-            this.ArbolDeDirecciones = GenerarNodos(Tokens);
+            this.ArbolDeDirecciones = GenerarNodos(Tokens, Errores);
             this.Asm = new StringBuilder();
         }
-        private Nodo GenerarNodos(List<TokenLogico> Tokens)
+        private Nodo GenerarNodos(List<TokenLogico> Tokens, ResultadosCompilacion Errores)
         {
             int NTemporal = 0;
             do
@@ -42,7 +42,12 @@ namespace My8086.Clases.Funciones
                 TokenLogico operador = Tokens[IndexLogico];
                 TokenLogico n2 = Tokens[IndexLogico + 1];
                 //NodosT.Add(new Nodo(NodosT.Count+1, n1, operador, n2));
-                Tokens.Insert(IndexLogico - 1, new Nodo(++NTemporal, n1, operador, n2));
+                if (n1.Token.TipoDato != n2.Token.TipoDato && !(n1.EsNumero && n2.EsNumero))
+                {
+                    Errores.ResultadoCompilacion("Comparación incorrecta, se especificarón tipos de datos diferentes", null);
+                    return null;
+                }
+                Tokens.Insert(IndexLogico - 1, new Nodo(++NTemporal, n1, operador, n2, n1.Token.TipoDato));
 
                 Tokens.Remove(n1);
                 Tokens.Remove(n2);
@@ -68,11 +73,24 @@ namespace My8086.Clases.Funciones
                 string variable = $"R_COMPARADOR_{nd.NOrden}";
                 if (!programa.SegmentoDeDatos.YaExisteVariable(variable))
                 {
-                    programa.SegmentoDeDatos.Nueva(new Variable(programa, variable, TipoDato.BitLogico))
+                    var NuevaVariable = new Variable(programa, variable, TipoDato.BitLogico) { EsAutomatica = true };
+                    programa.SegmentoDeDatos.Nueva(NuevaVariable)
                         .HacerReferencia();
                 }
                 DeclararTemporales(programa, nd.Numero1);
                 DeclararTemporales(programa, nd.Numero2);
+            }
+            if (tk.TipoToken == TipoToken.Cadena && tk.Token.TipoToken == Fases.TipoToken.Cadena)
+            {
+                //Asm.Append(EscribeNumero(this.ArbolDeDirecciones, this.Variable.Nombre));
+                //Es una cadena que no es una variable Ex. Imprime('Hola mundo');
+                //Crearemos una variable con un identificador unico que guarde esta cadena
+                LineaLexica lexica = new LineaLexica(tk.Token.Linea);
+                Variable var = this.Programa.SegmentoDeDatos.Nueva(new Variable(this.Programa, tk.Token, lexica, tk.Token.TipoDato));
+                var VariableComparacion = new Token(var.Nombre, My8086.Clases.Fases.TipoToken.Identificador, TipoDato.Cadena, tk.Token.Linea);
+                this.Programa.Acciones.Add((new AsignaCadena(Programa, lexica, var, tk.Token)));
+                tk.Token = VariableComparacion;
+                //sb.AppendLine($"MOV DI,{var.Nombre}");
             }
         }
         internal static OperacionesLogicas Analizar(List<Token> Argumentos, Programa Programa, ResultadosCompilacion Errores)
@@ -146,26 +164,27 @@ namespace My8086.Clases.Funciones
                 }
                 else
                 {
+                    if (tk.TipoDato == TipoDato.Cadena && tk.TipoToken == Fases.TipoToken.Cadena)
+                    {
+                        tokens.Add(new TokenLogico(tk, My8086.Clases.Funciones.OperacionLogica.TipoToken.Cadena));
+                        continue;
+                    }
                     Errores.ResultadoCompilacion($"Uso de variable no declarada: {tk.Lexema}", null, false);
                     return null;
                 }
             }
-            operaciones = new OperacionesLogicas(tokens, Programa);
+            operaciones = new OperacionesLogicas(tokens, Programa, Errores);
             return operaciones;
         }
         public StringBuilder GenerarAsm()
         {
             Asm.Append(";================[-OPERACION LOGICA-]================\n");
-            Asm.AppendLine(";"+this.ToString());
+            Asm.AppendLine(";" + this.ToString());
             /////////
             List<StringBuilder> operaciones = new List<StringBuilder>();
             if (this.ArbolDeDirecciones is Nodo)
             {
                 Traducir(operaciones, this.ArbolDeDirecciones);
-            }
-            else
-            {
-                //Asm.Append(EscribeNumero(this.ArbolDeDirecciones, this.Variable.Nombre));
             }
 
             foreach (var op in operaciones)
@@ -211,11 +230,12 @@ namespace My8086.Clases.Funciones
                             {
                                 sb.AppendLine("ADD AH,AL");
                             }
-                            sb.AppendLine($"MOV R_COMPARADOR_{nd.NOrden},AL");
+                            sb.AppendLine($"MOV R_COMPARADOR_{nd.NOrden},AH");
+                            sb.AppendLine($"MOV R_COMPARADOR,AH");
                             operaciones.Add(sb);
                             return operaciones;
                         }
-                        sb.AppendLine(nd.NemonicoOperacion($"R_COMPARADOR_{nd.NOrden}", nd.NOrden));
+                        sb.AppendLine(nd.NemonicoOperacion($"R_COMPARADOR_{nd.NOrden}", nd.TipoDato));
                     }
                     else
                     {
@@ -235,13 +255,32 @@ namespace My8086.Clases.Funciones
             StringBuilder sb = new StringBuilder();
             if (tk is Nodo nodoN1)
             {
-                sb.AppendLine($"LEA DX,SGN_SIGNOT{nodoN1.NOrden}");
-                sb.AppendLine($"CALL USAR_N{n}  ;vamos a utilizar T{nodoN1.NOrden}");
+                switch (nodoN1.TipoDato)
+                {
+                    case TipoDato.Cadena:
+
+                        break;
+
+                    case TipoDato.Decimal:
+                    case TipoDato.Entero:
+                        sb.AppendLine($"LEA DX,SGN_SIGNOT{nodoN1.NOrden}");
+                        sb.AppendLine($"CALL USAR_N{n}  ;vamos a utilizar T{nodoN1.NOrden}");
+                        break;
+                }
             }
             else if (tk.TipoToken == TipoToken.Temporal || tk.TipoToken == TipoToken.VariableNumerica)
             {
                 sb.AppendLine($"LEA DX,SGN_{tk.Token.Lexema}");
                 sb.AppendLine($"CALL USAR_N{n}  ;vamos a utilizar T_{tk.Token.Lexema}");
+            }
+            else if (tk.TipoToken == TipoToken.Cadena && tk.Token.TipoDato == TipoDato.Cadena)
+            {
+                sb.AppendLine($"MOV DI,{tk.Token.Lexema}");
+                sb.AppendLine($"MOV CAD_TEMP{n},DI");
+            }
+            else if (tk.TipoToken == TipoToken.Cadena)
+            {
+                sb.AppendLine($"MOV DI,{tk.Token.Lexema}");
             }
             else
             {

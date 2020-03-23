@@ -31,6 +31,7 @@ namespace My8086.Clases.Fases
         public bool UsarMultiplicacion { get; internal set; }
         public bool OperadoresAritmeticos => UsarSuma || UsarDivision || UsarResta || UsarMultiplicacion|| OperacionesConNumeros;
         public bool OperacionesConCadenas { get; internal set; }
+        public bool LeecturaNumeros { get; internal set; }
         public bool OperacionesConNumeros { get; internal set; }
         public bool OperacionesLogicas { get; internal set; }
 

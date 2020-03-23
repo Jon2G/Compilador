@@ -29,7 +29,7 @@ namespace My8086.Clases.Compilador
             this.Codigo.AppendLine(".stack");
             this.Codigo.AppendLine(".386");
             this.Codigo.AppendLine(".data");
-            if (this.Programa.OperadoresAritmeticos)
+            if (this.Programa.OperadoresAritmeticos || this.Programa.OperacionesLogicas)
             {
                 this.Codigo.AppendLine(";=========================================================");
                 this.Codigo.AppendLine(";VARIABLES TEMPORALES PARA LAS OPERACIONES ARITMETICAS");
@@ -70,8 +70,17 @@ namespace My8086.Clases.Compilador
                 this.Codigo.AppendLine(";=========================================================");
                 this.Codigo.AppendLine(";VARIABLES TEMPORALES PARA LAS OPERACIONES LOGICAS");
                 this.Codigo.AppendLine("R_COMPARADOR  db 0");
+                this.Codigo.AppendLine("CAD_TEMP1  dw 0");
+                this.Codigo.AppendLine("CAD_TEMP2  dw 0");
                 this.Codigo.AppendLine(";=========================================================");
             }
+            if (this.Programa.LeecturaNumeros)
+            {
+                this.Codigo.AppendLine("NUMERO_INVALIDO DB 'NUMERO INVALIDO!','$'");
+                this.Codigo.AppendLine("AUXILIAR  DB 0");
+            }
+            this.Codigo.AppendLine("OVERFLOW DB 'STACK OVERFLOW!','$'");
+            this.Codigo.AppendLine("EXCEPCION_NO_CONTROLADA DB 'EXCEPCION NO CONTROLADA:','$'");
             this.Codigo.AppendLine(";VARIABLES DEPENDIENTES DE LA PROGRAMACION");
             this.Codigo.Append(this.Programa.SegmentoDeDatos.Traduccion());
             this.Codigo.AppendLine(".code");
@@ -85,6 +94,11 @@ namespace My8086.Clases.Compilador
             this.Codigo.AppendLine(@"mov cx,0000h  ;es la esquina superior izquierda reglon: columna");
             this.Codigo.AppendLine(@"mov dx,184Fh ;es la esquina inferior derecha reglon: columna");
             this.Codigo.AppendLine(@"int 10h  ;interrupcion que llama al BIOS");
+            this.Codigo.AppendLine(";================>[MOVER CURSOR A 0]<================");
+            this.Codigo.AppendLine("XOR DX,DX; dl Columna,dh fila");
+            this.Codigo.AppendLine("MOV bh,0 ;PAGINA");
+            this.Codigo.AppendLine(" mov ah, 02h ;mover cursor");
+            this.Codigo.AppendLine("int  10h; ;servicio de video");
             this.Codigo.AppendLine(";================>[CODIGO GENERADO POR EL COMPILADOR]<================");
             foreach (Accion accion in this.Programa.Acciones)
             {
@@ -484,7 +498,7 @@ namespace My8086.Clases.Compilador
         
     MULTIPLICA ENDP");
             }
-            if (this.Programa.OperadoresAritmeticos)
+            if (this.Programa.OperadoresAritmeticos||this.Programa.OperacionesLogicas)
             {
                 this.Codigo.AppendLine(@";====================================[USAR_N1]====================================    
     USAR_N1 PROC NEAR 
@@ -733,6 +747,117 @@ ERROR_ALLOC:
    
             RET
             LIBERAR_CADENA ENDP ");
+                this.Codigo.AppendLine(@"LEER_CADENA PROC NEAR 
+        XOR CX,CX
+      
+ 
+     
+        MOV CADENA,DS
+        XOR AX,AX
+        MOV AL,BLOQUE_ACTUAL
+        MOV AH,0FH
+        MUL AH 
+          
+        MOV DI,CADENA
+        ADD DI,AX
+        MOV CX,ULTIMO_SEGMENTO
+        ADD DI,CX
+        MOV CADENA,DI
+        XOR CX,CX 
+        ;MOV AH,09H
+        ;LEA DX,ERROR_ALLOC_CADENA
+        ;INT 21H    
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;LECTURA
+AGREGAR_CARACTER:  
+    MOV SI,CADENA
+    MOV AH,08H
+    INT 21H
+    
+    CMP AL,08H
+    JE RETROCEDER
+    CMP AL,0DH ;TECLA ENTER
+    JE LEER_CADENA_SALIR
+    
+    MOV DI,SI
+    ADD DI,CX 
+    MOV [DI],AL 
+    INC CX
+    
+    ;IMPRIMIR EL CARACTER EN PANTALLA
+    MOV DL,AL
+    MOV AH,02H
+    INT 21H
+    ;;REVISAR SI YA NOS ACABAMOS EL BLOQUE
+    
+    MOV dx,0 ; 
+    MOV AX,CX ; 
+    MOV BX,0FH
+    DIV BX ;
+    
+    CMP AL,BLOQUE_ACTUAL 
+    JA REALLOC_CADENA
+    JMP AGREGAR_CARACTER
+    ;;;;;;;;;;;;;;;;;;;;; 
+            REALLOC_CADENA:
+        ;MOV AH,09H
+        ;LEA DX,REALLOC
+        ;INT 21H
+        ;;AUMENTAR EL BLOQUE Y RESERVAR UN PARRAFO MAS (REALLOC) 
+        ;FUNCION AH,04AH    
+        
+        ;PARAMETROS ENTRADA
+        ;ES - DIRECCION DEL BLOQUE A MODIFICAR
+        ;BX NUEVO TAMANIO DE BLOQUE  
+        
+        ;PARAMETROS DE SALIDA
+        ;SI HAY ERROR ACARREO CON VALOR,
+        ;BX - TAMANIO MAXIMO DE MEMORIA DISPONIBLE
+        ;AX CODIGO DE ERROR (7,8,9)        
+            
+            INC BLOQUE_ACTUAL
+            
+            MOV AH,04AH
+            MOV ES,DI
+            MOV BL,BLOQUE_ACTUAL
+            INT 21H
+            ;JC ERROR_REALLOC
+            JMP AGREGAR_CARACTER
+            ERROR_REALLOC:
+            LEA DX,ERROR
+            MOV AH,09H
+            INT 21H 
+    ;;;;;;;;;;;;;;;;;;;;;;     
+    ;;;;;;;;;;;;;
+    RETROCEDER:
+    MOV AH,02H
+    MOV DL,08H ;backspace 
+    INT 21H 
+    ;
+    MOV AH,02H  
+    MOV DL,00H ;caracter nulo para borra el caracter
+    INT 21H
+    ;
+    MOV AH,02H  
+    MOV DL,08H;backspace 
+    INT 21H
+    
+    DEC CX
+    JMP AGREGAR_CARACTER
+    ;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;    
+        LEER_CADENA_SALIR:
+        
+        MOV AL,FIN_CADENA
+        MOV DI,SI
+        ADD DI,CX         
+        MOV [DI],AL 
+        INC CX
+    
+        MOV CX,CADENA
+        MOV ULTIMO_SEGMENTO,CX
+   
+   RET      
+   LEER_CADENA ENDP");
             }
             if (this.Programa.OperacionesLogicas)
             {
@@ -810,7 +935,283 @@ mayor_que_exit:
 salir_mayorque:    
     RET    
 MAYOR_QUE ENDP");
+                this.Codigo.AppendLine(@"IGUAL_CADENA PROC NEAR
+    MOV R_COMPARADOR,1H
+    
+    MOV CX,0FFFFH
+    XOR AX,AX
+siguiente_iguales_cadena: 
+    CMP AL,FIN_CADENA
+    JE fin_iguales_cadena 
+       
+    INC CX
+    
+    MOV DI,CAD_TEMP1
+    
+    MOV SI,CAD_TEMP2
+    
+    ADD DI,CX
+    ADD SI,CX
+    
+    MOV AL,[DI]
+    MOV AH,[SI]
+    
+    CMP AL,AH
+    JE siguiente_iguales_cadena
+    JNE diferentes_iguales_cadena
+    
+
+
+    
+diferentes_iguales_cadena:
+MOV R_COMPARADOR,0H    
+
+fin_iguales_cadena:
+RET    
+IGUAL_CADENA ENDP");
             }
+            if (this.Programa.LeecturaNumeros)
+            {
+                this.Codigo.AppendLine(@"LEER_DECIMAL PROC NEAR 
+    XOR CX,CX ;CUENTA EL NUMERO DE ENTEROS
+    MOV SI,DI
+    MOV AH,01H
+    INT 21H
+              
+    MOV AH,'-'          
+    CMP AL,AH    
+    JE lectura_entero_negativo 
+    INC DI  
+    INC CX
+    JMP validar_numero_entero
+lectura_entero_negativo:
+    MOV AL,0FFH 
+    MOV [DI],AL   
+    
+    ;NUMEROS
+    lectura_numeros:
+    INC CX
+    INC DI 
+    CMP CX,06H 
+    JAE overflow_numerico 
+    
+    MOV AH,01H
+    INT 21H       
+    
+    CMP AL,0DH
+    JE fin_lectura_entero 
+    CMP AL,2EH
+    JE lectura_numeros_decimales 
+    validar_numero_entero:
+    CMP AL,30H
+    JL numero_invalido_enteros
+    CMP AL,39H
+    JA numero_invalido_enteros   
+    
+    SUB AL,30H
+    MOV [DI],AL
+    JMP lectura_numeros
+    
+    lectura_numeros_decimales:
+    MOV DI,SI
+    ADD DI,05H
+    
+    lectura_numero_decimal:
+    CMP AUXILIAR,04H 
+    JA overflow_numerico
+    
+    MOV AH,01H
+    INT 21H
+    
+    CMP AL,0DH
+    JE fin_lectura_entero
+    CMP AL,30H
+    JL numero_invalido_enteros
+    CMP AL,39H
+    JA numero_invalido_enteros   
+       
+    SUB AL,30H
+    MOV [DI],AL
+    
+    INC AUXILIAR
+    INC DI 
+       
+   JMP lectura_numero_decimal
+      
+fin_lectura_entero:
+;AJUSTAR LA PARTE DECIMAL
+DEC CX
+CMP CX,04H
+JL  ajuste_entero_necesario
+JMP sin_ajuste_entero
+ajuste_entero_necesario:  
+
+MOV AL,CL
+MOV AH,04H
+SUB AH,AL
+XOR DX,DX
+MOV DL,AH
+
+MOV DI,SI
+INC DI
+MOV BX,DI
+
+DEC CX
+siguiente_ajuste_entero:
+MOV DI,BX
+ADD DI,CX
+
+MOV AL,[DI]
+MOV AH,0H
+MOV [DI],AH
+ADD DI,DX
+MOV [DI],AL
+
+
+DEC CX
+JNS siguiente_ajuste_entero
+
+sin_ajuste_entero:
+RET    
+overflow_numerico: 
+LEA DI,OVERFLOW  
+CALL EXCEPCION  
+numero_invalido_enteros:
+LEA DI,NUMERO_INVALIDO
+CALL EXCEPCION
+               
+RET               
+LEER_DECIMAL ENDP");
+                this.Codigo.AppendLine(@"LEER_ENTERO PROC NEAR 
+    XOR CX,CX ;CUENTA EL NUMERO DE ENTEROS
+    MOV SI,DI
+    MOV AH,01H
+    INT 21H
+              
+    MOV AH,'-'          
+    CMP AL,AH    
+    JE lectura_entero_negativo2
+    MOV AH,01H
+    MOV [DI],AH ;ES POSITIVO
+    INC DI  
+    INC CX
+    JMP validar_numero_entero2
+lectura_entero_negativo2:
+    MOV AL,0FFH 
+    MOV [DI],AL   
+    
+    ;NUMEROS
+    lectura_numeros2:
+    INC CX
+    INC DI 
+    CMP CX,06H 
+    JAE overflow_numerico2 
+    
+    MOV AH,01H
+    INT 21H       
+    
+    CMP AL,0DH
+    JE fin_lectura_entero2 
+    CMP AL,2EH
+    JE numero_invalido_enteros2
+    
+    
+     
+    validar_numero_entero2:
+    CMP AL,30H
+    JL  numero_invalido_enteros2
+    CMP AL,39H
+    JA numero_invalido_enteros2   
+    
+    SUB AL,30H
+    MOV [DI],AL
+    JMP lectura_numeros2
+    
+    
+    
+      
+fin_lectura_entero2:
+;AJUSTAR LA PARTE DECIMAL
+DEC CX
+CMP CX,04H
+JL  ajuste_entero_necesario2
+JMP sin_ajuste_entero2
+ajuste_entero_necesario2:  
+
+MOV AL,CL
+MOV AH,04H
+SUB AH,AL
+XOR DX,DX
+MOV DL,AH
+
+MOV DI,SI
+INC DI
+MOV BX,DI
+
+DEC CX
+siguiente_ajuste_entero2:
+MOV DI,BX
+ADD DI,CX
+
+MOV AL,[DI]
+MOV AH,0H
+MOV [DI],AH
+ADD DI,DX
+MOV [DI],AL
+
+
+DEC CX
+JNS siguiente_ajuste_entero2
+
+sin_ajuste_entero2:
+RET    
+overflow_numerico2: 
+LEA DI,OVERFLOW  
+CALL EXCEPCION  
+numero_invalido_enteros2:
+LEA DI,NUMERO_INVALIDO
+CALL EXCEPCION
+               
+RET               
+LEER_ENTERO ENDP");
+            }
+            this.Codigo.AppendLine(@"EXCEPCION PROC NEAR
+
+MOV AH, 06h    ; Scroll up function
+XOR AL, AL     ; Clear entire screen
+XOR CX, CX     ; Upper left corner CH=row, CL=column
+MOV DX, 184FH  ; lower right corner DH=row, DL=column 
+MOV BH, 4Eh    ; YellowOnBlue
+INT 10H
+
+MOV DL,1AH
+MOV DH,0AH
+MOV bh,0 ;PAGINA
+mov ah, 02h ;mover cursor
+int  10h; ;servicio de video 
+
+ 
+LEA DX,EXCEPCION_NO_CONTROLADA
+MOV AH,09H
+INT 21H
+ 
+MOV DL,1AH
+MOV DH,0CH
+MOV bh,0 ;PAGINA
+mov ah, 02h ;mover cursor
+int  10h; ;servicio de video 
+ 
+MOV DX,DI
+MOV AH,09H
+INT 21H         
+
+XOR AX,AX
+INT 16H
+
+MOV AH,4CH
+INT 21H
+              
+EXCEPCION ENDP");
             #endregion
             this.Codigo.AppendLine("begin endp");
             this.Codigo.AppendLine("end begin");
@@ -822,8 +1223,17 @@ MAYOR_QUE ENDP");
             {
                 if (this.Programa.Acciones.Where(x => !(x is IBloque)).LastOrDefault() == accion)
                 {
-                    CerrarBLoquesPendientes();
-                    AgregarAccion(accion);
+                    if (this.BloquesPorCerrar.Count == 1)
+                    {
+                        IBloque block = this.BloquesPorCerrar.Dequeue();
+                        AgregarAccion(accion);
+                        this.Codigo.Append(block.CerrarBloque());
+                    }
+                    else
+                    {
+                        CerrarBLoquesPendientes();
+                        AgregarAccion(accion);
+                    }                
                     return;
                 }
                 if (accion.LineaDocumento.LineNumber >= this.BloquesPorCerrar.Peek().FinBloque.LineNumber)

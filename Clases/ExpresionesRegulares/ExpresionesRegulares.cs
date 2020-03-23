@@ -17,7 +17,7 @@ namespace My8086.Clases.ExpresionesRegulares
         }
         public Regex Cadena => new Regex(@"^(')(?<Cadena>(.)+)(')$", RegexOptions.Compiled);
         public Regex Identificador => new Regex(@"^(?<Lexema>(([a-zA-Z]+[0-9a-zA-Z]*|\\w)+))$", RegexOptions.Compiled);
-        public Regex PalabrasReservadas => new Regex(@"^(Nom.(([a-zA-Z]+[0-9a-zA-Z]*|\\w)+)|Program|Vars|Entero|Decimal|Cadena|Si|begin|end|Begin|End)$", RegexOptions.Compiled);
+        public Regex PalabrasReservadas => new Regex(@"^(Nom\.(([a-zA-Z]+[0-9a-zA-Z]*|\\w)+)|Program|Vars|Entero|Decimal|Cadena|Si|begin|end|Begin|End)$", RegexOptions.Compiled);
         public Regex Enteros => new Regex(@"^(\+|\-)?((\d)+)$", RegexOptions.Compiled);
         public Regex Decimales => new Regex(@"^(\d+.\d+)$", RegexOptions.Compiled);
         public Regex OperadoresAritmeticos => new Regex(@"^(\+|\-|:=)$", RegexOptions.Compiled);

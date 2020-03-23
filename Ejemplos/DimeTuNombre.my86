@@ -1,0 +1,39 @@
+Program Nom.QueMesEs
+	
+	Vars
+		Entero Edad;
+		Cadena Nombre;
+		Cadena Respuesta;
+		Entero Anio;
+	Begin
+	
+	Imprime('¿Cúal es tu nombre?\n');
+	Lee(Nombre);
+	Imprime('\n¡Hola!,');
+	Imprime(Nombre);
+	Imprime('\n¿En que año estamos?\n');
+	Lee(Anio);
+	Imprime('¿En que año naciste?\n');
+	Lee(Edad);
+	Edad:=Anio-Edad;
+	Imprime('¿Ya fué tu cumpleaños en este año?\nResponde con S/N:\n');
+	Lee(Respuesta);
+	Si(Respuesta='N' or Respuesta='n')
+		begin
+		Edad:=Edad-1;
+		end
+	Imprime('\n¿Tienes ');
+	Imprime(Edad);
+	Imprime('años?\nResponde con S/N:\n');
+	Lee(Respuesta);
+	Si(Respuesta='S' or Respuesta='s')
+	begin
+	Imprime('\nEl mago lo hizo de nuevo\n');
+	end
+	Sino
+	begin
+	Imprime('\nQue raro..., según mis calculos estoy equivocado :(\n');
+	end
+	
+
+End;

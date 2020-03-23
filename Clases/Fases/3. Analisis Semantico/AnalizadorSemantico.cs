@@ -24,8 +24,9 @@ namespace My8086.Clases.Fases._3._Analisis_Semantico
         {
             this.EsValido = true;
 
-            foreach (Accion Accion in Programa.Acciones)
+            for (int i = 0; i < Programa.Acciones.Count; i++)
             {
+                Accion Accion = Programa.Acciones[i];
                 if (!Accion.RevisarSemantica(this.Errores))
                 {
                     this.EsValido= false;

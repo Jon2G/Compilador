@@ -15,7 +15,7 @@ namespace My8086.Clases.Funciones.OperacionLogica
     {
         public bool EsNumero => (TipoToken == TipoToken.NumeroPositivo || TipoToken == TipoToken.NumeroNegativo || TipoToken == TipoToken.VariableNumerica);
 
-        public Token Token { get; private set; }
+        public Token Token { get;  set; }
         public TipoToken TipoToken { get; private set; }
         public TokenLogico()
         {

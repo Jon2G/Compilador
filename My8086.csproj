@@ -120,7 +120,6 @@
     <Compile Include="Clases\AppData.cs" />
     <Compile Include="Clases\AutoCompletar\AutoCompletado.cs" />
     <Compile Include="Clases\AutoCompletar\MyCompletionData.cs" />
-    <Compile Include="Clases\AutoCompletar\Sugerencia.cs" />
     <Compile Include="Clases\BaseDeDatos\SQLH.cs" />
     <Compile Include="Clases\Compilador\BorlandC.cs" />
     <Compile Include="Clases\Compilador\CodigoIntermedio.cs" />
@@ -157,6 +156,7 @@
     <Compile Include="Clases\Funciones\Imprimir.cs" />
     <Compile Include="Clases\Funciones\Variable.cs" />
     <Compile Include="Clases\Log.cs" />
+    <Compile Include="Clases\UI\ViewModelBase.cs" />
     <Compile Include="Ejemplos\Ejemplo.cs" />
     <Compile Include="Images\MyImage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -202,6 +202,8 @@
     <EmbeddedResource Include="Ejemplos\PruebaCompleta.my86" />
     <EmbeddedResource Include="CustomHighlightingAsm.xshd" />
     <EmbeddedResource Include="Ejemplos\QueMesEs.my86" />
+    <EmbeddedResource Include="Ejemplos\DimeTuNombre.my86" />
+    <EmbeddedResource Include="Ejemplos\SioNo.my86" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

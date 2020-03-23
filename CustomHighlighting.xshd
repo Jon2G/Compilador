@@ -1,19 +1,25 @@
 ﻿<?xml version="1.0"?>
 <SyntaxDefinition name="Custom Highlighting" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+
+  
   <Color name="Comment" foreground="Green" />
   <Color name="String" foreground="Salmon" />
 
   <!-- This is the main ruleset. -->
   <RuleSet>
+    
     <Span color="Comment" begin="//" />
     <Span color="Comment" multiline="true" begin="/\*" end="\*/" />
 
     <Span color="String">
       <Begin>'</Begin>
       <End>'</End>
-      <RuleSet>
+      
         <!-- nested span for escape sequences -->
-        <Span begin="\\" end="." />
+      <RuleSet>
+        <Rule foreground="PeachPuff">
+          \\n
+        </Rule>
       </RuleSet>
     </Span>
 
@@ -30,6 +36,8 @@
       <Word>End;</Word>
     </Keywords>
 
+
+    
     <!--<Keywords fontWeight="bold" foreground="MediumSeaGreen">
       <Word>Si</Word>
       <Word>entonces</Word>
@@ -68,6 +76,8 @@
       <Word>&lt;</Word>
       <Word>&gt;</Word>
       <Word>+</Word>
+      <Word>or</Word>
+      <Word>and</Word>
     </Keywords>
 
     <!-- Digits -->

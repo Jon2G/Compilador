@@ -31,13 +31,13 @@ namespace My8086
     /// </summary>
     public class MyCompletionData : ICompletionData
     {
-        public MyCompletionData(string Token, string Descripcion, int Orden, string ImgSource)
+        public MyCompletionData(string Token,string Completado, string Descripcion, int Orden, string ImgSource)
         {
-            this.Text = Token;
+            this.Text = Completado;
             this.Descripcion = Descripcion;
             this.Orden = (double)Orden;
             this.ImgSource = ImgSource;
-            this.ElementoAutoCompletado = new ElementoAutoCompletado(this.Text);
+            this.ElementoAutoCompletado = new ElementoAutoCompletado(Token);
         }
 
         private readonly ElementoAutoCompletado ElementoAutoCompletado;

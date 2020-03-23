@@ -4,7 +4,8 @@ Program Nom.QueMesEs
 		Entero NMes;
 		Cadena Mes;
 	Begin
-		NMes:=12;
+	Imprime('Ingresa el número del mes:');
+	Lee(NMes);
 		
 		Si(NMes=1)
 			begin

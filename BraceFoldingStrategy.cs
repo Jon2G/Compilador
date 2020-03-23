@@ -30,20 +30,20 @@ namespace My8086
         /// <summary>
         /// Gets/Sets the opening brace. The default value is '{'.
         /// </summary>
-        public char OpeningBrace { get; set; }
+        public string OpeningBrace { get; set; }
 
         /// <summary>
         /// Gets/Sets the closing brace. The default value is '}'.
         /// </summary>
-        public char ClosingBrace { get; set; }
+        public string ClosingBrace { get; set; }
 
         /// <summary>
         /// Creates a new BraceFoldingStrategy.
         /// </summary>
         public BraceFoldingStrategy()
         {
-            this.OpeningBrace = '{';
-            this.ClosingBrace = '}';
+            this.OpeningBrace = "begin";
+            this.ClosingBrace = "end";
         }
 
         public void UpdateFoldings(FoldingManager manager, TextDocument document)
@@ -51,6 +51,7 @@ namespace My8086
             int firstErrorOffset;
             IEnumerable<NewFolding> newFoldings = CreateNewFoldings(document, out firstErrorOffset);
             manager.UpdateFoldings(newFoldings, firstErrorOffset);
+
         }
 
         /// <summary>
@@ -62,23 +63,74 @@ namespace My8086
             return CreateNewFoldings(document);
         }
 
+        ///// <summary>
+        ///// Create <see cref="NewFolding"/>s for the specified document.
+        ///// </summary>
+        //public IEnumerable<NewFolding> CreateNewFoldings(ITextSource document)
+        //{
+        //    List<NewFolding> newFoldings = new List<NewFolding>();
+
+        //    Stack<int> startOffsets = new Stack<int>();
+        //    int lastNewLineOffset = 0;
+        //    string openingBrace = this.OpeningBrace;
+        //    string closingBrace = this.ClosingBrace;
+        //    for (int i = 0; i < document.TextLength - 5; i++)
+        //    {
+
+        //        string c = document.GetText(i, 5);
+        //        if (string.IsNullOrEmpty(c))
+        //        {
+        //            continue;
+        //        }
+        //        c = c.Replace("\t", "");
+
+        //        if (c == openingBrace)
+        //        {
+        //            startOffsets.Push(i);
+
+        //        }
+        //        else if (c == closingBrace && startOffsets.Count > 0)
+        //        {
+        //            int startOffset = startOffsets.Pop();
+        //            // don't fold if opening and closing brace are on the same line
+        //            if (startOffset < lastNewLineOffset)
+        //            {
+        //                newFoldings.Add(new NewFolding(startOffset, i + 1));
+        //            }
+        //        }
+        //        else if (c.Replace("\r", "").Replace("\n", "") == string.Empty)
+        //        {
+        //            lastNewLineOffset = i + 1;
+        //        }
+        //    }
+        //    newFoldings.Sort((a, b) => a.StartOffset.CompareTo(b.StartOffset));
+        //    return newFoldings;
+        //}
         /// <summary>
         /// Create <see cref="NewFolding"/>s for the specified document.
         /// </summary>
-        public IEnumerable<NewFolding> CreateNewFoldings(ITextSource document)
+        public IEnumerable<NewFolding> CreateNewFoldings(TextDocument document)
         {
             List<NewFolding> newFoldings = new List<NewFolding>();
 
             Stack<int> startOffsets = new Stack<int>();
             int lastNewLineOffset = 0;
-            char openingBrace = this.OpeningBrace;
-            char closingBrace = this.ClosingBrace;
-            for (int i = 0; i < document.TextLength; i++)
+            string openingBrace = this.OpeningBrace;
+            string closingBrace = this.ClosingBrace;
+            for (int i = 0; i < document.LineCount; i++)
             {
-                char c = document.GetCharAt(i);
+                var linea = document.Lines[i];
+                string c = document.GetText(linea);
+                //if (string.IsNullOrEmpty(c))
+                //{
+                //    continue;
+                //}
+                c = c.Replace("\t", "");
+
                 if (c == openingBrace)
                 {
-                    startOffsets.Push(i);
+                    startOffsets.Push(linea.Offset);
+
                 }
                 else if (c == closingBrace && startOffsets.Count > 0)
                 {
@@ -86,12 +138,12 @@ namespace My8086
                     // don't fold if opening and closing brace are on the same line
                     if (startOffset < lastNewLineOffset)
                     {
-                        newFoldings.Add(new NewFolding(startOffset, i + 1));
+                        newFoldings.Add(new NewFolding(startOffset, linea.EndOffset));
                     }
                 }
-                else if (c == '\n' || c == '\r')
+                else
                 {
-                    lastNewLineOffset = i + 1;
+                    lastNewLineOffset = linea.EndOffset;
                 }
             }
             newFoldings.Sort((a, b) => a.StartOffset.CompareTo(b.StartOffset));

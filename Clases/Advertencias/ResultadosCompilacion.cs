@@ -1,21 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using ICSharpCode.AvalonEdit.Document;
+using My8086.Clases.UI;
 
 namespace My8086.Clases.Advertencias
 {
-    public class ResultadosCompilacion
+    public class ResultadosCompilacion 
     {
-        public readonly List<Advertencias.WarningError> Resultados;
-        private EventHandler VerLinea;
+        private List<ErrorCompilacion> _Resultados;
+        public List<ErrorCompilacion> Resultados
+        {
+            get => _Resultados;
+            set
+            {
+                _Resultados = value;
+            }
+        }
+
         public bool SinErrores { get; private set; }
 
-        public ResultadosCompilacion(EventHandler VerLinea)
+        public ResultadosCompilacion()
         {
-            this.Resultados = new List<WarningError>();
-            this.VerLinea = VerLinea;
+            this.Resultados = new List<ErrorCompilacion>();
         }
         public void ResultadoCompilacion(string Texto, DocumentLine Linea, bool EsAdvertencia = false)
         {
@@ -23,19 +32,13 @@ namespace My8086.Clases.Advertencias
             {
                 this.SinErrores = false;
             }
-            this.Resultados.Add(new WarningError(new ErrorCompilacion(EsAdvertencia, Texto, Linea),
-                this.VerLinea));
+            this.Resultados.Add(new ErrorCompilacion(EsAdvertencia, Texto, Linea));
         }
 
         public void Clear()
         {
             this.SinErrores = true;
-            this.Resultados.Clear();
-        }
-
-        internal void SetVerLinea(EventHandler VerLinea)
-        {
-            this.VerLinea = VerLinea;
+            this.Resultados = new List<ErrorCompilacion>();
         }
 
         public void VariableNoDeclarada(string argumento, DocumentLine linea)

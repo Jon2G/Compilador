@@ -11,12 +11,12 @@
              HorizontalContentAlignment="Stretch">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition MaxWidth="50"/>
+            <ColumnDefinition Width="50"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Border BorderBrush="Black" BorderThickness="1">
-            <Image x:Name="Imagen" Source="../Images/Copy.png"/>
-        </Border>
+        <!--<Border BorderBrush="Black" BorderThickness="1">-->
+            <Image Margin="5,0" x:Name="Imagen" Source="../Images/Copy.png"/>
+        <!--</Border>-->
         <TextBlock Foreground="Black" x:Name="TxtName" Grid.Column="1" FontSize="16"/>
     </Grid>
 </UserControl>

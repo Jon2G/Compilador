@@ -1,0 +1,24 @@
+Program Nom.QueMesEs
+	
+	Vars
+		Cadena Respuesta;
+	Begin
+	Imprime('¿Sí ó no?\nIngresa S/N para responder:\n');
+	Lee(Respuesta);
+	Si(Respuesta='S' or Respuesta='s')
+	begin
+		Respuesta:='\nTu respuesta fué si :)';
+	end
+	Sino
+	begin
+		Si(Respuesta='N' or Respuesta='n')
+		begin
+			Respuesta:='\nTu respuesta fué no :(';
+		end
+		Sino
+		begin
+		Respuesta:='\nInvalida';
+		end
+	end
+	Imprime(Respuesta);
+End;

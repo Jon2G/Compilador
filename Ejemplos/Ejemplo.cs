@@ -11,7 +11,7 @@ namespace My8086.Ejemplos
     public class Ejemplo
     {
         private string NombreRecurso { get; set; }
-        private string Nombre { get; set; }
+        public string Nombre { get;private set; }
         public Ejemplo(string NombreRecurso)
         {
             this.NombreRecurso = NombreRecurso;

@@ -65,6 +65,13 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
                 this.Errores.ResultadoCompilacion("Sentencia no reconocida", linea.LineaDocumento);
             }
 
+            if (this.Programa is null)
+            {
+                this.Errores.ResultadoCompilacion($"No se inicializo el nombre del programa!",null);
+                this.EsValido = false;
+                return;
+            }
+
             RevisarBloques();
             this.EsValido = this.Errores.SinErrores;
         }

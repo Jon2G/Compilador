@@ -5,10 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:My8086.Clases.Advertencias"
              xmlns:images="clr-namespace:My8086.Images"
-             mc:Ignorable="d" 
-             Height="30" Width="655">
+             mc:Ignorable="d"  Background="White" HorizontalAlignment="Stretch" FontSize="18">
     <DockPanel VerticalAlignment="Center">
-        <images:MyImage x:Name="Img" DockPanel.Dock="Left" MySource="\Imgs\bug.png"/>
+        <images:MyImage MaxHeight="40" x:Name="Img" DockPanel.Dock="Left" MySource="\Imgs\bug.png"/>
         <Grid Margin="5,0" VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80*"/>

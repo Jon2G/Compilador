@@ -129,11 +129,11 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
                     //sb.AppendLine(nd.NemonicoOperacion(nd.NOrden));
                     if (nd.TipoToken == TipoToken.Temporal)
                     {
-                        sb.AppendLine(nd.NemonicoOperacion($"SIGNOT{nd.NOrden}", nd.NOrden));
+                        sb.AppendLine(nd.NemonicoOperacion($"SIGNOT{nd.NOrden}"));
                     }
                     else
                     {
-                        sb.AppendLine(nd.NemonicoOperacion(this.Variable.Nombre, nd.NOrden));
+                        sb.AppendLine(nd.NemonicoOperacion(this.Variable.Nombre));
                     }
                     //
 

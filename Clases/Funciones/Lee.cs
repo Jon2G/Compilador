@@ -13,7 +13,7 @@ namespace My8086.Clases.Funciones
 {
     internal class Lee : Accion
     {
-
+        private Variable VariableDestino;
         public Lee(Programa Programa, LineaLexica Linea) : base(Programa, Linea, 1)
         {
 
@@ -35,7 +35,19 @@ namespace My8086.Clases.Funciones
                     {
                         if (this.Programa.SegmentoDeDatos.ObtenerVariable(this.Argumentos[1].Lexema) is { } variable)
                         {
-                            variable.HacerReferencia();
+                            this.VariableDestino = variable;
+                            this.VariableDestino.HacerReferencia();
+                            switch (VariableDestino.TipoDato)
+                            {
+                                case TipoDato.Cadena:
+                                    this.Programa.OperacionesConCadenas = true;
+                                    break;
+                                case TipoDato.Decimal:
+                                case TipoDato.Entero:
+                                    this.Programa.LeecturaNumeros = true;
+                                    break;
+                                    
+                            }
                             return true;
                         }
                         else
@@ -68,26 +80,22 @@ namespace My8086.Clases.Funciones
         public override StringBuilder Traduccion()
         {
             StringBuilder sb = new StringBuilder();
-            if (this.Argumentos.Count >= 4)
+            switch (this.VariableDestino.TipoDato)
             {
-                if (this.Argumentos[this.Argumentos.Count - 4].TipoToken == TipoToken.SeparadorParametros)
-                {
-                    var x = this.Argumentos[this.Argumentos.Count - 3];
-                    var y = this.Argumentos[this.Argumentos.Count - 1];
-                    if ((x.TipoDato == TipoDato.Entero || x.TipoToken == TipoToken.Identificador) &&
-                        (y.TipoDato == TipoDato.Entero || y.TipoToken == TipoToken.Identificador))
-                    {
-                        sb.AppendLine($"Console.SetCursorPosition({x.Lexema}, {y.Lexema});");
-                    }
-                }
+                case TipoDato.Cadena:
+                    sb.AppendLine("CALL LEER_CADENA");
+                    sb.AppendLine($"MOV SI,CADENA");
+                    sb.AppendLine($"MOV {VariableDestino.Nombre},SI");
+                    break;
+                case TipoDato.Entero:
+                    sb.AppendLine($"LEA DI,SGN_{VariableDestino.Nombre}");
+                    sb.AppendLine("CALL LEER_ENTERO");
+                    break;
+                case TipoDato.Decimal:
+                    sb.AppendLine($"MOV DI,{VariableDestino.Nombre}");
+                    sb.AppendLine("CALL LEER_DECIMAL");
+                    break;
             }
-
-            sb.AppendLine($@"Console.Write(");
-            for (int i = 0; i < this.Argumentos.Count; i++)
-            {
-                sb.Append(this.Argumentos[i].Lexema);
-            }
-            sb.AppendLine(");");
             return sb;
         }
     }

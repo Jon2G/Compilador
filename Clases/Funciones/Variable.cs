@@ -16,6 +16,7 @@ namespace My8086.Clases.Funciones
         public readonly Token Valor;
         public readonly TipoDato TipoDato;
         public int Referencias { get; private set; }
+        public bool EsAutomatica { get;  set; }
         internal Variable(Programa Programa,string Nombre,TipoDato TipoDato) : base(Programa)
         {
             this.TipoDato = TipoDato;
@@ -39,6 +40,7 @@ namespace My8086.Clases.Funciones
             this.Nombre = "AUTOVAR" + Guid.NewGuid().ToString().Replace("-", "");
             this.Valor = Valor;
             this.TipoDato = TipoDato;
+            this.EsAutomatica = true;
         }
 
         public override bool RevisarSemantica(ResultadosCompilacion Errores)

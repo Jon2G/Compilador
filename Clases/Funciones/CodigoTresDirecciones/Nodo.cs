@@ -22,7 +22,7 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
             this.Numero2 = Numero2;
             this.NOrden = NOrden;
         }
-        public string NemonicoOperacion(string destino,int orden)
+        public string NemonicoOperacion(string destino)
         {
             StringBuilder sb = new StringBuilder();
             switch (this.Operador.Token.Lexema)

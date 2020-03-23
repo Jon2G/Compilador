@@ -61,7 +61,15 @@ namespace My8086.Clases.Funciones
                     //COPIAR VALOR ESTATICO
                     foreach (char caracter in parte)
                     {
-                        sb.AppendLine($"MOV DL,'{caracter}'");
+                        string especial = CaracterEspecial(caracter);
+                        if (especial != null)
+                        {
+                            sb.AppendLine($"MOV DL,{especial}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"MOV DL,'{caracter}'");
+                        }
                         sb.AppendLine("MOV [SI],DL");
                         sb.AppendLine("INC SI");
                         TamanioCadena++;
@@ -88,6 +96,30 @@ namespace My8086.Clases.Funciones
 
 
             return sb;
+        }
+
+        private string CaracterEspecial(char caracter)
+        {
+            switch (caracter)
+            {
+                case '¡':
+                    return "0ADH";
+                case '¿':
+                    return "0A8H";
+                case 'á':
+                    return "0A0H";
+                case 'í':
+                    return "0A1H";
+                case 'ó':
+                    return "0A2H";
+                case 'ú':
+                    return "0A3H";
+                case 'é':
+                    return "08AH";
+                case 'ñ':
+                    return "0A4H";
+            }
+            return null;
         }
     }
 }

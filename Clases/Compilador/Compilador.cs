@@ -19,7 +19,6 @@ namespace My8086.Clases.Compilador
     public class Compilador
     {
         private readonly ResultadosCompilacion ResultadosCompilacion;
-        public List<Advertencias.WarningError> Resultados => ResultadosCompilacion.Resultados;
         private readonly TextDocument Document;
         public EventHandler OnProgreso;
         private EventHandler _VerLinea;
@@ -27,15 +26,6 @@ namespace My8086.Clases.Compilador
         public StringBuilder ASM { get; private set; }
         public bool Compilado { get; set; }
 
-        public EventHandler VerLinea
-        {
-            get => _VerLinea;
-            set
-            {
-                _VerLinea = value;
-                this.ResultadosCompilacion.SetVerLinea(_VerLinea);
-            }
-        }
         private double _Progreso { get; set; }
 
         public double Progreso
@@ -48,11 +38,11 @@ namespace My8086.Clases.Compilador
             }
         }
 
-        public Compilador(TextDocument Document)
+        public Compilador(TextDocument Document, ResultadosCompilacion ResultadosCompilacion)
         {
             this.Document = Document;
 
-            this.ResultadosCompilacion = new ResultadosCompilacion(this.VerLinea);
+            this.ResultadosCompilacion = ResultadosCompilacion;
             this.TurboC = new BorlandC();
             //this.ReconceTokens = new ReconoceTokens(this.ResultadosCompilacion, this.PropiedadesPrograma);
         }

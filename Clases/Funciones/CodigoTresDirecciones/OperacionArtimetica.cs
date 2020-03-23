@@ -39,7 +39,7 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
 
             if (this.Argumentos[0].Lexema == ":=")
             {
-                this.TresDirecciones = new TresDirecciones(TokenAritmetico.Analizar(this.Argumentos.GetRange(1, this.Argumentos.Count - 1)))
+                this.TresDirecciones = new TresDirecciones(TokenAritmetico.Analizar(this.Argumentos.GetRange(1, this.Argumentos.Count - 1),this.Programa))
                 {
                     Variable = this.Variable
                 };
