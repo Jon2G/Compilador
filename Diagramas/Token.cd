@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="My8086.Clases.Fases.Token">
+    <Position X="5.75" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAgAAAAAAAEAAAAAAAAIAAAIAQAAAAAAAAgAAY=</HashCode>
+      <FileName>Clases\Fases\Token.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="My8086.Clases.Fases.TipoToken">
+    <Position X="9.25" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgoBAAAAAAAAAAAAAAgAAQBAAAjAAAAIAAkAAAAAA=</HashCode>
+      <FileName>Clases\Fases\Token.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="My8086.Clases.Fases.TipoDato">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAgAAAAAAAAAAAAAAAECAAAAIAAAAQAAAA=</HashCode>
+      <FileName>Clases\Fases\Token.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

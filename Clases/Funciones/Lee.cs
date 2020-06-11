@@ -40,13 +40,15 @@ namespace My8086.Clases.Funciones
                             switch (VariableDestino.TipoDato)
                             {
                                 case TipoDato.Cadena:
-                                    this.Programa.OperacionesConCadenas = true;
+                                    this.Programa.LeecturaCadenas = true;
                                     break;
                                 case TipoDato.Decimal:
-                                case TipoDato.Entero:
-                                    this.Programa.LeecturaNumeros = true;
+                                    this.Programa.LeecturaNumerosDecimales = true;
                                     break;
-                                    
+                                case TipoDato.Entero:
+                                    this.Programa.LeecturaNumerosEnteros = true;
+                                    break;
+
                             }
                             return true;
                         }

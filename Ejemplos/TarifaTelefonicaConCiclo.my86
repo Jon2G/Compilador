@@ -1,0 +1,31 @@
+Program Nom.TarifaTelefonica	
+	Vars
+		Entero Minutos;
+		Entero Tarifa:=5;
+		Decimal Costo;
+		Cadena Respuesta;
+	Begin
+	Imprime('Presione enter para iniciar la llamada.\n');
+	Lee(Respuesta);
+	
+	For(Minutos:=0;Respuesta <> 'c' and Respuesta <>'C';Minutos:=Minutos+1)
+	begin
+		Imprime('Lleva ');
+		Imprime(Minutos);
+		Imprime(',Presione ''c'' para colgar.\n');
+		Lee(Respuesta);
+	end
+	
+	Si(Minutos<=3)
+	begin
+		Imprime('Son $10.00 pesitos');
+	end
+	Sino
+	begin
+		Minutos:=Minutos-3;
+		Costo:=Minutos*Tarifa+10;
+		Imprime('Son ');
+		Imprime(Costo);
+		Imprime(' pesitos');
+	end
+End;

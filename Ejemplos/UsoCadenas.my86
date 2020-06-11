@@ -1,4 +1,4 @@
-Program Nom.programa
+﻿Program Nom.programa
 	
 	Vars
 		Cadena Mensaje;
@@ -8,7 +8,7 @@ Program Nom.programa
 	
 		Mensaje:='ABCDEFGHIJKLMNOPQRSTUWXYZ\n';
 		Mensaje2:='Hola mundo\n';
-		Mensaje3:='Pues no se puede mas\n';
+		Mensaje3:='[1],[2],[3],[4],[5],[6],[7],[8],[9]\n';
 		
 		Imprime (Mensaje);
 		Imprime(Mensaje2);
@@ -17,6 +17,6 @@ Program Nom.programa
 		Mensaje:='Cadena mas corta\n';
 		Imprime(Mensaje);
 		
-		Imprime('Sale pues,te la compro');
+		Imprime('Adios');
 		
 	End;

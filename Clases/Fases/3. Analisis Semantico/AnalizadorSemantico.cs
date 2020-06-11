@@ -29,6 +29,7 @@ namespace My8086.Clases.Fases._3._Analisis_Semantico
                 Accion Accion = Programa.Acciones[i];
                 if (!Accion.RevisarSemantica(this.Errores))
                 {
+                    Errores.ResultadoCompilacion("Error semantico", Accion.LineaDocumento);
                     this.EsValido= false;
                     break;
                 }

@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -38,6 +39,7 @@ using My8086.Clases;
 using My8086.Clases.Advertencias;
 using My8086.Clases.AutoCompletar;
 using My8086.Clases.Compilador;
+using My8086.Clases.UI;
 
 namespace My8086
 {
@@ -51,6 +53,7 @@ namespace My8086
         readonly BraceFoldingStrategy FoldingStrategy;
         private Compilador Compilador;
         public ResultadosCompilacion Errores { get; set; }
+
         public Window1()
         {
             this.FoldingStrategy = new BraceFoldingStrategy();
@@ -104,20 +107,26 @@ namespace My8086
             //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\PruebaCompleta.my86";
             // this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\QueMesEs.my86";
             //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\DimeTuNombre.my86";
-            TxtMy.Load($@"{AppData.Directorio}\..\..\Ejemplos\SIoNo.my86");
+            //TxtMy.Load($@"{AppData.Directorio}\..\..\Ejemplos\SIoNo.my86");
+            TxtMy.Load($@"{AppData.Directorio}\..\..\Ejemplos\OperacionesGrandes.my86");
             TxtArchivo.Text = TxtMy.Document.FileName;
             //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\ImprimeCadenas.txt";
             //this.currentFileName = $@"{AppData.Directorio}\..\..\Ejemplos\UsoVariablesNumericas.txt";
 
 
             // initial highlighting now set by XAML
-            TxtMy.TextArea.TextEntering += textEditor_TextArea_TextEntering;
-            TxtMy.TextArea.TextEntered += textEditor_TextArea_TextEntered;
+            TxtMy.TextArea.TextEntering += TextEditor_TextArea_TextEntering;
+            TxtMy.TextArea.TextEntered += TextEditor_TextArea_TextEntered;
 
-            DispatcherTimer foldingUpdateTimer = new DispatcherTimer();
-            foldingUpdateTimer.Interval = TimeSpan.FromSeconds(2);
-            foldingUpdateTimer.Tick += foldingUpdateTimer_Tick;
+            DispatcherTimer foldingUpdateTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(2)
+            };
+            foldingUpdateTimer.Tick += FoldingUpdateTimer_Tick;
             foldingUpdateTimer.Start();
+            ///
+            TxtMy.TextArea.TextView.BackgroundRenderers.Add(new HighLight(TxtMy));
+            ///
 
             this.Compilador = new Compilador(TxtMy.TextArea.Document, this.Errores);
         }
@@ -134,26 +143,31 @@ namespace My8086
         }
 
 
-        void openFileClick(object sender, RoutedEventArgs e)
+        void OpenFileClick(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog { CheckFileExists = true };
             if (dlg.ShowDialog() ?? false)
             {
                 this.Compilador.Compilado = false;
+                TxtMy.Document.FileName =
                 TxtArchivo.Text = dlg.FileName;
                 TxtMy.Load(dlg.FileName);
                 TxtMy.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(Path.GetExtension(dlg.FileName));
             }
         }
 
-        void saveFileClick(object sender, EventArgs e)
+        void SaveFileClick(object sender, EventArgs e)
         {
             if (TxtMy.Document.FileName == null)
             {
-                SaveFileDialog dlg = new SaveFileDialog();
-                dlg.DefaultExt = ".txt";
+                SaveFileDialog dlg = new SaveFileDialog()
+                {
+                    Filter = "Archivos de código (*.my86)|*.my86"
+                };
+                dlg.DefaultExt = ".my86";
                 if (dlg.ShowDialog() ?? false)
                 {
+                    TxtArchivo.Text =
                     TxtMy.Document.FileName = dlg.FileName;
                 }
                 else
@@ -169,20 +183,24 @@ namespace My8086
             }
             catch (Exception ex)
             {
-
+                Log.LogMe(ex);
             }
         }
 
-        void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
+        void TextEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
         {
             this.Compilador.Compilado = false;
-            if (e.Text == "(")
+            if (e.Text == "(" || e.Text == "*" || e.Text == "/" || e.Text == "+" || e.Text == "-" || e.Text == "=")
             {
                 this.AutoCompletado.AutoCompletar();
             }
+            else
+            {
+                this.AutoCompletado.AutoCompletarPalabrasReservadas();
+            }
         }
 
-        void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
+        void TextEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
         {
             if (e.Text.Length > 0 && AutoCompletado.CompletionWindow != null)
             {
@@ -195,7 +213,7 @@ namespace My8086
             }
             // do not set e.Handled=true - we still want to insert the character that was typed
         }
-        void foldingUpdateTimer_Tick(object sender, EventArgs e)
+        void FoldingUpdateTimer_Tick(object sender, EventArgs e)
         {
             if (TxtMy.Document != null)
             {
@@ -240,7 +258,7 @@ namespace My8086
         {
             if (TxtMy.Document.FileName != null)
             {
-                saveFileClick(sender, e);
+                SaveFileClick(sender, e);
             }
 
             this.Compilador = new Compilador(this.TxtMy.TextArea.Document, this.Errores);

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Markup;
 using ICSharpCode.AvalonEdit.Document;
 using My8086.Clases.Fases;
 using My8086.Clases.Funciones;
@@ -15,7 +16,7 @@ namespace My8086.Clases.Compilador
     {
         internal readonly Programa Programa;
         internal readonly StringBuilder Codigo;
-        private Queue<IBloque> BloquesPorCerrar;
+        private readonly Queue<IBloque> BloquesPorCerrar;
         internal CodigoIntermedio(Fases._4._Sintetizador.Sintesis sintetizado)
         {
             this.Codigo = new StringBuilder();
@@ -29,30 +30,30 @@ namespace My8086.Clases.Compilador
             this.Codigo.AppendLine(".stack");
             this.Codigo.AppendLine(".386");
             this.Codigo.AppendLine(".data");
-            if (this.Programa.OperadoresAritmeticos || this.Programa.OperacionesLogicas)
+            if (this.Programa.OperadoresAritmeticos || this.Programa.OperacionesLogicas || this.Programa.LeecturaNumerosDecimales || this.Programa.LeecturaNumerosEnteros)
             {
                 this.Codigo.AppendLine(";=========================================================");
                 this.Codigo.AppendLine(";VARIABLES TEMPORALES PARA LAS OPERACIONES ARITMETICAS");
                 this.Codigo.AppendLine(";PRIMER OPERADOR");
                 this.Codigo.AppendLine("SGN1 db 0");
-                this.Codigo.AppendLine("NUM1 db 0,0,0,0");
-                this.Codigo.AppendLine("DEC1 db 0,0,0,0 ");
+                this.Codigo.AppendLine("NUM1 db 0,0,0,0,0,0,0,0,0");
+                this.Codigo.AppendLine("DEC1 db 0,0,0,0,0,0,0,0,0 ");
                 this.Codigo.AppendLine(";SEGUNDO OPERADOR");
                 this.Codigo.AppendLine("SGN2 db 0");
-                this.Codigo.AppendLine("NUM2 db 0,0,0,0");
-                this.Codigo.AppendLine("DEC2 db 0,0,0,0");
+                this.Codigo.AppendLine("NUM2 db 0,0,0,0,0,0,0,0,0");
+                this.Codigo.AppendLine("DEC2 db 0,0,0,0,0,0,0,0,0");
                 this.Codigo.AppendLine(";VARIABLES DE RESULTADOS GLOBAL");
                 this.Codigo.AppendLine("SIGNOT     db 0");
-                this.Codigo.AppendLine("ENTEROST   db 0,0,0,0");
-                this.Codigo.AppendLine("DECIMALEST db 0,0,0,0");
+                this.Codigo.AppendLine("ENTEROST   db 0,0,0,0,0,0,0,0,0");
+                this.Codigo.AppendLine("DECIMALEST db 0,0,0,0,0,0,0,0,0");
                 this.Codigo.AppendLine(";AUXILIARES GLOBALES PARA LAS OPERACIONES");
-                this.Codigo.AppendLine("TEMP db 0,0,0,0,0,0,0,0,0");
+                this.Codigo.AppendLine("TEMP db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0");
                 this.Codigo.AppendLine("AUX  dw 0");
                 this.Codigo.AppendLine("POSICION_DIV dw 0");
                 this.Codigo.AppendLine("OVERFLOWDIV dw 0");
                 this.Codigo.AppendLine("DIVISON dw 0,0,0");
             }
-            if (this.Programa.OperacionesConCadenas)
+            if (this.Programa.LeecturaCadenas)
             {
                 this.Codigo.AppendLine(";=========================================================");
                 this.Codigo.AppendLine(";VARIABLES PARA LA LEECTURA DE CADENAS");
@@ -74,7 +75,7 @@ namespace My8086.Clases.Compilador
                 this.Codigo.AppendLine("CAD_TEMP2  dw 0");
                 this.Codigo.AppendLine(";=========================================================");
             }
-            if (this.Programa.LeecturaNumeros)
+            if (this.Programa.LeecturaNumerosDecimales || this.Programa.LeecturaNumerosEnteros)
             {
                 this.Codigo.AppendLine("NUMERO_INVALIDO DB 'NUMERO INVALIDO!','$'");
                 this.Codigo.AppendLine("AUXILIAR  DB 0");
@@ -107,7 +108,7 @@ namespace My8086.Clases.Compilador
             this.Codigo.AppendLine(";==============>[FIN CODIGO GENERADO POR EL COMPILADOR]<==============");
             this.Codigo.AppendLine("XOR AX,AX");
             this.Codigo.AppendLine("INT 16H");
-            if (this.Programa.OperacionesConCadenas)
+            if (this.Programa.LeecturaCadenas)
             {
                 this.Codigo.AppendLine(";================>[LIBERAR TODA LA MEMORIA DE CADENAS]<================");
                 this.Codigo.Append(this.Programa.SegmentoDeDatos.Free());
@@ -170,7 +171,7 @@ MOV SIGNOT,AL
     MOV SIGNOT,0FFH
     sumar_con_normalidad:   
             ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-            MOV SI,5H ;NUMERO MAS A LA IZQUIERDA             
+            MOV SI,017D ;NUMERO MAS A LA IZQUIERDA             
         
                 siguiente_sumando:
             
@@ -198,7 +199,7 @@ MOV SIGNOT,AL
             
             ;Ajustar acarreos        
         
-            MOV SI,07H  
+            MOV SI,018D ;Posicion del ultimo digito decimal ~  
         
             siguiente_acarreo:
         
@@ -265,7 +266,7 @@ MOV SIGNOT,AL
         
         parte_decimal:   
         ;MULTIPLICAR RESUIDO POR 10    
-        MOV SI,08H    
+        MOV SI,018D    
         
         copy_next_div: 
         MOV AL,SGN1[SI]
@@ -279,13 +280,23 @@ MOV SIGNOT,AL
         MOV SGN1,0H
         MOV NUM1[0],0
         MOV NUM1[1],0
-        MOV NUM1[2],1
+        MOV NUM1[2],0
         MOV NUM1[3],0 
+        MOV NUM1[4],0 
+        MOV NUM1[5],0 
+        MOV NUM1[6],0 
+        MOV NUM1[7],1 
+        MOV NUM1[8],0 
         
         MOV DEC1[0],0
         MOV DEC1[1],0
         MOV DEC1[2],0
         MOV DEC1[3],0
+        MOV DEC1[4],0
+        MOV DEC1[5],0
+        MOV DEC1[6],0
+        MOV DEC1[7],0
+        MOV DEC1[8],0
         
         CALL MULTIPLICA
         
@@ -299,7 +310,7 @@ MOV SIGNOT,AL
         CMP POSICION_DIV,06H
         JAE fin_division
         ;;;;;;;;;;;;;;;;;;REVISAR QUE EL NUM1 NO SEA YA CERO :V
-        MOV SI,07H  
+        MOV SI,018D ;Posicion del ultimo digito decimal ~  
         revisar_siguiente_div:
             MOV AL,ENTEROST[SI]
             CMP AL,0H
@@ -319,8 +330,8 @@ MOV SIGNOT,AL
 
             MOV AX,DIVISON[0H]
             AAM
-            MOV ENTEROST[2H],AH
-            MOV ENTEROST[3H],AL
+            MOV ENTEROST[7H],AH
+            MOV ENTEROST[8H],AL
             
             MOV AX,DIVISON[2H]
             AAM
@@ -337,7 +348,7 @@ MOV SIGNOT,AL
         
     DIVIDE ENDP");
             }
-            if (this.Programa.UsarResta||this.Programa.UsarSuma)
+            if (this.Programa.UsarResta || this.Programa.UsarSuma)
             {
                 this.Codigo.AppendLine(@";====================================[RESTA]====================================        
     RESTA PROC NEAR  
@@ -351,16 +362,19 @@ MOV SIGNOT,AL
         MOV AH,NUM2[SI]
         CMP AL,AH
         JL invertir_operandos
-        JA acomodo_terminado  
+        JA resta_es_positivo  
         INC SI
-        CMP SI,08H
+        CMP SI,018D
         JE acomodo_terminado
         JMP acomodar_siguiente 
 
+    resta_es_positivo:
+        MOV SIGNOT,01H
+    JMP acomodo_terminado
     
     invertir_operandos:
     MOV SIGNOT,0FFH
-    MOV SI,7H     
+    MOV SI,017D   ;~MOV SI,7H     
     invertir_siguiente:
     MOV AL,NUM1[SI]
     MOV AH,NUM2[SI]
@@ -374,7 +388,7 @@ MOV SIGNOT,AL
     acomodo_terminado:
     ;;   
             ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-            MOV SI,5H ;NUMERO MAS A LA IZQUIERDA             
+            MOV SI,017D ;NUMERO MAS A LA IZQUIERDA             
         
                 siguiente_restando:
             
@@ -395,7 +409,7 @@ MOV SIGNOT,AL
             
             ;Ajustar acarreos        
         
-            MOV SI,07H  
+            MOV SI,017D  
         
             siguiente_acarreo_neg:
         
@@ -422,7 +436,7 @@ MOV SIGNOT,AL
         
     RESTA ENDP");
             }
-            if (this.Programa.UsarMultiplicacion)
+            if (this.Programa.UsarMultiplicacion | this.Programa.UsarDivision)
             {
                 this.Codigo.AppendLine(@";====================================[MULTIPLICA]====================================
     MULTIPLICA PROC NEAR
@@ -437,16 +451,19 @@ MOV SIGNOT,AL
         
             MOV AUX,0H  
             ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-            MOV SI,5H ;NUMERO MAS A LA IZQUIERDA             
+            MOV SI,12D ;NUMERO MAS A LA IZQUIERDA             
         
                 siguiente_multiplicando:
-                MOV DI,5H ;NUMERO MAS A LA IZQUIERDA
-                MOV CX,7H
+                MOV DI,012D ;NUMERO MAS A LA IZQUIERDA
+                ;MOV CX,7H 
+                    MOV CX,016D
+                    
                 SUB CX,AUX
             
                  multiplicar_operandos:
-                    MOV AL,NUM2[SI] ;OP_1
-                    MUL NUM1[DI]
+                    MOV AL,NUM2[SI] ;OP_1  
+                    MOV AH,NUM1[DI]                 
+                    MUL AH
                     AAM
                     ;;===
                     MOV BX,DI
@@ -483,7 +500,7 @@ MOV SIGNOT,AL
             
             ;Ajustar acarreos        
         
-            MOV SI,07H  
+            MOV SI,017D  
         
             siguiente_acarreo_multiplica:
         
@@ -501,13 +518,13 @@ MOV SIGNOT,AL
         
     MULTIPLICA ENDP");
             }
-            if (this.Programa.OperadoresAritmeticos||this.Programa.OperacionesLogicas)
+            if (this.Programa.OperadoresAritmeticos || this.Programa.OperacionesLogicas || this.Programa.LeecturaNumerosEnteros || this.Programa.LeecturaNumerosDecimales)
             {
                 this.Codigo.AppendLine(@";====================================[USAR_N1]====================================    
     USAR_N1 PROC NEAR 
-    MOV SI,08H
+    MOV SI,018D ;DESPLAZAMIENTO POR EL CUAL SE ALCANZA LA ULTIMA CIFRA CONTANDO A CERO HASTA VARIABLE SIGNO
     ADD SI,DX 
-    MOV DI,08H
+    MOV DI,018D ;POSICION DEL ULTIMO NUMERO DEL DESTINO
     
     cpy_n1:
     MOV AL,[SI] 
@@ -522,9 +539,9 @@ MOV SIGNOT,AL
         
 ;====================================[USAR_N2]====================================
     USAR_N2 PROC NEAR
-    MOV SI,08H
+    MOV SI,018D ;DESPLAZAMIENTO POR EL CUAL SE ALCANZA LA ULTIMA CIFRA CONTANDO A CERO HASTA VARIABLE SIGNO
     ADD SI,DX 
-    MOV DI,08H
+    MOV DI,018D ;POSICION DEL ULTIMO NUMERO DEL DESTINO
     
     cpy_n2:
     MOV AL,[SI] 
@@ -538,8 +555,8 @@ MOV SIGNOT,AL
     USAR_N2 ENDP 
 ;====================================[SALVAR_TEMPORAL]====================================    
     SALVAR_TEMPORAL PROC NEAR
-    MOV SI,08H
-    MOV DI,08H
+    MOV SI,018D ;Posicion del ultimo digito decimal
+    MOV DI,018D
     ADD DI,DX 
         
     cpy_temp:
@@ -555,7 +572,7 @@ MOV SIGNOT,AL
     
 ;====================================[LIMPIAR]====================================    
     LIMPIAR PROC NEAR  
-        MOV SI,08H 
+        MOV SI,018D ;Posicion del ultimo digito decimal
         MOV CX,DX
         
         limpiar_siguienteT: 
@@ -568,8 +585,10 @@ MOV SIGNOT,AL
         DEC SI
         JNS limpiar_siguienteT 
         RET
-    LIMPIAR ENDP 
-;====================================[MOSTRAR_RESULTADO]==================================== 
+    LIMPIAR ENDP ");
+                if (this.Programa.ImprimeNumeros)
+                {
+                    this.Codigo.AppendLine(@";====================================[MOSTRAR_RESULTADO]==================================== 
     MOSTRAR_RESULTADO PROC NEAR
         ;REVISAR EL SIGNO
         MOV AL,[DI] ;SIGNOT
@@ -587,7 +606,7 @@ MOV SIGNOT,AL
             siguiente_numero_entero:
             INC SI 
             ;;;;;;;;;;
-            CMP SI,04H
+            CMP SI,09H ;Ultima localidad del numero entero +1
             JE un_cero_entero
             ;;;;;;;;;; 
 
@@ -604,7 +623,7 @@ MOV SIGNOT,AL
             CMP DL,0H 
             JE siguiente_numero_entero
             ;YA NO ES CERO A LA IZQUIERDA
-            CMP SI,04H ;SI SOLO TIENE DECIMALES
+            CMP SI,09H ;SI SOLO TIENE DECIMALES - Ultima localidad del numero entero +1
             JE un_cero_entero
             ;     
                 imprime_enteros:
@@ -622,7 +641,7 @@ MOV SIGNOT,AL
                 ADD DL,30H
                 CALL IMPRIME_CARACTER  
                 INC SI
-                CMP SI,03H
+                CMP SI,08H ;Ultimo numero entero
                 JA imprime_decimales
                 JMP imprime_enteros
             ; 
@@ -632,11 +651,11 @@ MOV SIGNOT,AL
             
            imprime_decimales:
            ;REVISAR SI TIENE DECIMALES PARA IMPRIMIR EL PUNTO
-            MOV SI,03H
+            MOV SI,08H ;Ultimo numero entero
             
             siguiente_cero_decimal:
-            INC SI
-            CMP SI,5H
+            INC SI ;incremento en 1 para entrar en el campo de los enteros
+            CMP SI,017D ;Ultimo numero decimal
             JA sin_decimales 
             
             
@@ -656,7 +675,7 @@ MOV SIGNOT,AL
             ;con decimales
             MOV DL,'.'
             CALL IMPRIME_CARACTER    
-            MOV SI,03H
+            MOV SI,08H ;Ultimo numero entero -1
             
             imprime_decimal_siguiente:
             INC SI
@@ -674,7 +693,7 @@ MOV SIGNOT,AL
 
             ADD DL,30H
             CALL IMPRIME_CARACTER
-            CMP SI,05H
+            CMP SI,017D ;Ultimo numero decimal
             JNE imprime_decimal_siguiente
             
         
@@ -687,8 +706,9 @@ MOV SIGNOT,AL
        INT 21H          
     RET
     IMPRIME_CARACTER ENDP");
+                }
             }
-            if (this.Programa.OperacionesConCadenas)
+            if (this.Programa.LeecturaCadenas)
             {
                 this.Codigo.AppendLine(@";==============>[ALOGAR_CADENA]<==============
         ALOGAR_CADENA PROC NEAR 
@@ -848,7 +868,12 @@ AGREGAR_CARACTER:
     MOV DL,08H;backspace 
     INT 21H
     
-    DEC CX
+    CMP CX,00H
+    JE no_decrementar_posicion
+    DEC CX                  
+    
+    no_decrementar_posicion:
+
     JMP AGREGAR_CARACTER
     ;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;    
@@ -883,7 +908,7 @@ signo_igual_igualdad:
     ;  
     siguiente_igualdad:
         INC SI 
-        CMP SI,07H
+        CMP SI,0012 ;Posicion del ultimo digito decimal ~
         JA iguales
         
         MOV AL,NUM1[SI]
@@ -921,7 +946,7 @@ signo_igual_mayorque:
     ;  
     siguiente_mayorque:
         INC SI 
-        CMP SI,07H
+        CMP SI,018D ;Posicion del ultimo digito decimal ~
         JA iguales
         
         MOV AL,NUM1[SI]
@@ -1018,8 +1043,26 @@ MOV R_COMPARADOR,0H
 fin_iguales_cadena:
 RET    
 IGUAL_CADENA ENDP");
+                this.Codigo.AppendLine(@"DIFERENTE_CADENA PROC NEAR
+CALL IGUAL_CADENA
+
+MOV AL,R_COMPARADOR
+CMP AL,01H
+JE A_CERO_C 
+JMP A_UNO_C
+
+A_CERO_C:
+MOV R_COMPARADOR,0H
+JMP SALIR_DIFERENTE_C
+
+A_UNO_C:
+MOV R_COMPARADOR,1H
+
+SALIR_DIFERENTE_C:
+RET   
+DIFERENTE_CADENA ENDP");
             }
-            if (this.Programa.LeecturaNumeros)
+            if (this.Programa.LeecturaNumerosDecimales)
             {
                 this.Codigo.AppendLine(@"LEER_DECIMAL PROC NEAR 
     XOR CX,CX ;CUENTA EL NUMERO DE ENTEROS
@@ -1029,19 +1072,43 @@ IGUAL_CADENA ENDP");
               
     MOV AH,'-'          
     CMP AL,AH    
-    JE lectura_entero_negativo 
+    JE lectura_entero_negativo
+    MOV AH,'+'
+    CMP AH,AL
+    JE lectura_decimal_positivo
+    JMP lectura_decimal_positivo_usgn
+    
+    lectura_decimal_positivo:
+    MOV DL,01H 
+    MOV [DI],DL
+    JMP lectura_numeros
+    
+    lectura_decimal_positivo_usgn:
+    MOV DL,01H
+    MOV [DI],DL
     INC DI  
     INC CX
     JMP validar_numero_entero
 lectura_entero_negativo:
-    MOV AL,0FFH 
+    MOV DL,0FFH
+    MOV AL,DL 
     MOV [DI],AL   
+    
+    JMP lectura_numeros
+    back_space_lectura_numeros_decimales:    
+    DEC CX
+    CMP CX,00H
+    JE lectura_numeros
+    DEC DI
+    MOV [DI],00H
+    DEC CX
+    DEC DI
     
     ;NUMEROS
     lectura_numeros:
     INC CX
     INC DI 
-    CMP CX,06H 
+    CMP CX,0BH 
     JAE overflow_numerico 
     
     MOV AH,01H
@@ -1049,8 +1116,12 @@ lectura_entero_negativo:
     
     CMP AL,0DH
     JE fin_lectura_entero 
-    CMP AL,2EH
-    JE lectura_numeros_decimales 
+    CMP AL,08H
+    JE back_space_lectura_numeros_decimales 
+    
+    CMP AL,2EH ;'.' 
+    JE lectura_numeros_decimales
+     
     validar_numero_entero:
     CMP AL,30H
     JL numero_invalido_enteros
@@ -1063,17 +1134,19 @@ lectura_entero_negativo:
     
     lectura_numeros_decimales:
     MOV DI,SI
-    ADD DI,05H
+    ADD DI,0AH
     
     lectura_numero_decimal:
-    CMP AUXILIAR,04H 
+    CMP AUXILIAR,09H 
     JA overflow_numerico
     
     MOV AH,01H
     INT 21H
     
     CMP AL,0DH
-    JE fin_lectura_entero
+    JE fin_lectura_entero  
+    CMP AL,08H
+    JE back_space_decimal_lec
     CMP AL,30H
     JL numero_invalido_enteros
     CMP AL,39H
@@ -1084,19 +1157,52 @@ lectura_entero_negativo:
     
     INC AUXILIAR
     INC DI 
-       
+    
    JMP lectura_numero_decimal
+
+    back_space_decimal_lec:
+    CMP AUXILIAR,00H
+    JE lectura_numeros_regresar_enteros
+    DEC AUXILIAR
+    DEC DI
+    MOV [DI],00H ;BORRAR 
+    MOV DL,00H
+    MOV AH,02H
+    INT 21H  
+    MOV DL,08H
+    MOV AH,02H
+    INT 21H
+    JMP lectura_numero_decimal
+    
+    lectura_numeros_regresar_enteros:
+    MOV DL,00H
+    MOV AH,02H
+    INT 21H  
+    MOV DL,08H
+    MOV AH,02H
+    INT 21H
+    INT 21H
+    MOV DL,00H
+    INT 21H
+    MOV DL,08H
+    INT 21H
+    DEC CX
+    MOV DI,SI
+    ADD DI,CX 
+    INC DI
+    INC CX
+    JMP back_space_lectura_numeros_decimales
       
 fin_lectura_entero:
 ;AJUSTAR LA PARTE DECIMAL
 DEC CX
-CMP CX,04H
+CMP CX,09H;04H
 JL  ajuste_entero_necesario
 JMP sin_ajuste_entero
 ajuste_entero_necesario:  
 
 MOV AL,CL
-MOV AH,04H
+MOV AH,09H;04H
 SUB AH,AL
 XOR DX,DX
 MOV DL,AH
@@ -1131,100 +1237,143 @@ CALL EXCEPCION
                
 RET               
 LEER_DECIMAL ENDP");
-                this.Codigo.AppendLine(@"LEER_ENTERO PROC NEAR 
-    XOR CX,CX ;CUENTA EL NUMERO DE ENTEROS
+
+            }
+            if (this.Programa.LeecturaNumerosEnteros)
+            {
+                this.Codigo.AppendLine(@"
+ES_NUMERO PROC NEAR
+    
+    CMP AL,30H
+    JL  numero_invalido_enteros3
+    CMP AL,39H
+    JA numero_invalido_enteros3 
+    
+    SUB AL,30H 
+    RET
+    numero_invalido_enteros3:
+    MOV AL,'$'
+    
+RET    
+ENDP
+LEER_ENTERO PROC NEAR 
+
+    ;LIMPIAR VARIABLES
+    MOV DX,DI
+    CALL LIMPIAR
+
     MOV SI,DI
+    XOR CX,CX
+    
+    MOV DL,01H
+    MOV [DI],DL
+
     MOV AH,01H
     INT 21H
-              
-    MOV AH,'-'          
-    CMP AL,AH    
+    
+    ;REVISAR SIGNO
+    MOV AH,'-'
+    CMP AH,AL
     JE lectura_entero_negativo2
+    MOV AH,'+'
+    CMP AH,AL
+    JE lectura_entero_positivo2
+    JMP validar_numero
+    
+    lectura_entero_negativo2:
+    MOV DL,0FFH
+    MOV [DI],DL
+    JMP siguiente_entero
+    
+    lectura_entero_positivo2:
+    MOV DL,01H
+    MOV [DI],DL
+    JMP siguiente_entero
+    
+    siguiente_entero:
     MOV AH,01H
-    MOV [DI],AH ;ES POSITIVO
-    INC DI  
+    INT 21H    
+    ;;;;;;;;;
+        validar_numero: 
+        CMP CX,09H
+        JAE overflow_numerico2
+            CMP AL,08H
+            JE retroceso_entero 
+            CMP AL,0DH
+            JE fin_ingreso_entero
+        CALL ES_NUMERO
+        MOV AH,'$'
+        CMP AL,AH
+        JNE salvar_numero
+        JMP numero_invalido_enteros2   
+    ;;;;;;;;; 
+    salvar_numero:
+    INC DI
     INC CX
-    JMP validar_numero_entero2
-lectura_entero_negativo2:
-    MOV AL,0FFH 
-    MOV [DI],AL   
-    
-    ;NUMEROS
-    lectura_numeros2:
-    INC CX
-    INC DI 
-    CMP CX,06H 
-    JAE overflow_numerico2 
-    
-    MOV AH,01H
-    INT 21H       
-    
-    CMP AL,0DH
-    JE fin_lectura_entero2 
-    CMP AL,2EH
-    JE numero_invalido_enteros2
-    
-    
-     
-    validar_numero_entero2:
-    CMP AL,30H
-    JL  numero_invalido_enteros2
-    CMP AL,39H
-    JA numero_invalido_enteros2   
-    
-    SUB AL,30H
     MOV [DI],AL
-    JMP lectura_numeros2
+    JMP siguiente_entero
+    
+    retroceso_entero:
+    MOV DL,00H
+    MOV AH,02H
+    INT 21H
+    MOV DL,8H
+    INT 21H    
+        
+    CMP CX,0H
+    JE siguiente_entero
+    DEC CX
+    MOV DL,0H
+    MOV [DI],DL
+    DEC DI
+    JMP siguiente_entero 
+    
+fin_ingreso_entero:
+    ;AJUSTE
+    CMP CX,00H
+    JE entero_ingreso_vacio
+    CMP CX,09H
+    JL ajustar_entero
+    
+    ajustar_entero: 
+    MOV AX,SI ;SALVAR DIRECCION
     
     
+    MOV DI,SI
+    ADD DI,CX ;FUENTE 
     
-      
-fin_lectura_entero2:
-;AJUSTAR LA PARTE DECIMAL
-DEC CX
-CMP CX,04H
-JL  ajuste_entero_necesario2
-JMP sin_ajuste_entero2
-ajuste_entero_necesario2:  
-
-MOV AL,CL
-MOV AH,04H
-SUB AH,AL
-XOR DX,DX
-MOV DL,AH
-
-MOV DI,SI
-INC DI
-MOV BX,DI
-
-DEC CX
-siguiente_ajuste_entero2:
-MOV DI,BX
-ADD DI,CX
-
-MOV AL,[DI]
-MOV AH,0H
-MOV [DI],AH
-ADD DI,DX
-MOV [DI],AL
-
-
-DEC CX
-JNS siguiente_ajuste_entero2
-
-sin_ajuste_entero2:
-RET    
+    ADD SI,09H ;DESTINO
+    
+    
+    ajusta_siguiente_digito_entero:
+        
+        MOV AL,[DI]
+        MOV [SI],AL
+        MOV DL,0H
+        MOV [DI],DL
+        
+        DEC SI
+        DEC DI   
+    
+    DEC CX    
+    CMP CX,00H
+    JE salir_ajuste_entero
+    JMP ajusta_siguiente_digito_entero
+entero_ingreso_vacio:
+salir_ajuste_entero:    
+RET       
 overflow_numerico2: 
 LEA DI,OVERFLOW  
 CALL EXCEPCION  
 numero_invalido_enteros2:
 LEA DI,NUMERO_INVALIDO
-CALL EXCEPCION
-               
+CALL EXCEPCION               
 RET               
 LEER_ENTERO ENDP");
             }
-            this.Codigo.AppendLine(@"EXCEPCION PROC NEAR
+            if (this.Programa.LeecturaNumerosDecimales || this.Programa.LeecturaNumerosEnteros)
+            {
+                this.Codigo.AppendLine(@"EXCEPCION PROC NEAR
 
 MOV AH, 06h    ; Scroll up function
 XOR AL, AL     ; Clear entire screen
@@ -1261,6 +1410,40 @@ MOV AH,4CH
 INT 21H
               
 EXCEPCION ENDP");
+            }
+            if (this.Programa.ImprimeCadenas)
+            {
+                this.Codigo.AppendLine(@"IMPRIME_CADENA PROC NEAR
+    
+    MOV DI,DX
+    
+    siguiente_caracter_impresion2:
+    MOV DL,[DI]
+    CMP DL,015H ;ALIAS IMPRIMIBLE PARA $
+    JE imprime_signo_pesos
+    CMP DL,'$'
+    JE salir_IMPRIME_CADENA
+    
+    MOV AH,02H
+    INT 21H
+    
+    siguiente_caracter_impresion:
+    INC DI
+    JMP siguiente_caracter_impresion2
+    
+    
+    imprime_signo_pesos:
+    MOV DL,'$'
+    MOV AH,02H
+    INT 21H
+    
+    
+    JMP siguiente_caracter_impresion
+    
+salir_IMPRIME_CADENA:
+RET    
+IMPRIME_CADENA ENDP");
+            }
             #endregion
             this.Codigo.AppendLine("begin endp");
             this.Codigo.AppendLine("end begin");
@@ -1282,7 +1465,7 @@ EXCEPCION ENDP");
                     {
                         CerrarBLoquesPendientes();
                         AgregarAccion(accion);
-                    }                
+                    }
                     return;
                 }
                 if (accion.LineaDocumento.LineNumber >= this.BloquesPorCerrar.Peek().FinBloque.LineNumber)

@@ -51,7 +51,11 @@
       <Word>Lee</Word>
       <Word>LimpiarPantalla</Word>
     </Keywords>
-
+    
+    <!--<Keywords fontWeight="bold" foreground="DarkRed">
+      <Word>Borrar</Word>
+    </Keywords>-->
+    
     <Keywords fontWeight="bold" foreground="LightSkyBlue">
       <Word>begin</Word>
       <Word>end</Word>

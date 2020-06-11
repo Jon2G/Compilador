@@ -16,7 +16,7 @@ namespace My8086.Clases.Funciones
         private readonly Variable Variable;
         public AsignaCadena(Programa Programa, LineaLexica Linea, Variable Variable, Token ValorCadena) : base(Programa, Linea, 0)
         {
-            this.Programa.OperacionesConCadenas = true;
+            this.Programa.LeecturaCadenas = true;
             this.ValorCadena = ValorCadena;
             this.Variable = Variable;
         }
@@ -100,26 +100,20 @@ namespace My8086.Clases.Funciones
 
         private string CaracterEspecial(char caracter)
         {
-            switch (caracter)
+            return caracter switch
             {
-                case '¡':
-                    return "0ADH";
-                case '¿':
-                    return "0A8H";
-                case 'á':
-                    return "0A0H";
-                case 'í':
-                    return "0A1H";
-                case 'ó':
-                    return "0A2H";
-                case 'ú':
-                    return "0A3H";
-                case 'é':
-                    return "08AH";
-                case 'ñ':
-                    return "0A4H";
-            }
-            return null;
+                '$' => "015H",
+                '¡' => "0ADH",
+                '¿' => "0A8H",
+                'á' => "0A0H",
+                'í' => "0A1H",
+                'ó' => "0A2H",
+                'ú' => "0A3H",
+                'é' => "08AH",
+                'ñ' => "0A4H",
+                '\'' => "027H",
+                _ => null,
+            };
         }
     }
 }

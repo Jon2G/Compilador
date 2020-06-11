@@ -21,10 +21,10 @@
                         <Setter Property="CornerRadius" Value="0,0,0,0"/>
                     </Style>
                 </ToolBar.Resources>
-                <Button Click="openFileClick">
+                <Button Click="OpenFileClick">
                     <Image Source="Images/Open.png" Height="16"/>
                 </Button>
-                <Button Click="saveFileClick">
+                <Button Click="SaveFileClick">
                     <Image Source="Images/Save.png" Height="16"/>
                 </Button>
                 <Separator/>

@@ -87,7 +87,7 @@ namespace My8086.Clases.Funciones
                 {
                     if (!programa.SegmentoDeDatos.YaExisteVariable(vv))
                     {
-                        programa.SegmentoDeDatos.Nueva(new Variable(programa, vv, TipoDato.Decimal) {EsAutomatica=true })
+                        programa.SegmentoDeDatos.Nueva(new Variable(programa, vv, TipoDato.Decimal) { EsAutomatica = true })
                             .HacerReferencia();
                     }
                 }
@@ -138,7 +138,7 @@ namespace My8086.Clases.Funciones
                     tokens.Add(new TokenLogico(tk, My8086.Clases.Funciones.OperacionLogica.TipoToken.OperadorSecundario));
                     continue;
                 }
-                if (tk.Lexema.Length == 1)
+                if (tk.Lexema.Length == 1 || tk.Lexema.Length == 2)
                 {
                     if (tk.Lexema == "<" || tk.Lexema == ">")
                     {
@@ -156,7 +156,7 @@ namespace My8086.Clases.Funciones
                         tokens.Add(new TokenLogico(tk, My8086.Clases.Funciones.OperacionLogica.TipoToken.OperadorLogico));
                         continue;
                     }
-                    else if (tk.Lexema == "=")
+                    else if (tk.Lexema == "=" || tk.Lexema == "<>")
                     {
                         tokens.Add(new TokenLogico(tk, My8086.Clases.Funciones.OperacionLogica.TipoToken.OperadorLogico));
                         continue;
@@ -244,10 +244,10 @@ namespace My8086.Clases.Funciones
                             }
                             else
                             {
-                                sb.AppendLine("ADD AH,AL");
+                                sb.AppendLine("OR AL,AH");
                             }
-                            sb.AppendLine($"MOV R_COMPARADOR_{nd.NOrden},AH");
-                            sb.AppendLine($"MOV R_COMPARADOR,AH");
+                            sb.AppendLine($"MOV R_COMPARADOR_{nd.NOrden},AL");
+                            sb.AppendLine($"MOV R_COMPARADOR,AL");
                             operaciones.Add(sb);
                             return operaciones;
                         }
@@ -302,15 +302,15 @@ namespace My8086.Clases.Funciones
             {
                 sb.AppendLine("\n;Parte Entera");
                 sb.AppendLine($"\n MOV SGN{n},{(tk.TipoToken == TipoToken.NumeroNegativo ? "0FF" : "1")}H");
-                for (int i = 0; i <= 3; i++)
+                for (int i = 0; i <= 8; i++)
                 {
-                    sb.Append($"MOV NUM{n}[{3 - i}h],");
+                    sb.Append($"MOV NUM{n}[{8 - i}h],");
                     sb.Append(NumeroLexema(tk, i, false).ToString());
                     sb.Append("\n");
                 }
 
                 sb.AppendLine("\n;Parte Decimal");
-                for (int i = 0; i <= 3; i++)
+                for (int i = 0; i <=8; i++)
                 {
                     sb.Append($"MOV DEC{n}[{i}h],");
                     sb.Append(NumeroLexema(tk, i, true).ToString());

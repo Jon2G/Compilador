@@ -11,7 +11,7 @@ namespace My8086.Clases.Fases._1._Analisis_Lexico
 {
     public class LineaLexica
     {
-        private readonly List<Token> Tokens;
+        public List<Token> Tokens { get; private set; }
         public int Elementos => Tokens.Count;
         public Token this[int index] => Tokens[index];
         public DocumentLine LineaDocumento { get; private set; }

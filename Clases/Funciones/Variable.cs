@@ -57,8 +57,8 @@ namespace My8086.Clases.Funciones
                 case TipoDato.Entero:
                     sb.AppendLine($"\n;=======>[{Nombre}-{this.TipoDato}]");
                     sb.AppendLine($"SGN_{Nombre} db 0");
-                    sb.AppendLine($"NUM_{Nombre} db 0,0,0,0");
-                    sb.AppendLine($"DEC_{Nombre} db 0,0,0,0 ");
+                    sb.AppendLine($"NUM_{Nombre} db 0,0,0,0,0,0,0,0,0");
+                    sb.AppendLine($"DEC_{Nombre} db 0,0,0,0,0,0,0,0,0 ");
                     break;
                 case TipoDato.Cadena:
                     sb.Append($"\n;=======>[{Nombre}-{this.TipoDato}]\n");

@@ -17,6 +17,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
@@ -31,13 +33,14 @@ namespace My8086
     /// </summary>
     public class MyCompletionData : ICompletionData
     {
-        public MyCompletionData(string Token,string Completado, string Descripcion, int Orden, string ImgSource)
+        public MyCompletionData(string Token, string Completado, string Descripcion, int Orden, string ImgSource, AutoCompletado AutoCompletado)
         {
             this.Text = Completado;
             this.Descripcion = Descripcion;
             this.Orden = (double)Orden;
             this.ImgSource = ImgSource;
             this.ElementoAutoCompletado = new ElementoAutoCompletado(Token);
+            this.AutoCompletado= AutoCompletado;
         }
 
         private readonly ElementoAutoCompletado ElementoAutoCompletado;
@@ -51,7 +54,7 @@ namespace My8086
         public string Text { get; private set; }
 
         // Use this property if you want to show a fancy UIElement in the drop down list.
-        public object Content =>ElementoAutoCompletado;
+        public object Content => ElementoAutoCompletado;
 
         private readonly string Descripcion;
         public object Description
@@ -64,10 +67,37 @@ namespace My8086
         {
             get => (double)Orden;
         }
+        private readonly AutoCompletado AutoCompletado;
 
         public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs)
         {
             textArea.Document.Replace(completionSegment, this.Text);
+
+            DocumentLine linea = textArea.Document.GetLineByOffset(completionSegment.Offset);
+            string contexto, tipo;
+            switch (this.ImgSource)
+            {
+                case "Imgs\\AddVariable_16x.png":
+                    contexto = textArea.Document.GetText(linea);
+                    tipo = this.AutoCompletado.TiposDatos.FirstOrDefault(x => x.StartsWith(contexto.Trim(), StringComparison.OrdinalIgnoreCase));
+                    if (tipo != null)
+                    {
+                        textArea.Document.Replace(linea.Offset, linea.Length, Regex.Replace(contexto, tipo, tipo, RegexOptions.IgnoreCase));
+                    }
+                    break;
+                case "Imgs\\Method_left_16x.png":
+                    contexto = textArea.Document.GetText(linea);
+                    tipo = this.AutoCompletado.Funciones.FirstOrDefault(x => contexto.ToLower().Trim().Contains(x.ToLower()));
+                    if (tipo != null)
+                    {
+                        textArea.Document.Replace(linea.Offset, linea.Length, Regex.Replace(contexto, tipo, tipo, RegexOptions.IgnoreCase));
+                    }
+                    this.AutoCompletado.AutoCompletar();
+                    break;
+            }
+            //GetText(completionSegment.Offset- this.Text.Length, this.Text.Length);
+            //DocumentLine linea = this.Documento.GetLineByNumber((s as CompletionWindow).TextArea.Caret.Line);
+
         }
     }
 }

@@ -15,20 +15,25 @@ namespace My8086.Clases.Funciones
     internal class For : Accion, IBloque
     {
         private static int ConsecutivoSalto = 0;
-        private string IdentifiacadorSalto;
+        private readonly string IdentifiacadorSalto;
         public DocumentLine InicioBloque { get; set; }
         public DocumentLine FinBloque { get; set; }
-        private Variable Contador { get; set; }
+        //private Variable Contador;
         private OperacionArtimetica ContadorOp { get; set; }
         private OperacionArtimetica Incremento { get; set; }
         private readonly OperacionesLogicas OperacionLogica;
         public For(Programa Programa, LineaLexica Linea, Variable Contador, OperacionesLogicas OperacionLogica) : base(Programa, Linea, 1)
         {
-            this.Contador = Contador;
+            //this.Contador = Contador;
             this.OperacionLogica = OperacionLogica;
-            this.Contador = new Variable(Programa, $"CONTADOR_FOR{++For.ConsecutivoSalto}", TipoDato.Entero) { EsAutomatica = true };
-            this.ContadorOp = new OperacionArtimetica(Programa, Contador, Linea, 3, 6);
-            this.Incremento = new OperacionArtimetica(Programa, Contador, Linea, 12, 17);
+            //this.Contador = new Variable(Programa, $"CONTADOR_FOR{++For.ConsecutivoSalto}", TipoDato.Entero) { EsAutomatica = true };
+            
+            int FinContador=Linea.Tokens.FindIndex(x => x.Lexema == ";");
+            this.ContadorOp = new OperacionArtimetica(Programa, Contador, Linea, 3, FinContador+1);
+
+            int inicioIncremento = Linea.Tokens.FindLastIndex(x => x.Lexema == ";");
+            this.Incremento = new OperacionArtimetica(Programa, Contador, Linea, inicioIncremento+2, Linea.Elementos - 1);
+
             this.OperacionLogica = OperacionLogica;
             this.IdentifiacadorSalto = (++For.ConsecutivoSalto).ToString();
             OperacionLogica.DeclararTemporales();

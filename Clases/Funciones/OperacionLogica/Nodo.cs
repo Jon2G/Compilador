@@ -23,7 +23,7 @@ namespace My8086.Clases.Funciones.OperacionLogica
             this.NOrden = NOrden;
             this.TipoDato = TipoDato;
         }
-        public string NemonicoOperacion(string destino,TipoDato TipoDato)
+        public string NemonicoOperacion(string destino, TipoDato TipoDato)
         {
             StringBuilder sb = new StringBuilder();
             switch (this.Operador.Token.Lexema)
@@ -49,6 +49,16 @@ namespace My8086.Clases.Funciones.OperacionLogica
                     break;
                 case ">":
                     sb.AppendLine("CALL MAYOR_QUE");
+                    break;
+                case "<>":
+                    if (TipoDato == TipoDato.Cadena)
+                    {
+                        sb.AppendLine("CALL DIFERENTE_CADENA");
+                    }
+                    else
+                    {
+                        sb.AppendLine("CALL DIFERENTE");
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

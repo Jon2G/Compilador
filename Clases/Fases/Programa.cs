@@ -15,6 +15,7 @@ namespace My8086.Clases.Fases
         public readonly ExpresionesRegulares.ExpresionesRegulares Expresiones;
         public Programa(string Titulo, ExpresionesRegulares.ExpresionesRegulares Expresiones)
         {
+            this.Titulo = Titulo;
             this.Acciones=new List<Accion>();
             this.Expresiones = Expresiones;
         }
@@ -30,10 +31,13 @@ namespace My8086.Clases.Fases
         public bool UsarResta { get; internal set; }
         public bool UsarMultiplicacion { get; internal set; }
         public bool OperadoresAritmeticos => UsarSuma || UsarDivision || UsarResta || UsarMultiplicacion|| OperacionesConNumeros;
-        public bool OperacionesConCadenas { get; internal set; }
-        public bool LeecturaNumeros { get; internal set; }
+        public bool LeecturaCadenas { get; internal set; }
+        public bool LeecturaNumerosDecimales { get; internal set; }
+        public bool LeecturaNumerosEnteros { get; internal set; }
         public bool OperacionesConNumeros { get; internal set; }
         public bool OperacionesLogicas { get; internal set; }
+        public bool ImprimeCadenas { get; internal set; }
+        public bool ImprimeNumeros { get; internal set; }
 
         public string CerrarBloque()
         {

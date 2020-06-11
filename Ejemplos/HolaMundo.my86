@@ -1,0 +1,4 @@
+﻿Program Nom.Hola_mundo
+	Begin
+		Imprime('Hola mundo');
+	End;

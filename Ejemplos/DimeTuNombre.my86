@@ -1,4 +1,4 @@
-Program Nom.QueMesEs
+﻿Program Nom.QueMesEs
 	
 	Vars
 		Entero Edad;
@@ -20,19 +20,19 @@ Program Nom.QueMesEs
 	Lee(Respuesta);
 	Si(Respuesta='N' or Respuesta='n')
 		begin
-		Edad:=Edad-1;
+			Edad:=Edad-1;
 		end
 	Imprime('\n¿Tienes ');
 	Imprime(Edad);
-	Imprime('años?\nResponde con S/N:\n');
+	Imprime(' años?\nResponde con S/N:\n');
 	Lee(Respuesta);
 	Si(Respuesta='S' or Respuesta='s')
 	begin
-	Imprime('\nEl mago lo hizo de nuevo\n');
+		Imprime('\nSuper :)\n');
 	end
 	Sino
 	begin
-	Imprime('\nQue raro..., según mis calculos estoy equivocado :(\n');
+		Imprime('\nQue raro..., según mis calculos estoy equivocado :(\n');
 	end
 	
 

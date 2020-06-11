@@ -1,0 +1,40 @@
+﻿//Diseñar el algoritmo correspondiente a un programa
+//que escribe el porcentaje descontado en una compra, introduciendo por teclado el
+//precio del descuento y el precio pagado.
+Program Nom.Descuento
+	
+	Vars
+		Decimal Importe;
+		Entero DescuentoPCT;	
+		Entero Descuento;
+	Begin
+	Imprime('¿Ingrese el importe de la compra:');
+	Lee(Importe);
+	Imprime('\nIngrese el descuento en porcentaje:');
+	Lee(DescuentoPCT);
+	
+			DescuentoPCT:=DescuentoPCT/100;
+			Descuento:=Importe*DescuentoPCT;
+		LimpiarPantalla();
+		Imprime('-========================================================-\n');
+		Imprime('--> Descuento %');
+		Imprime(DescuentoPCT);
+		Imprime('\n--> Descuento total $');
+		Imprime(Descuento);
+		Imprime('\n-========================================================-\n');
+		Imprime('-----------> Subtotal $');
+		Imprime(Importe);
+		Importe:=Importe-Descuento;
+		Imprime('\n-----------> Total $');
+		
+		Si(Importe<=0)
+			begin
+				Imprime('0.00 (GRATIS)');
+			end
+		Sino
+			begin
+				Imprime(Importe);
+			end	
+		Imprime('\n-========================================================-\n');
+
+End;

@@ -157,19 +157,20 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
                 sb.AppendLine($"LEA DX,SGN_{tk.Token.Lexema}");
                 sb.AppendLine($"CALL USAR_N{n}  ;vamos a utilizar T_{tk.Token.Lexema}");
             }
-            else
+            else //Ahi le revisa
             {
                 sb.AppendLine("\n;Parte Entera");
                 sb.AppendLine($"\n MOV SGN{n},{(tk.TipoToken == TipoToken.NumeroNegativo ? "0FF" : "1")}H");
-                for (int i = 0; i <= 3; i++)
+
+                for (int i = 0; i <= 8; i++)
                 {
-                    sb.Append($"MOV NUM{n}[{3 - i}h],");
+                    sb.Append($"MOV NUM{n}[{8 - i}h],");
                     sb.Append(NumeroLexema(tk, i, false).ToString());
                     sb.Append("\n");
                 }
 
                 sb.AppendLine("\n;Parte Decimal");
-                for (int i = 0; i <= 3; i++)
+                for (int i = 0; i <= 8; i++)
                 {
                     sb.Append($"MOV DEC{n}[{i}h],");
                     sb.Append(NumeroLexema(tk, i, true).ToString());
@@ -185,15 +186,15 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
 
             sb.AppendLine("\n;Parte Entera");
             sb.AppendLine($"\n MOV SGN_{nombreVariable},{(tk.TipoToken == TipoToken.NumeroNegativo ? "0FF" : "1")}H");
-            for (int i = 0; i <= 3; i++)
+            for (int i = 0; i <= 8; i++)
             {
-                sb.Append($"MOV NUM_{nombreVariable}[{3 - i}h],");
+                sb.Append($"MOV NUM_{nombreVariable}[{8 - i}h],");
                 sb.Append(NumeroLexema(tk, i, false).ToString());
                 sb.Append("\n");
             }
 
             sb.AppendLine("\n;Parte Decimal");
-            for (int i = 0; i <= 3; i++)
+            for (int i = 0; i <= 8; i++)
             {
                 sb.Append($"MOV DEC_{nombreVariable}[{i}h],");
                 sb.Append(NumeroLexema(tk, i, true).ToString());

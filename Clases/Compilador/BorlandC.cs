@@ -12,10 +12,12 @@ namespace My8086.Clases.Compilador
         private FileInfo RutaEjecutable;
         private FileInfo RutaTemporal;
         private readonly FileInfo RutaBorlandC;
+        private readonly DirectoryInfo RutaTemporales;
         public string ResultadosCompilacion { get; private set; }
         public BorlandC()
         {
             this.RutaBorlandC = new FileInfo(Path.Combine(Directory.GetCurrentDirectory(), @"TurboAsm\BIN\gui64.exe"));
+            this.RutaTemporales = new DirectoryInfo($"{RutaBorlandC.Directory.FullName}\\Temporales");
         }
 
         public bool GeneraEjecutable(string documento)
@@ -86,7 +88,7 @@ namespace My8086.Clases.Compilador
             //////
             this.RutaEjecutable.Refresh();
 
-            this.RutaTemporal.MoveTo(this.RutaTemporal.DirectoryName + $"\\Temporales\\{RutaTemporal.Name}");
+            this.RutaTemporal.MoveTo($"{this.RutaTemporales.FullName}\\{RutaTemporal.Name}");
             if (this.RutaEjecutable.Exists)
             {
                 this.RutaEjecutable.MoveTo(this.RutaTemporal.DirectoryName + $"\\{RutaEjecutable.Name}");
@@ -140,6 +142,7 @@ namespace My8086.Clases.Compilador
             }
             catch (Exception e)
             {
+                Log.LogMe(e);
                 throw e;
             }
             this.ResultadosCompilacion += "===========Ejecución finalizada===========\n";
@@ -147,12 +150,21 @@ namespace My8086.Clases.Compilador
 
         public void Limpiar()
         {
-            foreach (FileInfo temporal in this.RutaBorlandC.Directory.GetFiles("*.asm,*.exe,*.OBJ"))
+            foreach (FileInfo temporal in this.RutaTemporales.EnumerateFiles())
             {
-
+                string extension = temporal.Extension.ToLower();
+                if (extension == ".asm" || extension == ".exe" || extension == ".obj")
+                {
+                    try
+                    {
+                        temporal.Delete();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.LogMe(ex, "Al eliminar un temporal");
+                    }
+                }
             }
-
-
         }
     }
 }

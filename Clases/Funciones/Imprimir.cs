@@ -40,13 +40,17 @@ namespace My8086.Clases.Funciones
             {
                 case TipoDato.Decimal:
                 case TipoDato.Entero:
+                    this.Programa.ImprimeNumeros = true;
                     sb.AppendLine($"LEA DI,SGN_{this.VariableImpresion.Nombre}");
                     sb.AppendLine($"CALL MOSTRAR_RESULTADO");
                     break;
+                case TipoDato.Cadena:
                 default:
+                    this.Programa.ImprimeCadenas = true;
                     sb.AppendLine($"MOV DX,{this.VariableImpresion.Nombre}");
-                    sb.AppendLine("MOV AH,09H");
-                    sb.AppendLine("INT 21H");
+                    sb.AppendLine("CALL IMPRIME_CADENA");
+                    //sb.AppendLine("MOV AH,09H");
+                    //sb.AppendLine("INT 21H");
                     break;
             }
             return sb;

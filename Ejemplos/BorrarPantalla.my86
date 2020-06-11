@@ -1,0 +1,10 @@
+﻿Program Nom.programa
+	
+	Vars
+		Cadena Pausa;
+	Begin
+		Imprime('Hola');
+		Lee(Pausa);
+		Borrar();
+		Imprime('Adios');
+End;

@@ -21,19 +21,18 @@ namespace My8086.Clases.Compilador
         private readonly ResultadosCompilacion ResultadosCompilacion;
         private readonly TextDocument Document;
         public EventHandler OnProgreso;
-        private EventHandler _VerLinea;
-        private BorlandC TurboC;
+        private readonly BorlandC TurboC;
         public StringBuilder ASM { get; private set; }
         public bool Compilado { get; set; }
 
-        private double _Progreso { get; set; }
+        private double IProgreso { get; set; }
 
         public double Progreso
         {
-            get => _Progreso;
+            get => IProgreso;
             set
             {
-                _Progreso = value;
+                IProgreso = value;
                 OnProgreso?.Invoke(this, null);
             }
         }
@@ -101,58 +100,6 @@ namespace My8086.Clases.Compilador
             }
 
             return "No se ha compilado el archivo";
-        }
-        private void Convertir()
-        {
-            //int lineas = this.Document.LineCount;
-            //foreach (DocumentLine linea in this.Document.Lines)
-            //{
-            //    this.Progreso = (linea.LineNumber / (double)lineas) * 100;
-            //    string texto = Document.GetText(linea)?.Trim();
-            //    if (string.IsNullOrEmpty(texto))
-            //    {
-            //        continue;
-            //    }
-
-            //    if (texto.StartsWith("//"))
-            //    {
-            //        continue;
-            //    }
-            //    if (!texto.EndsWith(";"))
-            //    {
-            //        if (this.ReconceTokens.EsIncio(texto, linea.LineNumber))
-            //        {
-            //            continue;
-            //        }
-            //        if (this.ReconceTokens.EsFin(texto, linea.LineNumber))
-            //        {
-            //            continue;
-            //        }
-
-            //        this.ResultadosCompilacion.ResultadoCompilacion("Se esperaba ';' al final de la instrucción.", linea.LineNumber);
-            //        continue;
-            //    }
-
-            //    if (this.PropiedadesPrograma.Titulo is null)
-            //    {
-            //        this.ResultadosCompilacion.ResultadoCompilacion("FATAL No se definio un punto de entrada para la aplicación", linea.LineNumber);
-            //        break;
-            //    }
-            //    if (this.ReconceTokens.EsDeclaracionDeVariable(texto, linea.LineNumber))
-            //    {
-            //        continue;
-            //    }
-            //    if (this.ReconceTokens.EsUnaFuncionDeConsola(texto, linea.LineNumber))
-            //    {
-            //        continue;
-            //    }
-            //    this.ResultadosCompilacion.ResultadoCompilacion("Sentencia no recononocida...", linea.LineNumber);
-            //    break;
-            //}
-            //if (!this.PropiedadesPrograma.Cerrado)
-            //{
-            //    this.ResultadosCompilacion.ResultadoCompilacion($"Se esperaba el cierre de la función principal '{this.PropiedadesPrograma.Titulo}' y no se encontro", -1);
-            //}
         }
     }
 }

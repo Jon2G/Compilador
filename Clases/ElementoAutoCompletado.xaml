@@ -9,14 +9,10 @@
              MinHeight="25"
              Height="25" MinWidth="75" Padding="0" Margin="0"  HorizontalAlignment="Stretch" 
              HorizontalContentAlignment="Stretch">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50"/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
+    <DockPanel>
         <!--<Border BorderBrush="Black" BorderThickness="1">-->
-            <Image Margin="5,0" x:Name="Imagen" Source="../Images/Copy.png"/>
+            <Image DockPanel.Dock="Left" MaxWidth="45" Margin="5,0" x:Name="Imagen" Source="../Images/Copy.png"/>
         <!--</Border>-->
-        <TextBlock Foreground="Black" x:Name="TxtName" Grid.Column="1" FontSize="16"/>
-    </Grid>
+        <TextBlock DockPanel.Dock="Right" Foreground="Black" x:Name="TxtName" Grid.Column="1" FontSize="16"/>
+    </DockPanel>
 </UserControl>

@@ -1,13 +1,11 @@
 ﻿using ICSharpCode.AvalonEdit.Document;
 using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using My8086.Clases.Advertencias;
-using My8086.Clases.BaseDeDatos;
 using My8086.Clases.Funciones;
 using My8086.Clases.ExpresionesRegulares;
 namespace My8086.Clases.Fases
@@ -17,17 +15,17 @@ namespace My8086.Clases.Fases
         OperadorLogico, OperadorAritmetico,
         Identificador, Relacional, SeparadorParametros,
         PalabraReservada, Invalido, FinInstruccion,
-        ParentesisAbierto, ParentesCerrado, Cadena, NumeroEntero, NumeroDecimal
+        ParentesisAbierto, ParentesCerrado, Cadena, NumeroEntero, NumeroDecimal,
+        Ensamblador
     }
     public enum TipoDato
     {
-        Entero, Decimal, Cadena,BitLogico, Invalido, NoAplica
+        Entero, Decimal, Cadena,BitLogico, Invalido, NoAplica, Ensamblador
     }
     public class Token
     {
-        public TipoToken TipoToken { get; private set; }
+        public TipoToken TipoToken { get;  set; }
         public TipoDato TipoDato { get; set; }
-        public Guid Id { get; private set; }
         public DocumentLine Linea { get; private set; }
         public List<DocumentLine> LineasDeReferencia { get; private set; }
         public int Referencias { get => LineasDeReferencia?.Count ?? 0; }
@@ -37,7 +35,6 @@ namespace My8086.Clases.Fases
         {
             this.TipoDato = TipoDato;
             this.TipoToken = TipoToken;
-            this.Id = Guid.NewGuid();
             this.Linea = Linea;
             this.LineasDeReferencia = new List<DocumentLine>();
             this.Lexema = lexema;
@@ -55,7 +52,7 @@ namespace My8086.Clases.Fases
             return sb.ToString();
         }
 
-        public static Token Identificar(string Token, DocumentLine Linea, ResultadosCompilacion Errores, ExpresionesRegulares.ExpresionesRegulares Patrones)
+        public static Token Identificar(string Token, DocumentLine Linea, ExpresionesRegulares.ExpresionesRegulares Patrones)
         {
             Fases.Token token = new Token(Token, TipoToken.Invalido, TipoDato.Invalido, Linea);
             if (Patrones.Evaluar(Patrones.PalabrasReservadas, Token))

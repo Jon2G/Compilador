@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="My8086.Clases.Funciones.Accion">
+    <Position X="16.25" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAABBEAQAAEAAACAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Clases\Funciones\Accion.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="My8086.Clases.Funciones.AsignaCadena">
+    <Position X="8" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAABAAQAAAAAACAAAAAAAAAAAAAAQAAAAAAAA=</HashCode>
+      <FileName>Clases\Funciones\AsignaCadena.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="My8086.Clases.Funciones.CodigoTresDirecciones.OperacionArtimetica">
+    <Position X="10.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABACAAAAAAACAAAAAAAAAAAAAAQAAAAAAAA=</HashCode>
+      <FileName>Clases\Funciones\CodigoTresDirecciones\OperacionArtimetica.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="My8086.Clases.Funciones.FinSi">
+    <Position X="12.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Clases\Funciones\FinSi.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="My8086.Clases.Funciones.For">
+    <Position X="14.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAARAACBAgAAACAAAAQACAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Clases\Funciones\For.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="My8086.Clases.Funciones.Imprimir">
+    <Position X="16.75" Y="4.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAACAAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Clases\Funciones\Imprimir.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="My8086.Clases.Funciones.Lee">
+    <Position X="19.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAACAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Clases\Funciones\Lee.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="My8086.Clases.Funciones.Si">
+    <Position X="21.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAARAACCAgAAACAAAAAACAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Clases\Funciones\Si.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="My8086.Clases.Funciones.Sino">
+    <Position X="23.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAABAACAAgAAAGAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Clases\Funciones\Sino.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="My8086.Clases.Funciones.Variable">
+    <Position X="26" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAABEAAAAAAAACgAAEAAAAAAAAAAAAAAAgAAI=</HashCode>
+      <FileName>Clases\Funciones\Variable.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="My8086.Clases.Funciones.IBloque">
+    <Position X="19" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAgAAAAAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Clases\Funciones\IBloque.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
