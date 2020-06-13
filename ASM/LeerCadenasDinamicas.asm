@@ -1,0 +1,370 @@
+.model small
+.stack
+
+.data
+;=========================================================
+;VARIABLES PARA LA LEECTURA DE CADENAS
+CADENA DW 00
+LONGUITUD_CADENA DW 0
+BLOQUE_ACTUAL DB 0
+ULTIMO_SEGMENTO DW 0
+ERROR DB 'ERROR','$'
+REALLOC DB 10,13,'REALLOC',10,13,'$'
+ERROR_ALLOC_CADENA DB 10,13,'OCURRIO UN ERROR RESERVANDO MEMORIA PARA LA CADENA',10,13,'$'
+FIN_CADENA DB '$'
+;VARIABLES DEPENDIENTES DE LA PROGRAMACION
+
+;=======>[Nombre-Cadena]
+Nombre DW 00
+LONGUITUD_Nombre DW 0
+
+;=======>[AUTOVAR968d72b615a04b70891c68f0e188df70-Cadena]
+AUTOVAR968d72b615a04b70891c68f0e188df70 DW 00
+LONGUITUD_AUTOVAR968d72b615a04b70891c68f0e188df70 DW 0
+
+;=======>[AUTOVAR2de90a12ff6a49beb34fbcfbf4830046-Cadena]
+AUTOVAR2de90a12ff6a49beb34fbcfbf4830046 DW 00
+LONGUITUD_AUTOVAR2de90a12ff6a49beb34fbcfbf4830046 DW 0
+
+;=======>[AUTOVARa004cf0da42e4b809e8457ff95262de2-Cadena]
+AUTOVARa004cf0da42e4b809e8457ff95262de2 DW 00
+LONGUITUD_AUTOVARa004cf0da42e4b809e8457ff95262de2 DW 0
+.code
+;INICIA PROCEDIMIENTO PRINCIPAL
+begin proc FAR
+MOV AX,@data
+MOV DS,AX
+;================>[LIMPIAR PANTALLA]<================
+mov ax,0600h  ;ah 06(es un recorrido), al 00(pantalla completa)
+mov bh,01Fh    ;fondo blanco(7), sobre azul(1)
+mov cx,0000h  ;es la esquina superior izquierda reglon: columna
+mov dx,184Fh ;es la esquina inferior derecha reglon: columna
+int 10h  ;interrupcion que llama al BIOS
+;================>[CODIGO GENERADO POR EL COMPILADOR]<================
+;================[-ALOGAR CADENA-]================
+MOV BLOQUE_ACTUAL,12D
+CALL ALOGAR_CADENA
+MOV SI,CADENA
+;=================[ASIGNAR VALOR A LA CADENA]=================
+MOV DL,0A8H
+MOV [SI],DL
+INC SI
+MOV DL,'C'
+MOV [SI],DL
+INC SI
+MOV DL,0A3H
+MOV [SI],DL
+INC SI
+MOV DL,'a'
+MOV [SI],DL
+INC SI
+MOV DL,'l'
+MOV [SI],DL
+INC SI
+MOV DL,' '
+MOV [SI],DL
+INC SI
+MOV DL,'e'
+MOV [SI],DL
+INC SI
+MOV DL,'s'
+MOV [SI],DL
+INC SI
+MOV DL,' '
+MOV [SI],DL
+INC SI
+MOV DL,'t'
+MOV [SI],DL
+INC SI
+MOV DL,'u'
+MOV [SI],DL
+INC SI
+MOV DL,' '
+MOV [SI],DL
+INC SI
+MOV DL,'n'
+MOV [SI],DL
+INC SI
+MOV DL,'o'
+MOV [SI],DL
+INC SI
+MOV DL,'m'
+MOV [SI],DL
+INC SI
+MOV DL,'b'
+MOV [SI],DL
+INC SI
+MOV DL,'r'
+MOV [SI],DL
+INC SI
+MOV DL,'e'
+MOV [SI],DL
+INC SI
+MOV DL,'?'
+MOV [SI],DL
+INC SI
+MOV DL,10
+MOV [SI],DL
+INC SI
+MOV DL,13
+MOV [SI],DL
+INC SI
+MOV DL,FIN_CADENA
+MOV [SI],DL
+MOV DX,CADENA
+MOV AUTOVAR968d72b615a04b70891c68f0e188df70,DX
+MOV DX,AUTOVAR968d72b615a04b70891c68f0e188df70
+MOV AH,09H
+INT 21H
+CALL LEER_CADENA
+MOV SI,CADENA
+MOV Nombre,SI
+;================[-ALOGAR CADENA-]================
+MOV BLOQUE_ACTUAL,11D
+CALL ALOGAR_CADENA
+MOV SI,CADENA
+;=================[ASIGNAR VALOR A LA CADENA]=================
+MOV DL,10
+MOV [SI],DL
+INC SI
+MOV DL,13
+MOV [SI],DL
+INC SI
+MOV DL,'H'
+MOV [SI],DL
+INC SI
+MOV DL,'o'
+MOV [SI],DL
+INC SI
+MOV DL,'l'
+MOV [SI],DL
+INC SI
+MOV DL,'a'
+MOV [SI],DL
+INC SI
+MOV DL,','
+MOV [SI],DL
+INC SI
+MOV DL,FIN_CADENA
+MOV [SI],DL
+MOV DX,CADENA
+MOV AUTOVAR2de90a12ff6a49beb34fbcfbf4830046,DX
+MOV DX,AUTOVAR2de90a12ff6a49beb34fbcfbf4830046
+MOV AH,09H
+INT 21H
+MOV DX,Nombre
+MOV AH,09H
+INT 21H
+;================[-ALOGAR CADENA-]================
+MOV BLOQUE_ACTUAL,11D
+CALL ALOGAR_CADENA
+MOV SI,CADENA
+;=================[ASIGNAR VALOR A LA CADENA]=================
+MOV DL,':'
+MOV [SI],DL
+INC SI
+MOV DL,'D'
+MOV [SI],DL
+INC SI
+MOV DL,FIN_CADENA
+MOV [SI],DL
+MOV DX,CADENA
+MOV AUTOVARa004cf0da42e4b809e8457ff95262de2,DX
+MOV DX,AUTOVARa004cf0da42e4b809e8457ff95262de2
+MOV AH,09H
+INT 21H
+;==============>[FIN CODIGO GENERADO POR EL COMPILADOR]<==============
+XOR AX,AX
+INT 16H
+;================>[LIBERAR TODA LA MEMORIA DE CADENAS]<================
+MOV BX,Nombre
+CALL LIBERAR_CADENA
+MOV BX,AUTOVAR968d72b615a04b70891c68f0e188df70
+CALL LIBERAR_CADENA
+MOV BX,AUTOVAR2de90a12ff6a49beb34fbcfbf4830046
+CALL LIBERAR_CADENA
+MOV BX,AUTOVARa004cf0da42e4b809e8457ff95262de2
+CALL LIBERAR_CADENA
+MOV AH,4CH
+INT 21H
+RET
+
+;==============>[PROCEDIMIENTOS INTERNOS GENERADOS POR EL COMPILADOR]<==============
+;==============>[ALOGAR_CADENA]<==============
+        ALOGAR_CADENA PROC NEAR 
+    
+        ;MOV BLOQUE_ACTUAL,0AH ;INDICA EL BLOQUE EN EL QUE SE ESTA ESCRIBIENDO
+    
+        ;RESERVAR LA MEOMRIA PARA LEER LA CADENA (MALLOC)
+        ;FUNCION AH,48H       
+    
+        ;PARAMETROS DE ENTRADA:
+        ;BX - TAMANIO DE EL BLOQUE (EN PARRAFOS GRUPOS DE 16 BYTES)    
+    
+        ;PARAMETOS DE SALIDA:  
+        ;SI NO HAY ERROR BANDERA DE ACARREO LIMPIA
+        ;AX - APUNTA A LA DIRECCION DE INICIO DEL NUEVO BLOQUE RESERVADO
+    
+        ;SI HAY ERROR ACARREO CON VALOR,
+        ;BX - TAMANIO MAXIMO DE MEMORIA DISPONIBLE
+        ;AX CODIGO DE ERROR (7 O 8)
+              
+        MOV AH,48H
+        XOR BX,BX
+        MOV BL,BLOQUE_ACTUAL ;16*BLOQUE_ACTUAL BYTES DE INICIO
+        INT 21H 
+        MOV CADENA,AX 
+        JC ERROR_ALLOC
+        JMP FIN_ALOGAR_CADENA
+ 
+ERROR_ALLOC:     
+        MOV CADENA,DS
+        XOR AX,AX
+        MOV AL,BLOQUE_ACTUAL
+        MOV AH,0FH
+        MUL AH 
+          
+        MOV DI,CADENA
+        ADD DI,AX
+        MOV CX,ULTIMO_SEGMENTO
+        ADD DI,CX
+        MOV CADENA,DI
+        
+         
+        ;MOV AH,09H
+        ;LEA DX,ERROR_ALLOC_CADENA
+        ;INT 21H    
+    
+        FIN_ALOGAR_CADENA:
+        MOV CX,CADENA
+        MOV ULTIMO_SEGMENTO,CX
+        RET
+         
+    ALOGAR_CADENA ENDP
+
+        ;==============>[ALOGAR_CADENA]<==============
+        LIBERAR_CADENA PROC NEAR ;(FREE)
+            ;Funcion AH   49h  
+            ;PARAMETROS DE ENTRADA: ES:0-DIRECCION BASE CERO DEL BLOQUE PARA LIBERAR
+            ;PARAMETROS DE SALIDA: SI EL ACARREO ESTA ACTIVO AX CONTIENE EL CODIGO DE 
+            ;ERROR (7,9)
+      
+            MOV AH,49H 
+            MOV ES,BX
+            INT 21H
+   
+            RET
+            LIBERAR_CADENA ENDP 
+    LEER_CADENA PROC NEAR 
+        XOR CX,CX
+      
+ 
+     
+        MOV CADENA,DS
+        XOR AX,AX
+        MOV AL,BLOQUE_ACTUAL
+        MOV AH,0FH
+        MUL AH 
+          
+        MOV DI,CADENA
+        ADD DI,AX
+        MOV CX,ULTIMO_SEGMENTO
+        ADD DI,CX
+        MOV CADENA,DI
+        XOR CX,CX 
+        ;MOV AH,09H
+        ;LEA DX,ERROR_ALLOC_CADENA
+        ;INT 21H    
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;LECTURA
+AGREGAR_CARACTER:  
+    MOV SI,CADENA
+    MOV AH,08H
+    INT 21H
+    
+    CMP AL,08H
+    JE RETROCEDER
+    CMP AL,0DH ;TECLA ENTER
+    JE LEER_CADENA_SALIR
+    
+    MOV DI,SI
+    ADD DI,CX 
+    MOV [DI],AL 
+    INC CX
+    
+    ;IMPRIMIR EL CARACTER EN PANTALLA
+    MOV DL,AL
+    MOV AH,02H
+    INT 21H
+    ;;REVISAR SI YA NOS ACABAMOS EL BLOQUE
+    
+    MOV dx,0 ; 
+    MOV AX,CX ; 
+    MOV BX,0FH
+    DIV BX ;
+    
+    CMP AL,BLOQUE_ACTUAL 
+    JA REALLOC_CADENA
+    JMP AGREGAR_CARACTER
+    ;;;;;;;;;;;;;;;;;;;;; 
+            REALLOC_CADENA:
+        ;MOV AH,09H
+        ;LEA DX,REALLOC
+        ;INT 21H
+        ;;AUMENTAR EL BLOQUE Y RESERVAR UN PARRAFO MAS (REALLOC) 
+        ;FUNCION AH,04AH    
+        
+        ;PARAMETROS ENTRADA
+        ;ES - DIRECCION DEL BLOQUE A MODIFICAR
+        ;BX NUEVO TAMANIO DE BLOQUE  
+        
+        ;PARAMETROS DE SALIDA
+        ;SI HAY ERROR ACARREO CON VALOR,
+        ;BX - TAMANIO MAXIMO DE MEMORIA DISPONIBLE
+        ;AX CODIGO DE ERROR (7,8,9)        
+            
+            INC BLOQUE_ACTUAL
+            
+            MOV AH,04AH
+            MOV ES,DI
+            MOV BL,BLOQUE_ACTUAL
+            INT 21H
+            ;JC ERROR_REALLOC
+            JMP AGREGAR_CARACTER
+            ERROR_REALLOC:
+            LEA DX,ERROR
+            MOV AH,09H
+            INT 21H 
+    ;;;;;;;;;;;;;;;;;;;;;;     
+    ;;;;;;;;;;;;;
+    RETROCEDER:
+    MOV AH,02H
+    MOV DL,08H ;backspace 
+    INT 21H 
+    ;
+    MOV AH,02H  
+    MOV DL,00H ;caracter nulo para borra el caracter
+    INT 21H
+    ;
+    MOV AH,02H  
+    MOV DL,08H;backspace 
+    INT 21H
+    
+    DEC CX
+    JMP AGREGAR_CARACTER
+    ;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;    
+        LEER_CADENA_SALIR:
+        
+        MOV AL,FIN_CADENA
+        MOV DI,SI
+        ADD DI,CX         
+        MOV [DI],AL 
+        INC CX
+    
+        MOV CX,CADENA
+        MOV ULTIMO_SEGMENTO,CX
+   
+   RET      
+   LEER_CADENA ENDP
+
+end begin
