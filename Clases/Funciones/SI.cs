@@ -21,12 +21,12 @@ namespace My8086.Clases.Funciones
         public Sino Sino { get; set; }
         public Si(Programa Programa, LineaLexica Linea, OperacionesLogicas OperacionLogica) : base(Programa, Linea, 0)
         {
-            this.IdentifiacadorSalto = (++ConsecutivoSalto).ToString();
+            this.IdentifiacadorSalto = (++ConsecutivoSalto).ToString();//berifica sino hay un identificador igual y aumentar uno
             // this.IdentifiacadorSalto = Guid.NewGuid().ToString().Replace("-", "");
             this.OperacionLogica = OperacionLogica;
             OperacionLogica.DeclararTemporales();
         }
-        public override bool RevisarSemantica(ResultadosCompilacion Errores)
+        public override bool RevisarSemantica(ResultadosCompilacion Errores)//ya n berifica la semantica porque ya paso por varios filtros
         {
             return true;
         }
@@ -35,23 +35,23 @@ namespace My8086.Clases.Funciones
         {
             if (this.Sino != null)
             {
-                this.Sino.IdentifiacadorSalto = this.IdentifiacadorSalto;
+                this.Sino.IdentifiacadorSalto = this.IdentifiacadorSalto;//asigna el mismo identificador al sino en caso que lo haya
             }
             StringBuilder sb = new StringBuilder();
             sb.Append(";");
             sb.Append(this.OperacionLogica.GenerarAsm());
-            sb.AppendLine("MOV AL,1H");
-            sb.AppendLine("CMP R_COMPARADOR,AL");
-            sb.AppendLine($"JE IF_VERDADERO_{this.IdentifiacadorSalto}");
-            if (this.Sino != null)
+            sb.AppendLine("MOV AL,1H");//asigna 1 a al
+            sb.AppendLine("CMP R_COMPARADOR,AL"); //compara al con r_comparador
+            sb.AppendLine($"JE IF_VERDADERO_{this.IdentifiacadorSalto}");//si es verdadera la condicon entonces salta a la etiqueta 
+            if (this.Sino != null)//berifica si hay un sino
             {
-                sb.AppendLine($"JMP INICIO_SINO_{this.IdentifiacadorSalto}");
+                sb.AppendLine($"JMP INICIO_SINO_{this.IdentifiacadorSalto}");//si lo hay salta a la etiqueta
             }
             else
             {
-                sb.AppendLine($"JMP IF_FALSO_{this.IdentifiacadorSalto}");
+                sb.AppendLine($"JMP IF_FALSO_{this.IdentifiacadorSalto}");// sino es asi pasa al else 
             }
-            sb.AppendLine($"IF_VERDADERO_{this.IdentifiacadorSalto}:");
+            sb.AppendLine($"IF_VERDADERO_{this.IdentifiacadorSalto}:");//ejecuta las acciones se es verdadero
             sb.AppendLine(";ACCIONES VERDADERAS :)");
             return sb;
         }
@@ -59,7 +59,7 @@ namespace My8086.Clases.Funciones
         StringBuilder IBloque.CerrarBloque()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"IF_FALSO_{this.IdentifiacadorSalto}:");
+            sb.AppendLine($"IF_FALSO_{this.IdentifiacadorSalto}:");//cierra el bloque y ejecuta las acciones del else
             sb.AppendLine(";ACCIONES FALSAS :(");
             return sb;
         }

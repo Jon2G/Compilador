@@ -48,7 +48,7 @@ namespace My8086.Clases.Funciones
         public override StringBuilder Traduccion()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"INICIO_FOR_{IdentifiacadorSalto}:");
+            sb.AppendLine($"INICIO_FOR_{IdentifiacadorSalto}:");//las mismas funciones del sino
             sb.Append(this.ContadorOp.Traduccion());
             sb.AppendLine($"INICIO_CICLO_{IdentifiacadorSalto}:");
             return sb;

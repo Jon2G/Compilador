@@ -31,7 +31,7 @@ namespace My8086.Clases.Funciones
         public override StringBuilder Traduccion()
         {
             StringBuilder sb = new StringBuilder();
-            if (this.Si != null)
+            if (this.Si != null)//berifica si hay un si
             {
                 IBloque bloque = this.Si;
                 while (bloque!=null)
@@ -51,23 +51,23 @@ namespace My8086.Clases.Funciones
                 {
                     if(bloque is Si s)
                     {
-                        sb.AppendLine($"JMP IF_FALSO_{s.IdentifiacadorSalto}");
+                        sb.AppendLine($"JMP IF_FALSO_{s.IdentifiacadorSalto}");// si la condicion es false salta al las acciones del falso 
 
                     }
                     else if(bloque is Sino ss)
                     {
-                        sb.AppendLine($"JMP FIN_SINO{ss.IdentifiacadorSalto}");
+                        sb.AppendLine($"JMP FIN_SINO{ss.IdentifiacadorSalto}");// si no hay un sino salta al final 
                     }
                 }
             }
-            sb.AppendLine($"INICIO_SINO_{this.IdentifiacadorSalto}:");
+            sb.AppendLine($"INICIO_SINO_{this.IdentifiacadorSalto}:");//si hay un sino salta al inicio del sino 
             return sb;
         }
 
         public StringBuilder CerrarBloque()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"FIN_SINO{this.IdentifiacadorSalto}:");
+            sb.AppendLine($"FIN_SINO{this.IdentifiacadorSalto}:");//salta al final del no
             return sb;
         }
     }

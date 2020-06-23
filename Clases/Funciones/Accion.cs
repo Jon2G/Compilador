@@ -12,9 +12,9 @@ namespace My8086.Clases.Funciones
 {
     public abstract class Accion
     {
-        protected List<Token> Argumentos { get; private set; }
-        public readonly DocumentLine LineaDocumento;
-        protected readonly Programa Programa;
+        protected List<Token> Argumentos { get; private set; }//objetos para completar la accion 
+        public readonly DocumentLine LineaDocumento;//referecia a la line donde esta la accion
+        protected readonly Programa Programa;//referencia al programa
         protected Accion(Programa Programa)
         {
             this.Programa = Programa;
@@ -43,8 +43,8 @@ namespace My8086.Clases.Funciones
             Variable variable = this.Programa.SegmentoDeDatos.ObtenerVariable(tk.Lexema);
             variable?.HacerReferencia();
         }
-        public abstract bool RevisarSemantica(ResultadosCompilacion Errores);
-        public abstract StringBuilder Traduccion();
+        public abstract bool RevisarSemantica(ResultadosCompilacion Errores);//abstraccion de revision de semantica 
+        public abstract StringBuilder Traduccion();//forma de traducir la accion
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(this.GetType().Name);

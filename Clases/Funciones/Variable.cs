@@ -22,7 +22,7 @@ namespace My8086.Clases.Funciones
             this.TipoDato = TipoDato;
             this.Nombre = Nombre;
         }
-        internal Variable(Programa Programa, LineaLexica Linea, TipoDato TipoDato) : base(Programa, Linea, 0)
+        internal Variable(Programa Programa, LineaLexica Linea, TipoDato TipoDato) : base(Programa, Linea, 0)//line tipo yal progra,a que pertenece 
         {
             this.Nombre = this.Argumentos[1].Lexema;
             this.TipoDato = TipoDato;
