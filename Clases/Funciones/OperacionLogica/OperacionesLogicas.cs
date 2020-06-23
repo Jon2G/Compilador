@@ -98,7 +98,7 @@ namespace My8086.Clases.Funciones
             if (tk.TipoToken == TipoToken.Cadena && tk.Token.TipoToken == Fases.TipoToken.Cadena)
             {
                 //Asm.Append(EscribeNumero(this.ArbolDeDirecciones, this.Variable.Nombre));
-                //Es una cadena que no es una variable Ex. Imprime('Hola mundo');
+                //Es una cadena que no es una variable Ex. Si('Hola mundo'=variable);
                 //Crearemos una variable con un identificador unico que guarde esta cadena
                 LineaLexica lexica = new LineaLexica(tk.Token.Linea);
                 Variable var = this.Programa.SegmentoDeDatos.Nueva(new Variable(this.Programa, tk.Token, lexica, tk.Token.TipoDato));
@@ -239,12 +239,12 @@ namespace My8086.Clases.Funciones
                             sb.AppendLine($"MOV AH,R_COMPARADOR_{((Nodo)nd.Numero2).NOrden}");
                             if (nd.Operador.Token.Lexema == "and")
                             {
-                                sb.AppendLine("MUL AH");
+                                sb.AppendLine("MUL AH");//AND
 
                             }
                             else
                             {
-                                sb.AppendLine("OR AL,AH");
+                                sb.AppendLine("OR AL,AH"); //OR 
                             }
                             sb.AppendLine($"MOV R_COMPARADOR_{nd.NOrden},AL");
                             sb.AppendLine($"MOV R_COMPARADOR,AL");

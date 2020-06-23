@@ -22,7 +22,6 @@ namespace My8086.Clases.Funciones
         public Si(Programa Programa, LineaLexica Linea, OperacionesLogicas OperacionLogica) : base(Programa, Linea, 0)
         {
             this.IdentifiacadorSalto = (++ConsecutivoSalto).ToString();
-            // this.IdentifiacadorSalto = Guid.NewGuid().ToString().Replace("-", "");
             this.OperacionLogica = OperacionLogica;
             OperacionLogica.DeclararTemporales();
         }
@@ -35,6 +34,7 @@ namespace My8086.Clases.Funciones
         {
             if (this.Sino != null)
             {
+                //En caso de que haya un sino se relacionan con el mismo identificador
                 this.Sino.IdentifiacadorSalto = this.IdentifiacadorSalto;
             }
             StringBuilder sb = new StringBuilder();
@@ -42,7 +42,9 @@ namespace My8086.Clases.Funciones
             sb.Append(this.OperacionLogica.GenerarAsm());
             sb.AppendLine("MOV AL,1H");
             sb.AppendLine("CMP R_COMPARADOR,AL");
+            //R_COMPARADOR SIEMPRE ES EL RESULTADO DE LA UTLIMA COMPARACION
             sb.AppendLine($"JE IF_VERDADERO_{this.IdentifiacadorSalto}");
+            //SI ES IGUAL A AL(1) SALTA A IF_VERDARERO_N
             if (this.Sino != null)
             {
                 sb.AppendLine($"JMP INICIO_SINO_{this.IdentifiacadorSalto}");

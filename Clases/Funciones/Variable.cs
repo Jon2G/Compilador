@@ -37,7 +37,7 @@ namespace My8086.Clases.Funciones
         }
         internal Variable(Programa Programa, Token Valor, LineaLexica Linea, TipoDato TipoDato) : base(Programa, Linea, 0)
         {
-            this.Nombre = "AUTOVAR" + Guid.NewGuid().ToString().Replace("-", "");
+            this.Nombre = "AUTOVAR" + Guid.NewGuid().ToString("N");
             this.Valor = Valor;
             this.TipoDato = TipoDato;
             this.EsAutomatica = true;
