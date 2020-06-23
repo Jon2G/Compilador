@@ -109,7 +109,7 @@ StyleCopReport.xml
 *.dll.lastcodeanalysissucceeded
 *.dll.CodeAnalysisLog.xml
 [Oo]bj/
-[Bb]in/
+#[Bb]in/
 #========================================================
 # Chutzpah Test files
 _Chutzpah*

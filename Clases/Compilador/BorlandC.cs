@@ -150,6 +150,11 @@ namespace My8086.Clases.Compilador
 
         public void Limpiar()
         {
+            this.RutaTemporales.Refresh();
+            if (!this.RutaTemporales.Exists)
+            {
+                return;
+            }
             foreach (FileInfo temporal in this.RutaTemporales.EnumerateFiles())
             {
                 string extension = temporal.Extension.ToLower();

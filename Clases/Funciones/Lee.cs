@@ -23,7 +23,7 @@ namespace My8086.Clases.Funciones
         {
             if (!Argumentos.Any())
             {
-                Errores.ResultadoCompilacion("Hace falta un argumento para la función imprimir",
+                Errores.ResultadoCompilacion("Se esperaba (Variable); el la función leer.",
                     LineaDocumento);
             }
 
@@ -33,7 +33,8 @@ namespace My8086.Clases.Funciones
                 {
                     if (this.Argumentos[2].TipoToken == TipoToken.ParentesCerrado)
                     {
-                        if (this.Programa.SegmentoDeDatos.ObtenerVariable(this.Argumentos[1].Lexema) is { } variable)
+                        Variable variable = this.Programa.SegmentoDeDatos.ObtenerVariable(this.Argumentos[1].Lexema);
+                        if (variable != null)
                         {
                             this.VariableDestino = variable;
                             this.VariableDestino.HacerReferencia();
@@ -48,13 +49,12 @@ namespace My8086.Clases.Funciones
                                 case TipoDato.Entero:
                                     this.Programa.LeecturaNumerosEnteros = true;
                                     break;
-
                             }
                             return true;
                         }
                         else
                         {
-                            Errores.ResultadoCompilacion("Variable destino de leectura invalida",
+                            Errores.ResultadoCompilacion("Variable no declarada",
                                 LineaDocumento);
                         }
                     }
@@ -86,7 +86,7 @@ namespace My8086.Clases.Funciones
             {
                 case TipoDato.Cadena:
                     sb.AppendLine("CALL LEER_CADENA");
-                    sb.AppendLine($"MOV SI,CADENA");
+                    sb.AppendLine($"MOV SI,CADENA"); //CADENA variable auxiliar
                     sb.AppendLine($"MOV {VariableDestino.Nombre},SI");
                     break;
                 case TipoDato.Entero:

@@ -1,0 +1,12 @@
+[autoexec]
+@echo off
+mount C: "C:\Program Files (x86)\GUI Turbo Assembler\BIN"
+C:
+cls
+mycode.exe
+echo.
+echo.
+echo.
+echo Program successfully executed !
+pause
+exit
