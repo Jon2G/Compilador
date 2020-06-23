@@ -55,8 +55,13 @@ End;
 ## Creditos
 
 * García García Jonathan Eduardo
-*Guzmán Olvera Jessica
-*Gonzalez Santiesteban Santiago
-Proyecto escolar realizado para la ESIME Culhuacán 
-*Profesor: Mora Jain Jesus
-*Materia: Compiladores
+
+* Guzmán Olvera Jessica
+
+* Gonzalez Santiesteban Santiago
+
+## Proyecto escolar realizado para la ESIME Culhuacán 
+
+* Profesor: Mora Jain Jesus
+
+* Materia: Compiladores - 5CV14
