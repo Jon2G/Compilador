@@ -40,7 +40,6 @@ namespace My8086.Clases.Funciones
 
             sb
                 .AppendLine(";================>[LIMPIAR PANTALLLA]<================")
-<<<<<<< HEAD
                 .AppendLine("mov ax,0600h  ") // Mover el cursor al inicio de la pantalla(barrido)
                   .AppendLine(" mov bh,01Fh ")//Fondo azul(01),color blanco (F)
                 .AppendLine(" mov cx,0000h ")//Inicio de la pantalla 0,0
@@ -51,18 +50,6 @@ namespace My8086.Clases.Funciones
                 .AppendLine("MOV bh,0 ")//;PAGINA
                 .AppendLine(" mov ah, 02h ")//;mover cursor
                 .AppendLine("int  10h");//; ;servicio de video
-=======
-                .AppendLine("mov ax,0600h  ")//Mover el cursor al inicio de la pantalla (barrido)
-                .AppendLine(" mov bh,01Fh ")//Fondo azul(01),color blanco (F)
-                .AppendLine(" mov cx,0000h ")//Inicio de la pantalla 0,0
-                .AppendLine(" mov dx,184Fh ")//Fin de la pantalla
-                .AppendLine("int 10h ") //Interrupción de video
-                .AppendLine(";================>[MOVER CURSOR A 0]<================")
-                .AppendLine("XOR DX,DX")//; dl Columna,dh fila 
-                .AppendLine("MOV bh,0")//;PAGINA
-                .AppendLine(" mov ah, 02h")//;mover cursor
-                .AppendLine("int  10h;"); //;servicio de video
->>>>>>> e53720558099cb75543900398773c99c73bc02fb
 
             return sb;
         }
