@@ -5,9 +5,8 @@
 		Entero X2;
 		Entero X3;
 	Begin
-		X1:=1234.1234;
-		X2:=1234.1234;
-		X3:=X1*X2;
+		X1:=99.12;
+		X3:=X1/-4;
 		Imprime('Resultado:\n');
 		Imprime(X3);
 End;
