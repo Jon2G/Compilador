@@ -24,7 +24,6 @@ namespace My8086.Clases.ExpresionesRegulares
         public Regex SaltoLinea => new Regex(@"(\\n)", RegexOptions.Compiled);
         public Regex OperadoresLogicos => new Regex(@"^(<>|<|>|=|and|or)$", RegexOptions.Compiled);
         public Regex Comentarios => new Regex(@"\/\/[\s\S]*$", RegexOptions.Compiled);
-        // public  Regex Documento => new Regex(@"(,|\s|\n|;|:=|=|\+|<>|<|>)(?=(?:[^\""]*\""[^\""]*\"")*[^\""]*$)", RegexOptions.Compiled);
         public Regex Documento => new Regex(@"(,|\s|\n|;|:=|=|\+\s|\-\s|\*|\/|<>|<|>|\)|\()(?=(?:[^\']*\'[^\']*\')*[^\']*$)", RegexOptions.Compiled);
         public bool Evaluar(Regex Expresion, string Texto)
         {

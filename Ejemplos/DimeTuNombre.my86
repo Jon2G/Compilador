@@ -15,12 +15,12 @@
 	Lee(Anio);
 	Imprime('¿En que año naciste?\n');
 	Lee(Edad);
-	Edad:=Anio-Edad;
+	Edad:=Anio- Edad;
 	Imprime('¿Ya fué tu cumpleaños en este año?\nResponde con S/N:\n');
 	Lee(Respuesta);
 	Si(Respuesta='N' or Respuesta='n')
 		begin
-			Edad:=Edad-1;
+			Edad:=Edad- 1;
 		end
 	Imprime('\n¿Tienes ');
 	Imprime(Edad);

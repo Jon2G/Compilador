@@ -1,4 +1,4 @@
-Program Nom.TarifaTelefonica	
+﻿Program Nom.TarifaTelefonica	
 	Vars
 		Entero Minutos;
 		Entero Tarifa:=5;
@@ -8,7 +8,7 @@ Program Nom.TarifaTelefonica
 	Imprime('Presione enter para iniciar la llamada.\n');
 	Lee(Respuesta);
 	
-	For(Minutos:=0;Respuesta <> 'c' and Respuesta <>'C';Minutos:=Minutos+1)
+	For(Minutos:=0;Respuesta <> 'c' and Respuesta <>'C';Minutos:=Minutos+ 1)
 	begin
 		Imprime('Lleva ');
 		Imprime(Minutos);
@@ -22,8 +22,8 @@ Program Nom.TarifaTelefonica
 	end
 	Sino
 	begin
-		Minutos:=Minutos-3;
-		Costo:=Minutos*Tarifa+10;
+		Minutos:=Minutos- 3;
+		Costo:=Minutos*Tarifa+ 10;
 		Imprime('Son ');
 		Imprime(Costo);
 		Imprime(' pesitos');

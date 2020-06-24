@@ -24,7 +24,7 @@ Program Nom.Descuento
 		Imprime('\n-========================================================-\n');
 		Imprime('-----------> Subtotal $');
 		Imprime(Importe);
-		Importe:=Importe-Descuento;
+		Importe:=Importe- Descuento;
 		Imprime('\n-----------> Total $');
 		
 		Si(Importe<=0)
