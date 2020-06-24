@@ -29,12 +29,12 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
                     || this.Argumentos[2].TipoToken == Fases.TipoToken.ParentesCerrado)
                 {
                     TipoToken tipoNumero = TipoToken.NumeroPositivo;
-                    if(double.TryParse(this.Argumentos[1].Lexema,out double numero))
+                    if (double.TryParse(this.Argumentos[1].Lexema, out double numero))
                     {
                         if (numero < 0)
                         {
                             tipoNumero = TipoToken.NumeroNegativo;
-                            this.Argumentos[1].Lexema=this.Argumentos[1].Lexema.Replace("-", "");
+                            this.Argumentos[1].Lexema = this.Argumentos[1].Lexema.Replace("-", "");
                         }
                     }
                     this.TresDirecciones = new TresDirecciones

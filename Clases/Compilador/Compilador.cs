@@ -49,11 +49,11 @@ namespace My8086.Clases.Compilador
         {
 
             this.Progreso = 0;
-            this.ResultadosCompilacion.Clear();//limpia los errores anteriores
+            this.ResultadosCompilacion.Clear();
             //try
             //{
             //Fase 1 Analisis Lexico
-            Fases.Base.Analizador analizador//construye un analizador envia una lista y el documento
+            Fases.Base.Analizador analizador
                  = new AnalizadorLexico(this.Document, this.ResultadosCompilacion);
             analizador.Analizar();
             if (analizador.EsValido)
@@ -88,7 +88,7 @@ namespace My8086.Clases.Compilador
                 }
             }
             this.Compilado = false;
-            return "Se encontrarón errores previos a la compilación\n";// si es invalido no lo compila y manda el error
+            return "Se encontrarón errores previos a la compilación\n";
         }
 
         public string Ejecutar()

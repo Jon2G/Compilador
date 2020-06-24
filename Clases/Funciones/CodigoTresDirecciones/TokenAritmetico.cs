@@ -55,16 +55,6 @@ namespace My8086.Clases.Funciones.CodigoTresDirecciones
                         {
                             programa.UsarResta = true;
                         }
-                        int posicion = Tks.IndexOf(tk);
-                        if (posicion<Tks.Count)
-                        {
-                            Token numero = Tks[posicion + 1];
-                            if (numero.TipoToken == Fases.TipoToken.NumeroEntero || numero.TipoToken == Fases.TipoToken.NumeroDecimal)
-                            {
-                                numero.Lexema = simbolo + numero.Lexema;
-                                continue;
-                            }
-                        }
                         tokens.Add(new TokenAritmetico(tk, TipoToken.OperadorSecundario));
                     }
                     if (simbolo == '*' || simbolo == '/')

@@ -15,7 +15,7 @@ namespace My8086.Clases.Fases._1._Analisis_Lexico
         public int Elementos => Tokens.Count;
         public Token this[int index] => Tokens[index];
         public DocumentLine LineaDocumento { get; private set; }
-        public LineaLexica(DocumentLine LineaDocumento)//inicializa con una lista vacia
+        public LineaLexica(DocumentLine LineaDocumento)
         {
             this.Tokens = new List<Token>();
             this.LineaDocumento = LineaDocumento;

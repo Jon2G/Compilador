@@ -24,20 +24,20 @@ namespace My8086.Clases.Fases
     }
     public class Token
     {
-        public TipoToken TipoToken { get;  set; }//el tipo de token
-        public TipoDato TipoDato { get; set; }//el tipo de dato
-        public DocumentLine Linea { get; private set; }//a que linea pertenece
-        public List<DocumentLine> LineasDeReferencia { get; private set; }//referencia de la linea 
-        public int Referencias { get => LineasDeReferencia?.Count ?? 0; }// conteo de referencias que tiene
-        public string Lexema { get; internal set; }// la palabra
-        public bool EsValido => (TipoToken != TipoToken.Invalido && TipoDato != TipoDato.Invalido);//verificar si es valido
-        public Token(string lexema, TipoToken TipoToken, TipoDato TipoDato, DocumentLine Linea)//token,dato,referencia
+        public TipoToken TipoToken { get;  set; }
+        public TipoDato TipoDato { get; set; }
+        public DocumentLine Linea { get; private set; }
+        public List<DocumentLine> LineasDeReferencia { get; private set; }
+        public int Referencias { get => LineasDeReferencia?.Count ?? 0; }
+        public string Lexema { get; internal set; }
+        public bool EsValido => (TipoToken != TipoToken.Invalido && TipoDato != TipoDato.Invalido);
+        public Token(string lexema, TipoToken TipoToken, TipoDato TipoDato, DocumentLine Linea)
         {
-            this.TipoDato = TipoDato;//el tipo de dato
-            this.TipoToken = TipoToken;//el tipo de token
-            this.Linea = Linea;//a que linea pertenece
-            this.LineasDeReferencia = new List<DocumentLine>();//referencia de la linea 
-            this.Lexema = lexema;//texto
+            this.TipoDato = TipoDato;
+            this.TipoToken = TipoToken;
+            this.Linea = Linea;
+            this.LineasDeReferencia = new List<DocumentLine>();
+            this.Lexema = lexema;
         }
         protected Token() { }
         public override string ToString()
@@ -52,23 +52,23 @@ namespace My8086.Clases.Fases
             return sb.ToString();
         }
 
-        public static Token Identificar(string Token, DocumentLine Linea, ExpresionesRegulares.ExpresionesRegulares Patrones)//
+        public static Token Identificar(string Token, DocumentLine Linea, ExpresionesRegulares.ExpresionesRegulares Patrones)
         {
-            Fases.Token token = new Token(Token, TipoToken.Invalido, TipoDato.Invalido, Linea);///secrea el token con estado invalido
-            if (Patrones.Evaluar(Patrones.PalabrasReservadas, Token))//copara con los patrones de la expreciones 
+            Fases.Token token = new Token(Token, TipoToken.Invalido, TipoDato.Invalido, Linea);
+            if (Patrones.Evaluar(Patrones.PalabrasReservadas, Token))
             {
                 token.TipoToken = TipoToken.PalabraReservada;
                 token.TipoDato = TipoDato.NoAplica;
                 return token;
             }
             //
-            if (Patrones.Evaluar(Patrones.Enteros, Token))//copara con enteros
+            if (Patrones.Evaluar(Patrones.Enteros, Token))
             {
                 token.TipoToken = TipoToken.NumeroEntero;
                 token.TipoDato = TipoDato.Entero;
                 return token;
             }
-            if (Patrones.Evaluar(Patrones.Decimales, Token))//copara con decimales 
+            if (Patrones.Evaluar(Patrones.Decimales, Token))
             {
                 token.TipoToken = TipoToken.NumeroDecimal;
                 token.TipoDato = TipoDato.Decimal;
@@ -86,7 +86,7 @@ namespace My8086.Clases.Fases
                 token.TipoToken = TipoToken.Identificador;
                 token.TipoDato = TipoDato.Cadena;
                 return token;
-            }//comparaciones directas 
+            }
             if (Token == ",")
             {
                 token.TipoToken = TipoToken.SeparadorParametros;
@@ -125,7 +125,7 @@ namespace My8086.Clases.Fases
                 token.TipoDato = TipoDato.NoAplica;
                 return token;
             }
-            if (Token == "+"|| Token == "*"||Token == "-"||Token == "/")// expresion regular
+            if (Token == "+"|| Token == "*"||Token == "-"||Token == "/")
             {
                 token.TipoToken = TipoToken.OperadorAritmetico;
                 token.TipoDato = TipoDato.NoAplica;

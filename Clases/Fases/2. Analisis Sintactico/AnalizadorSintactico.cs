@@ -25,9 +25,9 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
             this.Expresiones = Lexica.Expresiones;
         }
 
-        public override void Analizar()// lo hace por cada lista lexica
+        public override void Analizar()
         {
-            foreach (LineaLexica linea in this.LineasLexicas)//regrese una lista de acciones 
+            foreach (LineaLexica linea in this.LineasLexicas)
             {
                 if (NombrePrograma(linea))
                 {
@@ -89,21 +89,21 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
         }
         private bool NombrePrograma(LineaLexica linea)
         {
-            if (linea[0].Lexema == "Program")//espera que la primera linea sea program
+            if (linea[0].Lexema == "Program")
             {
-                if (linea[1].TipoToken == TipoToken.PalabraReservada)// debe empezar con Nom.
+                if (linea[1].TipoToken == TipoToken.PalabraReservada)
                 {
                     if (linea[1].Lexema.StartsWith("Nom."))
                     {
                         //si se inicializo el nombre
-                        if (this.Programa != null)// daria error si se escribe dos veces
+                        if (this.Programa != null)
                         {
                             this.Errores.ResultadoCompilacion($"El nombre del programa ya ha sido declarado como '{this.Programa.Titulo}'",
                                 linea.LineaDocumento);
                             return true;
                         }
 
-                        string nombre = linea[1].Lexema.Replace("Nom.", "").Trim();//remplasa NOM. con una cadena vacia
+                        string nombre = linea[1].Lexema.Replace("Nom.", "").Trim();
                         this.Programa = new Programa(nombre, this.Expresiones);
                         if (string.IsNullOrEmpty(nombre))
                         {
@@ -116,7 +116,7 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
             }
             return false;
         }
-        private bool IniciaPrograma(LineaLexica linea)// debe tener la palabra reservada begin 
+        private bool IniciaPrograma(LineaLexica linea)
         {
             if (linea[0].Lexema == "Begin")
             {
@@ -127,7 +127,7 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
                     return true;
                 }
 
-                this.Programa.Inicia = linea.LineaDocumento;// asigna la linea de inicio de programa 
+                this.Programa.Inicia = linea.LineaDocumento;
                 return true;
             }
             return false;
@@ -338,9 +338,9 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
         }
         private bool DeclaraVariable(LineaLexica linea)
         {
-            if (linea[0].Lexema == "Vars")//verificar que solo haya una var y no dos 
+            if (linea[0].Lexema == "Vars")
             {
-                if (this.Programa.SegmentoDeDatos != null)//representacion de segmento de datos que se declara en el ensamblador 
+                if (this.Programa.SegmentoDeDatos != null)
                 {
                     this.Errores.ResultadoCompilacion($"El inicio del segmento de datos ya habia sido declarado anteriormente.",
                         linea.LineaDocumento);
@@ -349,14 +349,14 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
                 this.Programa.SegmentoDeDatos = new SegmentoDeDatos();
                 return true;
             }
-            if (linea[0].TipoToken == TipoToken.PalabraReservada &&//revisa si es una cadena reservada
+            if (linea[0].TipoToken == TipoToken.PalabraReservada &&
                 linea[0].Lexema == "Entero" ||
                 linea[0].Lexema == "Cadena" ||
                 linea[0].Lexema == "Decimal"
                 )
             {
                 TipoDato TipoDato = TipoDato.Invalido;
-                switch (linea[0].Lexema) //ve que tipo de dato es 
+                switch (linea[0].Lexema)
                 {
                     case "Entero":
                         TipoDato = TipoDato.Entero;
@@ -368,12 +368,12 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
                         TipoDato = TipoDato.Decimal;
                         break;
                 }
-                if (linea.Elementos == 1)//verifica si no hay identificador
+                if (linea.Elementos == 1)
                 {
                     this.Errores.ResultadoCompilacion($"Se esperaba un indentificador para la variable '{TipoDato}'.", linea.LineaDocumento);
                     return true;
                 }
-                if (linea.Elementos < 3)// si tiene menos de tres elementos tipo identificador y punto y coma 
+                if (linea.Elementos < 3)
                 {
                     return false;
                 }
@@ -382,15 +382,15 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
                     this.Errores.ResultadoCompilacion($"No se aperturo el segmento de datos.", linea.LineaDocumento);
                     return true;
                 }
-                Variable variableNueva = new Variable(Programa, linea, TipoDato);//crea una nueva variable 
+                Variable variableNueva = new Variable(Programa, linea, TipoDato);
                 if (this.Programa.SegmentoDeDatos.YaExisteVariable(variableNueva))
                 {
                     this.Errores.ResultadoCompilacion($"La variable '{variableNueva.Nombre}' ya fué declarada en este contexto.", linea.LineaDocumento);
                 }
                 else
                 {
-                    this.Programa.SegmentoDeDatos.Nueva(variableNueva);//agrega la primera variable 
-                    if (linea.Elementos == 5) //verifica los 5 elementos en caso que tenga valor 
+                    this.Programa.SegmentoDeDatos.Nueva(variableNueva);
+                    if (linea.Elementos == 5)
                     {
                         LineaLexica l = new LineaLexica(linea.LineaDocumento);
                         for (int i = 1; i < linea.Elementos; i++)
@@ -480,19 +480,19 @@ namespace My8086.Clases.Fases._2._Analisis_Sintactico
 
             return false;
         }
-        private bool UsoVariableNumerica(LineaLexica linea)//detectar cualquier uso de una variable numerica 
+        private bool UsoVariableNumerica(LineaLexica linea)
         {
-            if (linea[0].TipoToken == TipoToken.Identificador)// identificador verifica que lo tnega 
+            if (linea[0].TipoToken == TipoToken.Identificador)
             {
-                Variable var = this.Programa.SegmentoDeDatos.ObtenerVariable(linea[0].Lexema);//pide informacion de la variable 
-                if (var != null)//ve si exixte la vribable 
+                Variable var = this.Programa.SegmentoDeDatos.ObtenerVariable(linea[0].Lexema);
+                if (var != null)
                 {
-                    if (linea[1].TipoToken == TipoToken.OperadorAritmetico || linea[1].TipoToken == TipoToken.Relacional)//revisa el operador si es aritmetico
+                    if (linea[1].TipoToken == TipoToken.OperadorAritmetico || linea[1].TipoToken == TipoToken.Relacional)
                     {
                         this.Programa.AgregarAccion(new OperacionArtimetica(Programa, var, linea));
-                        return true;//genera codigo de tres direcciones como la practica 5
+                        return true;
                     }
-                    else if (linea[1].TipoToken == TipoToken.OperadorLogico)// si no es una operacion logica 
+                    else if (linea[1].TipoToken == TipoToken.OperadorLogico)
                     {
                         return false;
                     }

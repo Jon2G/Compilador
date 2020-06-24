@@ -16,7 +16,7 @@ namespace My8086.Clases.Fases
         public Programa(string Titulo, ExpresionesRegulares.ExpresionesRegulares Expresiones)
         {
             this.Titulo = Titulo;
-            this.Acciones=new List<Accion>();// es parecida a la lista de lineas lexicas 
+            this.Acciones=new List<Accion>();
             this.Expresiones = Expresiones;
         }
         public void AgregarAccion(Accion accion)
@@ -26,7 +26,7 @@ namespace My8086.Clases.Fases
 
         public DocumentLine FinBloque { get; set; }
         public DocumentLine InicioBloque { get; set; }
-        public bool UsarSuma { get; internal set; }//optimizacion de la traduccion 
+        public bool UsarSuma { get; internal set; }
         public bool UsarDivision { get; internal set; }
         public bool UsarResta { get; internal set; }
         public bool UsarMultiplicacion { get; internal set; }
