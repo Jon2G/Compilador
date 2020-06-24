@@ -1,7 +1,7 @@
 
 
 # My8086
-Una ligera capa de abstracción para el lengiaje ensamlador del procesador 8086
+Una ligera capa de abstracción para el lenguaje ensamlador del procesador 8086
 ![Alt text](Images/Captura.PNG?raw=true "Captura")
 
 Pemite escribir codigó de alto nivel que será traducido  a lenguaje ensamblador,compilado con Turbo C y Ejecutado.
@@ -55,8 +55,13 @@ End;
 ## Creditos
 
 * García García Jonathan Eduardo
-*Guzmán Olvera Jessica
-*Gonzalez Santiesteban Santiago
-Proyecto escolar realizado para la ESIME Culhuacán 
-*Profesor: Mora Jain Jesus
-*Materia: Compiladores
+
+* Guzmán Olvera Jessica
+
+* Gonzalez Santiesteban Santiago
+
+## Proyecto escolar realizado para la ESIME Culhuacán 
+
+* Profesor: Mora Jain Jesus
+
+* Materia: Compiladores - 5CV14
